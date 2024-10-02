@@ -3,7 +3,7 @@
 # Thông tin VPS
 VPS_USER="root"
 VPS_HOST="14.225.220.10"
-VPS_PATH="~/hsnr-ban-vang-backend"
+VPS_PATH="~/tsp-be-nest"
 
 npm run build
 

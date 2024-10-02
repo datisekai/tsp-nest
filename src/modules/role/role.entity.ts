@@ -2,9 +2,10 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Permission } from '../permission/permission.entity';
 
@@ -16,7 +17,18 @@ export class Role {
   @Column({ type: 'varchar', unique: true })
   name: string; // e.g., 'admin', 'teacher', 'student'
 
-  @OneToMany(() => Permission, (permission) => permission.role)
+  @ManyToMany(() => Permission, (permission) => permission.roles)
+  @JoinTable({
+    name: 'role_permissions', // Tên bảng liên kết
+    joinColumn: {
+      name: 'role_id', // Tên cột trong bảng liên kết chứa khóa chính của bảng Role
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'permission_id', // Tên cột trong bảng liên kết chứa khóa chính của bảng Permission
+      referencedColumnName: 'id',
+    },
+  })
   permissions: Permission[];
 
   @CreateDateColumn()

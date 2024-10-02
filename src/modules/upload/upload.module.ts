@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { UploadController } from './upload.controller';
+import { PermissionModule } from '../permission/permission.module';
 
 @Module({
-  imports: [],
+  imports: [PermissionModule],
   controllers: [UploadController],
   providers: [],
   exports: [],

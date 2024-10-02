@@ -4,7 +4,8 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToOne,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Role } from '../role/role.entity';
 
@@ -16,9 +17,6 @@ export class Permission {
   @Column({ type: 'varchar' })
   action: string; // e.g., 'view', 'edit', 'delete', 'create'
 
-  @ManyToOne(() => Role, (role) => role.permissions, { onDelete: 'CASCADE' })
-  role: Role;
-
   @Column({ type: 'varchar', nullable: true })
   resource: string; // e.g., 'User', 'Post'
 
@@ -27,4 +25,8 @@ export class Permission {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  // This side of the many-to-many relationship is passive (doesn't define JoinTable)
+  @ManyToMany(() => Role, (role) => role.permissions)
+  roles: Role[];
 }

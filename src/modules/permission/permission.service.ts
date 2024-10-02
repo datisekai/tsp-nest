@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../user/user.entity';
 import { Permission } from './permission.entity';
 import { Role } from '../role/role.entity';
 import {
@@ -9,16 +8,15 @@ import {
   QueryPermissionDto,
   UpdatePermissionDto,
 } from './permission.dto';
+import { User } from '../user/user.entity';
 
 @Injectable()
 export class PermissionService {
   constructor(
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
     @InjectRepository(Permission)
     private readonly permissionRepository: Repository<Permission>,
     @InjectRepository(Role)
-    private readonly roleRepository: Repository<Role>,
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async hasPermissions(
@@ -65,7 +63,9 @@ export class PermissionService {
     }
 
     if (roleId) {
-      queryBuilder.andWhere('permission.role.id = :roleId', { roleId });
+      queryBuilder
+        .innerJoin('permission.roles', 'role')
+        .andWhere('role.id = :roleId', { roleId });
     }
 
     return queryBuilder.getMany();
@@ -74,7 +74,7 @@ export class PermissionService {
   async findOne(id: number): Promise<Permission> {
     const permission = await this.permissionRepository.findOne({
       where: { id },
-      relations: ['role'],
+      relations: ['roles'], // Fetch associated roles
     });
     if (!permission) {
       throw new NotFoundException(`Permission with ID ${id} not found`);
@@ -83,17 +83,7 @@ export class PermissionService {
   }
 
   async create(createPermissionDto: CreatePermissionDto): Promise<Permission> {
-    const { roleId, ...rest } = createPermissionDto;
-
-    const role = await this.roleRepository.findOne({ where: { id: roleId } });
-    if (!role) {
-      throw new NotFoundException(`Role with ID ${roleId} not found`);
-    }
-
-    const permission = this.permissionRepository.create({
-      ...rest,
-      role,
-    });
+    const permission = this.permissionRepository.create(createPermissionDto);
     return this.permissionRepository.save(permission);
   }
 
@@ -102,17 +92,7 @@ export class PermissionService {
     updatePermissionDto: UpdatePermissionDto,
   ): Promise<Permission> {
     const permission = await this.findOne(id);
-
-    const { roleId, ...rest } = updatePermissionDto;
-    if (roleId) {
-      const role = await this.roleRepository.findOne({ where: { id: roleId } });
-      if (!role) {
-        throw new NotFoundException(`Role with ID ${roleId} not found`);
-      }
-      permission.role = role;
-    }
-
-    Object.assign(permission, rest);
+    Object.assign(permission, updatePermissionDto);
     return this.permissionRepository.save(permission);
   }
 

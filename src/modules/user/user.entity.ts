@@ -8,6 +8,7 @@ import {
   Unique,
 } from 'typeorm';
 import { Role } from '../role/role.entity';
+import { UserType } from './user.dto';
 @Entity()
 @Unique(['code', 'deviceUid'])
 export class User {
@@ -50,6 +51,13 @@ export class User {
     type: 'varchar',
   })
   salt: string;
+
+  @Column({
+    type: 'enum',
+    enum: UserType,
+    default: UserType.STUDENT, // Giá trị mặc định là student
+  })
+  type: UserType;
 
   @CreateDateColumn()
   createdAt: Date;

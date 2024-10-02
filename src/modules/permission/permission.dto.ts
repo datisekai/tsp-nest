@@ -1,5 +1,11 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsArray,
+  ArrayNotEmpty,
+} from 'class-validator';
 
 export class CreatePermissionDto {
   @ApiProperty()
@@ -11,10 +17,6 @@ export class CreatePermissionDto {
   @IsString()
   @IsOptional()
   resource?: string; // e.g., 'User', 'Post'
-
-  @ApiProperty()
-  @IsNotEmpty()
-  roleId: number; // Foreign key for Role
 }
 
 export class UpdatePermissionDto extends PartialType(CreatePermissionDto) {}

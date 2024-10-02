@@ -1,6 +1,4 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import {
   IsString,
   IsEmail,
@@ -11,9 +9,14 @@ import {
   IsInt,
   Min,
   IsUrl,
+  IsEnum,
 } from 'class-validator';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
+export enum UserType {
+  TEACHER = 'teacher',
+  STUDENT = 'student',
+}
 export class CreateUserDto {
   @ApiProperty()
   @IsString()
@@ -63,6 +66,14 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   device_uid?: string;
+
+  @ApiPropertyOptional({
+    enum: UserType,
+    description: 'Type of user (teacher or student)',
+  })
+  @IsEnum(UserType)
+  @IsOptional()
+  type?: UserType; // Thêm type để phân loại teacher hoặc student
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}
@@ -86,10 +97,18 @@ export class QueryUserDto extends PaginationDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  device_uid?: string;
+  deviceUid?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   name?: string;
+
+  @ApiPropertyOptional({
+    enum: UserType,
+    description: 'Filter by user type (teacher or student)',
+  })
+  @IsEnum(UserType)
+  @IsOptional()
+  type?: UserType; // Thêm field để tìm kiếm theo type
 }

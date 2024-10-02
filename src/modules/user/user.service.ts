@@ -18,10 +18,11 @@ export class UserService {
       page = 1,
       limit = 10,
       code,
-      device_uid,
+      deviceUid,
       email,
       name,
       phone,
+      type, // Thêm điều kiện lọc theo type (teacher/student)
     } = queryDto;
 
     const queryBuilder = this.userRepository.createQueryBuilder('user');
@@ -31,9 +32,9 @@ export class UserService {
       queryBuilder.andWhere('user.code LIKE :code', { code: `%${code}%` });
     }
 
-    if (device_uid) {
-      queryBuilder.andWhere('user.device_uid LIKE :device_uid', {
-        device_uid: `%${device_uid}%`,
+    if (deviceUid) {
+      queryBuilder.andWhere('user.deviceUid LIKE :deviceUid', {
+        deviceUid: `%${deviceUid}%`,
       });
     }
 
@@ -49,9 +50,14 @@ export class UserService {
       queryBuilder.andWhere('user.phone LIKE :phone', { phone: `%${phone}%` });
     }
 
+    // Lọc theo type (teacher/student)
+    if (type) {
+      queryBuilder.andWhere('user.type = :type', { type });
+    }
+
     // Paginate results
     queryBuilder.skip((page - 1) * limit).take(limit);
-    queryBuilder.orderBy('user.updated_at', 'DESC');
+    queryBuilder.orderBy('user.createdAt', 'DESC');
 
     // Execute the query and get the data and total count
     const [data, total] = await queryBuilder.getManyAndCount();

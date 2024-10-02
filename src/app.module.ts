@@ -10,6 +10,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { UserModule } from './modules/user/user.module';
 import { PermissionModule } from './modules/permission/permission.module';
+import { RoleModule } from './modules/role/role.module';
+import { FacultyModule } from './modules/faculty/faculty.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { PermissionModule } from './modules/permission/permission.module';
     UserModule,
     UploadModule,
     PermissionModule,
+    RoleModule,
+    FacultyModule,
   ],
   controllers: [AppController],
   providers: [AppService],

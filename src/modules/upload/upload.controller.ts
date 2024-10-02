@@ -2,12 +2,16 @@ import {
   Controller,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AppResource } from 'src/app.role';
+import { AppPermission, AppResource } from 'src/app.role';
 import { uploadFromBuffer } from 'src/common/helpers/upload';
+import { JwtAuthGuard } from '../auth/guards';
+import { PermissionGuard } from '../auth/guards/permission.guard';
+import { Permissions } from 'src/common/decorators';
 
 @ApiTags(AppResource.UPLOAD)
 @Controller('api.upload')
@@ -18,6 +22,8 @@ export class UploadController {
   @ApiOperation({
     summary: 'Upload Image',
   })
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.UPLOAD_IMAGE)
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file) {
     try {
@@ -33,6 +39,8 @@ export class UploadController {
   @ApiOperation({
     summary: 'Upload Video',
   })
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.UPLOAD_VIDEO)
   @UseInterceptors(FileInterceptor('file'))
   async uploadVideo(@UploadedFile() file: any) {
     try {

@@ -4,6 +4,9 @@ export enum AppResource {
   UPLOAD = 'UPLOAD',
   PERMISSION = 'PERMISSION',
   ROLE = 'ROLE',
+  FACULTY = 'FACULTY',
+  MAJOR = 'MAJOR',
+  CLASS = 'CLASS',
 }
 
 export enum AppPermission {
@@ -22,4 +25,16 @@ export enum AppPermission {
   ROLE_CREATE = 'role:create',
   ROLE_UPDATE = 'role:update',
   ROLE_DELETE = 'role:delete',
+  FACULTY_VIEW = 'faculty:view',
+  FACULTY_CREATE = 'faculty:create',
+  FACULTY_UPDATE = 'faculty:update',
+  FACULTY_DELETE = 'faculty:delete',
+  MAJOR_VIEW = 'major:view',
+  MAJOR_CREATE = 'major:create',
+  MAJOR_UPDATE = 'major:update',
+  MAJOR_DELETE = 'major:delete',
+  CLASS_VIEW = 'class:view',
+  CLASS_CREATE = 'class:create',
+  CLASS_UPDATE = 'class:update',
+  CLASS_DELETE = 'class:delete',
 }
