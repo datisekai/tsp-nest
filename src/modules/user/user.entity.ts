@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { Role } from '../role/role.entity';
 @Entity()
-@Unique(['code', 'device_uid'])
+@Unique(['code', 'deviceUid'])
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -42,7 +42,7 @@ export class User {
     type: 'varchar',
     nullable: true,
   })
-  device_uid: string;
+  deviceUid: string;
 
   @Column({
     select: false,
@@ -52,8 +52,8 @@ export class User {
   salt: string;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updatedAt: Date;
 }

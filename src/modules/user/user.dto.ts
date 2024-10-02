@@ -1,4 +1,5 @@
 import { PartialType } from '@nestjs/mapped-types';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import {
   IsString,
@@ -14,42 +15,51 @@ import {
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 export class CreateUserDto {
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   @Length(4, 20)
   code: string;
 
+  @ApiProperty()
   @IsEmail()
   @IsNotEmpty()
   email: string;
 
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   @Length(8, 100)
   password: string;
 
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   phone?: string;
 
+  @ApiPropertyOptional()
   @IsOptional()
   @IsInt()
   @Min(1)
   roleId?: number;
 
+  @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
   active?: boolean;
 
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   name: string;
 
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   @IsUrl()
   avatar?: string;
 
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   device_uid?: string;
@@ -58,22 +68,27 @@ export class CreateUserDto {
 export class UpdateUserDto extends PartialType(CreateUserDto) {}
 
 export class QueryUserDto extends PaginationDto {
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   code?: string;
 
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   email?: string;
 
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   phone?: string;
 
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   device_uid?: string;
 
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   name?: string;

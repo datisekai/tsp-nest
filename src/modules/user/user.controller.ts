@@ -16,17 +16,17 @@ import { PermissionGuard } from '../auth/guards/permission.guard';
 import { CreateUserDto, QueryUserDto, UpdateUserDto } from './user.dto';
 import { UserService } from './user.service';
 import { AppPermission, AppResource } from 'src/app.role';
-import { Auth, Permissions, User } from 'src/common/decorators';
+import { Permissions, User } from 'src/common/decorators';
 import { User as UserEntity } from './user.entity';
+import { JwtAuthGuard } from '../auth/guards';
 
 @ApiTags(AppResource.USER)
-@UseGuards(PermissionGuard)
 @Controller('api.user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  @Auth()
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.USER_VIEW)
   @UsePipes(new ValidationPipe({ transform: true })) // Automatically applies validation
   async findAll(@Query() queryDto: QueryUserDto) {
@@ -40,6 +40,7 @@ export class UserController {
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.USER_CREATE)
   @UsePipes(new ValidationPipe({ transform: true }))
   async create(@Body() createUserDto: CreateUserDto) {
@@ -47,7 +48,7 @@ export class UserController {
   }
 
   @Put('me')
-  @Auth()
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.USER_UPDATE_OWN)
   @UsePipes(new ValidationPipe({ transform: true }))
   async updateMe(
@@ -58,13 +59,23 @@ export class UserController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.USER_UPDATE)
   @UsePipes(new ValidationPipe({ transform: true }))
   async update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto);
   }
 
+  @Put(':id/reset-device')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.USER_UPDATE)
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async resetDevice(@Param('id') id: number) {
+    return this.userService.resetDevice(id);
+  }
+
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.USER_DELETE)
   @UsePipes(new ValidationPipe({ transform: true }))
   async delete(@Param('id') id: number) {

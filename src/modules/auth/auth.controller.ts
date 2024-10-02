@@ -1,12 +1,13 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Auth, User } from 'src/common/decorators';
+import { User } from 'src/common/decorators';
 import { User as UserEntity } from 'src/modules/user/user.entity';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dtos/login.dto';
-import { LocalAuthGuard } from './guards';
+import { JwtAuthGuard, LocalAuthGuard } from './guards';
+import { AppResource } from 'src/app.role';
 
-@ApiTags('Auth routes')
+@ApiTags(AppResource.AUTH)
 @Controller('api.auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -24,7 +25,7 @@ export class AuthController {
     };
   }
 
-  @Auth()
+  @UseGuards(JwtAuthGuard)
   @Get('profile')
   @ApiOperation({
     summary: 'Get My Profile',
@@ -36,7 +37,7 @@ export class AuthController {
     };
   }
 
-  @Auth()
+  @UseGuards(JwtAuthGuard)
   @Post('check-token')
   async checkToken() {
     return { data: true };

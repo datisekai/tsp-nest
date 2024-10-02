@@ -25,6 +25,7 @@ export class PermissionService {
     user: User,
     requiredPermissions: string[],
   ): Promise<boolean> {
+    console.log('user', user);
     const userWithRole = await this.userRepository.findOne({
       where: {
         id: user.id,
@@ -115,8 +116,8 @@ export class PermissionService {
     return this.permissionRepository.save(permission);
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: number): Promise<Permission> {
     const permission = await this.findOne(id);
-    await this.permissionRepository.remove(permission);
+    return this.permissionRepository.remove(permission);
   }
 }

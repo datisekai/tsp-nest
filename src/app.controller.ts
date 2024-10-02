@@ -1,9 +1,8 @@
-import { Controller, Get, Post, Render, Request, Res } from '@nestjs/common';
+import { Controller, Get, Render } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AppService } from './app.service';
-import { Response } from 'express';
-import { ApiOperation } from '@nestjs/swagger';
-import { join } from 'path';
 
+@ApiTags('COMMON')
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
@@ -12,7 +11,7 @@ export class AppController {
   @ApiOperation({
     summary: 'Health check',
   })
-  getHealthCheck(@Request() req): string {
+  getHealthCheck(): string {
     return 'ok';
   }
 
@@ -21,7 +20,7 @@ export class AppController {
   @ApiOperation({
     summary: 'Docs API',
   })
-  getDoc(@Res() res: Response) {
+  getDoc() {
     return {};
   }
 }
