@@ -1,11 +1,12 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { User } from 'src/common/decorators';
-import { User as UserEntity } from 'src/modules/user/user.entity';
+import { User } from '../../common/decorators';
+import { User as UserEntity } from '../../modules/user/user.entity';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dtos/login.dto';
 import { JwtAuthGuard, LocalAuthGuard } from './guards';
-import { AppResource } from 'src/app.role';
+import { AppResource } from '../../app.role';
+import { UserType } from '../user/user.dto';
 
 @ApiTags(AppResource.AUTH)
 @Controller('api.auth')
@@ -13,16 +14,21 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @UseGuards(LocalAuthGuard)
-  @Post('login')
+  @Post('login-student')
   @ApiOperation({
-    summary: 'Login',
+    summary: 'Login student',
   })
-  async login(@Body() loginDto: LoginDto, @User() user: UserEntity) {
-    const data = await this.authService.login(user);
-    return {
-      message: 'Login successfully',
-      data,
-    };
+  async loginStudent(@Body() loginDto: LoginDto, @User() user: UserEntity) {
+    return this.authService.login(user, UserType.STUDENT);
+  }
+
+  @UseGuards(LocalAuthGuard)
+  @Post('login-teacher')
+  @ApiOperation({
+    summary: 'Login student',
+  })
+  async loginTeacher(@Body() loginDto: LoginDto, @User() user: UserEntity) {
+    return this.authService.login(user, UserType.TEACHER);
   }
 
   @UseGuards(JwtAuthGuard)

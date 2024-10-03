@@ -18,8 +18,8 @@ import {
   QueryFacultyDto,
 } from './faculty.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { AppPermission, AppResource } from 'src/app.role';
-import { Permissions } from 'src/common/decorators';
+import { AppPermission, AppResource } from '../../app.role';
+import { Permissions } from '../../common/decorators';
 import { JwtAuthGuard } from '../auth/guards';
 import { PermissionGuard } from '../auth/guards/permission.guard';
 

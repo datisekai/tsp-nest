@@ -18,8 +18,8 @@ import {
   UpdatePermissionDto,
   QueryPermissionDto,
 } from './permission.dto';
-import { Permissions } from 'src/common/decorators';
-import { AppPermission, AppResource } from 'src/app.role';
+import { Permissions } from '../../common/decorators';
+import { AppPermission, AppResource } from '../../app.role';
 import { JwtAuthGuard } from '../auth/guards';
 import { PermissionGuard } from '../auth/guards/permission.guard';
 

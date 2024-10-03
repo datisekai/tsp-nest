@@ -7,11 +7,11 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AppPermission, AppResource } from 'src/app.role';
-import { uploadFromBuffer } from 'src/common/helpers/upload';
+import { AppPermission, AppResource } from '../../app.role';
+import { uploadFromBuffer } from '../../common/helpers/upload';
 import { JwtAuthGuard } from '../auth/guards';
 import { PermissionGuard } from '../auth/guards/permission.guard';
-import { Permissions } from 'src/common/decorators';
+import { Permissions } from '../../common/decorators';
 
 @ApiTags(AppResource.UPLOAD)
 @Controller('api.upload')

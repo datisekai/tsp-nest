@@ -15,8 +15,8 @@ import { ApiTags } from '@nestjs/swagger';
 import { PermissionGuard } from '../auth/guards/permission.guard';
 import { CreateUserDto, QueryUserDto, UpdateUserDto } from './user.dto';
 import { UserService } from './user.service';
-import { AppPermission, AppResource } from 'src/app.role';
-import { Permissions, User } from 'src/common/decorators';
+import { AppPermission, AppResource } from '../../app.role';
+import { Permissions, User } from '../../common/decorators';
 import { User as UserEntity } from './user.entity';
 import { JwtAuthGuard } from '../auth/guards';
 

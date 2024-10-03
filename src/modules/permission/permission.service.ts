@@ -20,16 +20,10 @@ export class PermissionService {
   ) {}
 
   async hasPermissions(
-    user: User,
+    userWithRole: User,
     requiredPermissions: string[],
   ): Promise<boolean> {
-    console.log('user', user);
-    const userWithRole = await this.userRepository.findOne({
-      where: {
-        id: user.id,
-      },
-      relations: ['role', 'role.permissions'],
-    });
+    console.log('userWIthRole', userWithRole);
 
     if (!userWithRole || !userWithRole.role) {
       return false;

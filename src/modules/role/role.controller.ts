@@ -14,10 +14,10 @@ import {
 import { RoleService } from './role.service';
 import { CreateRoleDto, UpdateRoleDto, AssignPermissionsDto } from './role.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { AppPermission, AppResource } from 'src/app.role';
+import { AppPermission, AppResource } from '../../app.role';
 import { JwtAuthGuard } from '../auth/guards';
 import { PermissionGuard } from '../auth/guards/permission.guard';
-import { Permissions } from 'src/common/decorators';
+import { Permissions } from '../../common/decorators';
 import { QueryUserDto } from '../user/user.dto';
 
 @ApiTags(AppResource.ROLE)

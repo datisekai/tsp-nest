@@ -1,13 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsString,
-  IsNotEmpty,
-  IsOptional,
-  IsInt,
-  Min,
-  Max,
-} from 'class-validator';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { PaginationDto } from '../../common/dto/pagination.dto';
 
 export class CreateFacultyDto {
   @ApiProperty({ description: 'Name of the faculty' })

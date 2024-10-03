@@ -5,8 +5,8 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { PermissionService } from 'src/modules/permission/permission.service';
-import { User } from 'src/modules/user/user.entity';
+import { PermissionService } from '../../permission/permission.service';
+import { User } from '../../user/user.entity';
 
 @Injectable()
 export class PermissionGuard implements CanActivate {
@@ -27,11 +27,14 @@ export class PermissionGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
 
     const user: User = request.user;
+    console.log('user', user);
 
     const hasPermission = await this.permissionService.hasPermissions(
       user,
       requiredPermissions,
     );
+
+    console.log('pass');
 
     if (!hasPermission) {
       throw new ForbiddenException(

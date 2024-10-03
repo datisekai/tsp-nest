@@ -11,7 +11,7 @@ import {
   IsUrl,
   IsEnum,
 } from 'class-validator';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginationDto } from '../../common/dto/pagination.dto';
 
 export enum UserType {
   TEACHER = 'teacher',

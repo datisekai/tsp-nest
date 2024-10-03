@@ -79,7 +79,7 @@ export class UserService {
   async findByCode(code: string): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { code },
-      select: ['id', 'active', 'code', 'email', 'password'],
+      select: ['id', 'active', 'code', 'email', 'password', 'type'],
     });
     if (!user) {
       throw new NotFoundException(`User with Code ${code} not found`);
@@ -89,6 +89,7 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const user = this.userRepository.create(createUserDto);
+
     return this.userRepository.save(user);
   }
 
