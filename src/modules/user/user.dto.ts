@@ -16,6 +16,7 @@ import { PaginationDto } from '../../common/dto/pagination.dto';
 export enum UserType {
   TEACHER = 'teacher',
   STUDENT = 'student',
+  MASTER = 'master',
 }
 export class CreateUserDto {
   @ApiProperty()
@@ -24,15 +25,15 @@ export class CreateUserDto {
   @Length(4, 20)
   code: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsEmail()
-  @IsNotEmpty()
+  @IsOptional()
   email: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  @Length(8, 100)
+  @Length(6, 100)
   password: string;
 
   @ApiPropertyOptional()
@@ -69,11 +70,11 @@ export class CreateUserDto {
 
   @ApiPropertyOptional({
     enum: UserType,
-    description: 'Type of user (teacher or student)',
+    description: 'Type of user (teacher or student or master)',
   })
   @IsEnum(UserType)
   @IsOptional()
-  type?: UserType; // Thêm type để phân loại teacher hoặc student
+  type?: UserType;
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}

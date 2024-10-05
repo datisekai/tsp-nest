@@ -67,7 +67,7 @@ export class RoleController {
 
   @Put(':id/permissions')
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(AppPermission.ROLE_UPDATE)
+  @Permissions(AppPermission.ROLE_ASSIGN_PERMISSION)
   @UsePipes(new ValidationPipe({ transform: true }))
   async assignPermissionsToRole(
     @Param('id') roleId: number,

@@ -13,24 +13,21 @@ import { UserType } from '../user/user.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @UseGuards(LocalAuthGuard)
   @Post('login-student')
   @ApiOperation({
     summary: 'Login student',
   })
-  async loginStudent(@Body() loginDto: LoginDto, @User() user: UserEntity) {
-    return this.authService.login(user, UserType.STUDENT);
+  async loginStudent(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto, UserType.STUDENT);
   }
 
-  @UseGuards(LocalAuthGuard)
   @Post('login-teacher')
   @ApiOperation({
     summary: 'Login student',
   })
-  async loginTeacher(@Body() loginDto: LoginDto, @User() user: UserEntity) {
-    return this.authService.login(user, UserType.TEACHER);
+  async loginTeacher(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto, UserType.TEACHER);
   }
-
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   @ApiOperation({

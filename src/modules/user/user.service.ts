@@ -81,9 +81,7 @@ export class UserService {
       where: { code },
       select: ['id', 'active', 'code', 'email', 'password', 'type'],
     });
-    if (!user) {
-      throw new NotFoundException(`User with Code ${code} not found`);
-    }
+
     return user;
   }
 

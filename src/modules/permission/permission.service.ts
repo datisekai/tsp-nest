@@ -23,15 +23,14 @@ export class PermissionService {
     userWithRole: User,
     requiredPermissions: string[],
   ): Promise<boolean> {
-    console.log('userWIthRole', userWithRole);
-
     if (!userWithRole || !userWithRole.role) {
       return false;
     }
 
-    const userPermissions = userWithRole.role.permissions.map(
-      (perm) => `${perm.resource}:${perm.action}`,
-    );
+    const userPermissions =
+      userWithRole?.role?.permissions.map(
+        (perm) => `${perm.resource}:${perm.action}`,
+      ) || [];
 
     return requiredPermissions.every((permission) =>
       userPermissions.includes(permission),

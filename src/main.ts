@@ -86,9 +86,10 @@ async function bootstrap() {
     ],
   });
 
+  const PORT = +process.env.PORT || 4099;
   await app.init();
-  await server.listen(4099).then(() => {
-    console.log('app listion on port 3999');
+  await server.listen(PORT).then(() => {
+    console.log('app listion on port ' + PORT);
   });
 }
 bootstrap();

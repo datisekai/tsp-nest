@@ -6,9 +6,12 @@ import {
   UpdateDateColumn,
   ManyToOne,
   Unique,
+  BeforeInsert,
+  BeforeUpdate,
 } from 'typeorm';
 import { Role } from '../role/role.entity';
 import { UserType } from './user.dto';
+import { hash } from 'bcryptjs';
 @Entity()
 @Unique(['code', 'deviceUid'])
 export class User {
@@ -18,7 +21,7 @@ export class User {
   @Column({ type: 'varchar', unique: true })
   code: string;
 
-  @Column({ type: 'varchar', unique: true })
+  @Column({ type: 'varchar', unique: true, nullable: true })
   email: string;
 
   @Column({ type: 'varchar', select: false })
@@ -64,4 +67,13 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  async hashPassword() {
+    if (!this.password) {
+      return;
+    }
+    this.password = await hash(this.password, 10);
+  }
 }

@@ -12,6 +12,7 @@ import { UserModule } from './modules/user/user.module';
 import { PermissionModule } from './modules/permission/permission.module';
 import { RoleModule } from './modules/role/role.module';
 import { FacultyModule } from './modules/faculty/faculty.module';
+import { InitModule } from './modules/init/init.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { FacultyModule } from './modules/faculty/faculty.module';
     PermissionModule,
     RoleModule,
     FacultyModule,
+    InitModule,
   ],
   controllers: [AppController],
   providers: [AppService],

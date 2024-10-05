@@ -19,7 +19,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "sync-vps": "npm run build && rsync -azP dist/** root@14.225.220.10:~/hsnr-ban-vang-backend/dist",
-    "dump": "ts-node src/scripts/data-dump.ts"
+    "dump": "ts-node src/scripts/data-dump.ts",
+    "dump:permission": "ts-node src/scripts/permission-dump.ts"
   },
   "dependencies": {
     "@colyseus/monitor": "^0.15.8",
@@ -42,6 +43,7 @@
     "axios": "^1.6.8",
     "bcryptjs": "^2.4.3",
     "bull": "^4.12.9",
+    "cheerio": "^1.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "cloudinary": "^2.0.3",
