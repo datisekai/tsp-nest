@@ -17,6 +17,7 @@ export enum UserType {
   TEACHER = 'teacher',
   STUDENT = 'student',
   MASTER = 'master',
+  UNKNOWN = 'unknown',
 }
 export class CreateUserDto {
   @ApiProperty()

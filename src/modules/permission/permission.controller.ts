@@ -22,6 +22,7 @@ import { Permissions } from '../../common/decorators';
 import { AppPermission, AppResource } from '../../app.role';
 import { JwtAuthGuard } from '../auth/guards';
 import { PermissionGuard } from '../auth/guards/permission.guard';
+import { ApiPermissions } from 'src/common/decorators/api.decorator';
 
 @ApiTags(AppResource.PERMISSION)
 @Controller('api.permission')
@@ -31,6 +32,7 @@ export class PermissionController {
   @Get()
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.PERMISSION_VIEW)
+  @ApiPermissions(AppPermission.PERMISSION_VIEW)
   @UsePipes(new ValidationPipe({ transform: true }))
   async findAll(@Query() queryDto: QueryPermissionDto) {
     return this.permissionService.findAll(queryDto);
@@ -39,6 +41,7 @@ export class PermissionController {
   @Get(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.PERMISSION_VIEW)
+  @ApiPermissions(AppPermission.PERMISSION_VIEW)
   @UsePipes(new ValidationPipe({ transform: true }))
   async findOne(@Param('id') id: number) {
     return this.permissionService.findOne(id);
@@ -47,6 +50,7 @@ export class PermissionController {
   @Post()
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.PERMISSION_CREATE)
+  @ApiPermissions(AppPermission.PERMISSION_CREATE)
   @UsePipes(new ValidationPipe({ transform: true }))
   async create(@Body() createPermissionDto: CreatePermissionDto) {
     return this.permissionService.create(createPermissionDto);
@@ -55,6 +59,7 @@ export class PermissionController {
   @Put(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.PERMISSION_UPDATE)
+  @ApiPermissions(AppPermission.PERMISSION_UPDATE)
   @UsePipes(new ValidationPipe({ transform: true }))
   async update(
     @Param('id') id: number,
@@ -66,6 +71,7 @@ export class PermissionController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.PERMISSION_DELETE)
+  @ApiPermissions(AppPermission.PERMISSION_DELETE)
   @UsePipes(new ValidationPipe({ transform: true }))
   async delete(@Param('id') id: number) {
     return this.permissionService.delete(id);

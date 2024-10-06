@@ -23,7 +23,7 @@ export class AuthService {
   async login(dto: LoginDto, loginType: UserType) {
     const user = await this.userService.findByCode(dto.code);
 
-    if (user && (await compare(dto.password, user.password))) {
+    if (user && (await compare(dto.password, user.password)) && user.password) {
       const { password, ...rest } = user;
       const payload = { sub: user.id };
 
@@ -66,10 +66,19 @@ export class AuthService {
       throw new NotFoundException('Invalid code or password');
     }
 
-    const newUser = await this.userService.create({
-      ...userInfo,
-      type: loginType,
-    });
+    let newUser: User = {} as User;
+    if (user && !user.password) {
+      newUser = await this.userService.update(user.id, {
+        password: userInfo.password,
+        type: loginType,
+      });
+      userInfo = { ...userInfo, ...newUser };
+    } else {
+      newUser = await this.userService.create({
+        ...userInfo,
+        type: loginType,
+      });
+    }
 
     const { password, ...rest } = newUser;
 

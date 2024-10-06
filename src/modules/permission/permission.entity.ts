@@ -7,9 +7,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Role } from '../role/role.entity';
+import { BaseEntity } from '../../common/entities/base.entity';
 
 @Entity()
-export class Permission {
+export class Permission extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -18,12 +19,6 @@ export class Permission {
 
   @Column({ type: 'varchar', nullable: true })
   resource: string; // e.g., 'User', 'Post'
-
-  @CreateDateColumn()
-  created_at: Date;
-
-  @UpdateDateColumn()
-  updated_at: Date;
 
   // This side of the many-to-many relationship is passive (doesn't define JoinTable)
   @ManyToMany(() => Role, (role) => role.permissions)

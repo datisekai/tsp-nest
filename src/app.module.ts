@@ -13,6 +13,11 @@ import { PermissionModule } from './modules/permission/permission.module';
 import { RoleModule } from './modules/role/role.module';
 import { FacultyModule } from './modules/faculty/faculty.module';
 import { InitModule } from './modules/init/init.module';
+import { MajorModule } from './modules/major/major.module';
+import { ClassModule } from './modules/class/class.module';
+import { NotificationModule } from './modules/notification/notification.module';
+import { MetaModule } from './modules/meta/meta.module';
+import { LetterModule } from './modules/letter/letter.module';
 
 @Module({
   imports: [
@@ -36,6 +41,11 @@ import { InitModule } from './modules/init/init.module';
     RoleModule,
     FacultyModule,
     InitModule,
+    MajorModule,
+    ClassModule,
+    NotificationModule,
+    MetaModule,
+    LetterModule,
   ],
   controllers: [AppController],
   providers: [AppService],

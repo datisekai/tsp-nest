@@ -8,9 +8,10 @@ import {
   JoinTable,
 } from 'typeorm';
 import { Permission } from '../permission/permission.entity';
+import { BaseEntity } from '../../common/entities/base.entity';
 
 @Entity()
-export class Role {
+export class Role extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -30,10 +31,4 @@ export class Role {
     },
   })
   permissions: Permission[];
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }

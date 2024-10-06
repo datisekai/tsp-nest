@@ -8,13 +8,20 @@ import {
   Unique,
   BeforeInsert,
   BeforeUpdate,
+  ManyToMany,
+  JoinTable,
+  OneToMany,
 } from 'typeorm';
 import { Role } from '../role/role.entity';
 import { UserType } from './user.dto';
 import { hash } from 'bcryptjs';
+import { Class } from '../class/class.entity';
+import { Major } from '../major/major.entity';
+import { BaseEntity } from '../../common/entities/base.entity';
+import { Letter } from '../letter/letter.entity';
 @Entity()
 @Unique(['code', 'deviceUid'])
-export class User {
+export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -24,7 +31,7 @@ export class User {
   @Column({ type: 'varchar', unique: true, nullable: true })
   email: string;
 
-  @Column({ type: 'varchar', select: false })
+  @Column({ type: 'varchar', select: false, nullable: true })
   password: string;
 
   @Column({ type: 'varchar', nullable: true })
@@ -58,15 +65,54 @@ export class User {
   @Column({
     type: 'enum',
     enum: UserType,
-    default: UserType.STUDENT, // Giá trị mặc định là student
+    default: UserType.UNKNOWN,
   })
   type: UserType;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @OneToMany(() => Letter, (letter) => letter.user)
+  letters: Letter[];
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+  @ManyToMany(() => Class, (classEntity) => classEntity.users)
+  @JoinTable({
+    name: 'user_classes',
+    joinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'class_id',
+      referencedColumnName: 'id',
+    },
+  })
+  classes: Class[];
+
+  @ManyToMany(() => Major, (major) => major.teachers)
+  @JoinTable({
+    name: 'teacher_majors', // Bảng liên kết teacher và major
+    joinColumn: {
+      name: 'teacher_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'major_id',
+      referencedColumnName: 'id',
+    },
+  })
+  majors: Major[];
+
+  @ManyToMany(() => Class, (classEntity) => classEntity.teachers)
+  @JoinTable({
+    name: 'teacher_classes', // Bảng liên kết teacher và class
+    joinColumn: {
+      name: 'teacher_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'class_id',
+      referencedColumnName: 'id',
+    },
+  })
+  teacherClasses: Class[];
 
   @BeforeInsert()
   @BeforeUpdate()

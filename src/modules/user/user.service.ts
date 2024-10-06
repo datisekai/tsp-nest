@@ -76,6 +76,14 @@ export class UserService {
     return user;
   }
 
+  async findByIds(ids: number[]): Promise<User[]> {
+    const users = await this.userRepository.findByIds(ids);
+    if (!users) {
+      throw new NotFoundException(`User with IDS ${ids.toString()} not found`);
+    }
+    return users;
+  }
+
   async findByCode(code: string): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { code },
@@ -83,6 +91,41 @@ export class UserService {
     });
 
     return user;
+  }
+
+  async findOrCreateUsersByCodes(
+    userData: { code: string; name?: string }[],
+  ): Promise<User[]> {
+    const codes = userData.map((user) => user.code); // Lấy tất cả codes từ mảng userData
+    const existingUsers = await this.findByCodes(codes); // Tìm người dùng hiện có
+    const existingUserCodes = new Set(existingUsers.map((user) => user.code));
+
+    // Lọc những codes không tồn tại
+    const newUsersData = userData.filter(
+      (user) => !existingUserCodes.has(user.code),
+    );
+
+    // Tạo người dùng mới với name và code
+    const newUsers = await Promise.all(
+      newUsersData.map(async (user) => {
+        return this.create({
+          code: user.code,
+          name: user.name || 'Unknown', // Nếu không có name, dùng tên mặc định
+          password: null, // Mật khẩu null
+          email: ``, // Email giả định
+        });
+      }),
+    );
+
+    return [...existingUsers, ...newUsers];
+  }
+
+  // Tìm người dùng dựa trên codes
+  async findByCodes(codes: string[]): Promise<User[]> {
+    return this.userRepository
+      .createQueryBuilder('user')
+      .where('user.code IN (:...codes)', { codes })
+      .getMany();
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {

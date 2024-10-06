@@ -7,6 +7,9 @@ export enum AppResource {
   FACULTY = 'FACULTY',
   MAJOR = 'MAJOR',
   CLASS = 'CLASS',
+  NOTIFICATION = 'NOTIFICATION',
+  META = 'META',
+  LETTER = 'LETTER',
 }
 
 export enum AppPermission {
@@ -39,13 +42,14 @@ export enum AppPermission {
   CLASS_UPDATE = 'class:update',
   CLASS_DELETE = 'class:delete',
   CLASS_STATISTIC = 'class:statistic',
-  CLASS_VIEW_STUDENT = 'class:view_student',
   CLASS_CREATE_STUDENT = 'class:create_student',
   CLASS_UPDATE_STUDENT = 'class:update_student',
   CLASS_DELETE_STUDENT = 'class:delete_student',
   LETTER_VIEW = 'letter:view',
   LETTER_UPDATE = 'letter:update',
+  LETTER_VIEW_OWN = 'letter:view_own',
   NOTIFICATION_VIEW = 'notification:view',
+  NOTIFICATION_VIEW_OWN = 'notification:view_own',
   NOTIFICATION_CREATE = 'notification:create',
   NOTIFICATION_UPDATE = 'notification:update',
   NOTIFICATION_DELETE = 'notification:delete',
@@ -67,4 +71,6 @@ export enum AppPermission {
   EXAM_CREATE = 'exam:create',
   EXAM_UPDATE = 'exam:update',
   EXAM_DELETE = 'exam:delete',
+  META_VIEW = 'meta:view',
+  META_UPDATE = 'meta:update',
 }

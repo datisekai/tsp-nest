@@ -22,6 +22,7 @@ import { AppPermission, AppResource } from '../../app.role';
 import { Permissions } from '../../common/decorators';
 import { JwtAuthGuard } from '../auth/guards';
 import { PermissionGuard } from '../auth/guards/permission.guard';
+import { ApiPermissions } from 'src/common/decorators/api.decorator';
 
 @ApiTags(AppResource.FACULTY)
 @Controller('api.faculty')
@@ -31,6 +32,7 @@ export class FacultyController {
   @Get()
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.FACULTY_VIEW)
+  @ApiPermissions(AppPermission.FACULTY_VIEW)
   @UsePipes(new ValidationPipe({ transform: true }))
   async findAll(@Query() queryFacultyDto: QueryFacultyDto) {
     return this.facultyService.findAll(queryFacultyDto);
@@ -39,6 +41,7 @@ export class FacultyController {
   @Get(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.FACULTY_VIEW)
+  @ApiPermissions(AppPermission.FACULTY_VIEW)
   @UsePipes(new ValidationPipe({ transform: true }))
   async findOne(@Param('id') id: number) {
     return this.facultyService.findOne(id);
@@ -47,6 +50,7 @@ export class FacultyController {
   @Post()
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.FACULTY_CREATE)
+  @ApiPermissions(AppPermission.FACULTY_CREATE)
   @UsePipes(new ValidationPipe({ transform: true }))
   async create(@Body() createFacultyDto: CreateFacultyDto) {
     return this.facultyService.create(createFacultyDto);
@@ -55,6 +59,7 @@ export class FacultyController {
   @Put(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.FACULTY_UPDATE)
+  @ApiPermissions(AppPermission.FACULTY_UPDATE)
   @UsePipes(new ValidationPipe({ transform: true }))
   async update(
     @Param('id') id: number,
@@ -66,6 +71,7 @@ export class FacultyController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.FACULTY_DELETE)
+  @ApiPermissions(AppPermission.FACULTY_DELETE)
   @UsePipes(new ValidationPipe({ transform: true }))
   async delete(@Param('id') id: number) {
     return this.facultyService.delete(id);

@@ -23,7 +23,7 @@ export class AuthController {
 
   @Post('login-teacher')
   @ApiOperation({
-    summary: 'Login student',
+    summary: 'Login teacher',
   })
   async loginTeacher(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto, UserType.TEACHER);

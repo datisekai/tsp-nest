@@ -4,10 +4,13 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Major } from '../major/major.entity';
+import { BaseEntity } from '../../common/entities/base.entity';
 
 @Entity()
-export class Faculty {
+export class Faculty extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -17,9 +20,6 @@ export class Faculty {
   @Column('varchar')
   description: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
+  @OneToMany(() => Major, (major) => major.faculty)
+  majors: Major[];
 }
