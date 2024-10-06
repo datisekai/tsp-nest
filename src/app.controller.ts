@@ -14,13 +14,4 @@ export class AppController {
   getHealthCheck(): string {
     return 'ok';
   }
-
-  @Get('docs/api')
-  @Render('doc-api')
-  @ApiOperation({
-    summary: 'Docs API',
-  })
-  getDoc() {
-    return {};
-  }
 }

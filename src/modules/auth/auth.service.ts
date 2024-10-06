@@ -27,7 +27,7 @@ export class AuthService {
       const { password, ...rest } = user;
       const payload = { sub: user.id };
 
-      if (user.type != loginType) {
+      if (user.type != UserType.MASTER && user.type != loginType) {
         throw new ForbiddenException(
           'You do not have permission to perform this action',
         );
