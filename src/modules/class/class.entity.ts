@@ -11,6 +11,7 @@ import { User } from '../user/user.entity';
 import { Notification } from '../notification/notification.entity';
 import { BaseEntity } from '../../common/entities/base.entity';
 import { Letter } from '../letter/letter.entity';
+import { Attendance } from '../attendance/attendance.entity';
 
 @Entity()
 export class Class extends BaseEntity {
@@ -31,6 +32,9 @@ export class Class extends BaseEntity {
 
   @OneToMany(() => Letter, (letter) => letter.user)
   letters: Letter[];
+
+  @OneToMany(() => Attendance, (attendance) => attendance.class)
+  attendances: Attendance[];
 
   @OneToMany(
     () => Notification,

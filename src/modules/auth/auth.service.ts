@@ -7,7 +7,6 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '../../modules/user/user.entity';
 import { UserService } from '../../modules/user/user.service';
 import { UserType } from '../user/user.dto';
-import { Not } from 'typeorm';
 import { InitService } from '../init/init.service';
 import { LoginDto } from './dtos/login.dto';
 import { compare } from 'bcryptjs';

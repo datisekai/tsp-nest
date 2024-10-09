@@ -19,6 +19,8 @@ import { Class } from '../class/class.entity';
 import { Major } from '../major/major.entity';
 import { BaseEntity } from '../../common/entities/base.entity';
 import { Letter } from '../letter/letter.entity';
+import { Attendance } from '../attendance/attendance.entity';
+import { Attendee } from '../attendance/attendee.entity';
 @Entity()
 @Unique(['code', 'deviceUid'])
 export class User extends BaseEntity {
@@ -113,6 +115,12 @@ export class User extends BaseEntity {
     },
   })
   teacherClasses: Class[];
+
+  @OneToMany(() => Attendance, (entity) => entity.user)
+  attendances: Attendance[];
+
+  @OneToMany(() => Attendee, (entity) => entity.user)
+  attendees: Attendee[];
 
   @BeforeInsert()
   @BeforeUpdate()
