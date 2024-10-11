@@ -47,6 +47,7 @@ export class ClassService {
 
   async findAll(
     queryClassDto: QueryClassDto,
+    userId?: number,
   ): Promise<{ data: Class[]; total: number }> {
     const { name, majorId, teacherIds, page = 1, limit = 10 } = queryClassDto;
 
@@ -54,6 +55,10 @@ export class ClassService {
       .createQueryBuilder('class')
       .leftJoinAndSelect('class.major', 'major')
       .leftJoinAndSelect('class.teachers', 'teacher');
+
+    if (userId) {
+      queryBuilder.andWhere('teacher.id = :userId', { userId });
+    }
 
     if (name) {
       queryBuilder.andWhere('class.name LIKE :name', { name: `%${name}%` });

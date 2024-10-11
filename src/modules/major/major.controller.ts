@@ -21,8 +21,9 @@ import { AppPermission, AppResource } from '../..//app.role';
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards';
 import { PermissionGuard } from '../auth/guards/permission.guard';
-import { Permissions } from 'src/common/decorators';
+import { Permissions, User } from 'src/common/decorators';
 import { ApiPermissions } from 'src/common/decorators/api.decorator';
+import { User as UserEntity } from '../user/user.entity';
 
 @ApiTags(AppResource.MAJOR)
 @Controller('api.major')
@@ -45,6 +46,17 @@ export class MajorController {
     @Query() queryMajorDto: QueryMajorDto,
   ): Promise<{ data: Major[]; total: number }> {
     return this.majorService.findAll(queryMajorDto);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.MAJOR_VIEW_OWN, AppPermission.MAJOR_VIEW)
+  @ApiPermissions(AppPermission.MAJOR_VIEW_OWN, AppPermission.MAJOR_VIEW)
+  async findAllOwn(
+    @Query() queryMajorDto: QueryMajorDto,
+    @User() user: UserEntity,
+  ): Promise<{ data: Major[]; total: number }> {
+    return this.majorService.findAll(queryMajorDto, user.id);
   }
 
   @Get(':id')

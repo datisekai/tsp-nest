@@ -23,8 +23,9 @@ import { ApiTags } from '@nestjs/swagger';
 import { AppPermission, AppResource } from 'src/app.role';
 import { JwtAuthGuard } from '../auth/guards';
 import { PermissionGuard } from '../auth/guards/permission.guard';
-import { Permissions } from 'src/common/decorators';
+import { Permissions, User } from 'src/common/decorators';
 import { ApiPermissions } from 'src/common/decorators/api.decorator';
+import { User as UserEntity } from '../user/user.entity';
 
 @ApiTags(AppResource.CLASS)
 @Controller('api.class')
@@ -47,6 +48,17 @@ export class ClassController {
     @Query() queryClassDto: QueryClassDto,
   ): Promise<{ data: Class[]; total: number }> {
     return this.classService.findAll(queryClassDto);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.CLASS_VIEW_OWN, AppPermission.CLASS_VIEW)
+  @ApiPermissions(AppPermission.CLASS_VIEW_OWN, AppPermission.CLASS_VIEW)
+  async findAllOwn(
+    @Query() queryClassDto: QueryClassDto,
+    @User() user: UserEntity,
+  ): Promise<{ data: Class[]; total: number }> {
+    return this.classService.findAll(queryClassDto, user.id);
   }
 
   @Get(':id')

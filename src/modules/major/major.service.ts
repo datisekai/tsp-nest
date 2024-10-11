@@ -43,6 +43,7 @@ export class MajorService {
 
   async findAll(
     queryMajorDto: QueryMajorDto,
+    userId?: number,
   ): Promise<{ data: Major[]; total: number }> {
     const { name, facultyId, teacherIds, page = 1, limit = 10 } = queryMajorDto;
 
@@ -51,6 +52,10 @@ export class MajorService {
       .createQueryBuilder('major')
       .leftJoinAndSelect('major.faculty', 'faculty')
       .leftJoinAndSelect('major.teachers', 'teacher');
+
+    if (userId) {
+      queryBuilder.andWhere('teacher.id = :userId', { userId });
+    }
 
     // Tìm kiếm theo tên nếu có
     if (name) {
