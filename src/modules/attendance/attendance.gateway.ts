@@ -107,16 +107,16 @@ export class AttendanceGateway implements OnGatewayInit {
           );
 
           // Nếu sinh viên chưa được điểm danh, thêm họ vào danh sách attendees
-          if (!room.attendees.includes(id)) {
-            room.attendees.push(id);
+          // if (!room.attendees.includes(id)) {
+          //   room.attendees.push(id);
 
-            // Thêm client vào room
-            client.join(classId);
-            console.log(`Sinh viên ${id} đã được thêm vào room ${classId}`);
+          //   // Thêm client vào room
+          //   client.join(classId);
+          //   console.log(`Sinh viên ${id} đã được thêm vào room ${classId}`);
 
-            // Phát sự kiện cập nhật danh sách sinh viên đã điểm danh tới tất cả sinh viên trong phòng
-            this.server.to(classId).emit('updateAttendees', room.attendees);
-          }
+          //   // Phát sự kiện cập nhật danh sách sinh viên đã điểm danh tới tất cả sinh viên trong phòng
+          //   this.server.to(classId).emit('updateAttendees', room.attendees);
+          // }
 
           return { success: true, message: 'Điểm danh thành công!' };
         } else {
