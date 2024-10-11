@@ -40,8 +40,8 @@ export class MajorController {
 
   @Get()
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(AppPermission.MAJOR_VIEW)
-  @ApiPermissions(AppPermission.MAJOR_VIEW)
+  // @Permissions(AppPermission.MAJOR_VIEW)
+  // @ApiPermissions(AppPermission.MAJOR_VIEW)
   async findAll(
     @Query() queryMajorDto: QueryMajorDto,
   ): Promise<{ data: Major[]; total: number }> {

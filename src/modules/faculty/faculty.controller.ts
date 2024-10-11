@@ -31,8 +31,8 @@ export class FacultyController {
 
   @Get()
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(AppPermission.FACULTY_VIEW)
-  @ApiPermissions(AppPermission.FACULTY_VIEW)
+  // @Permissions(AppPermission.FACULTY_VIEW)
+  // @ApiPermissions(AppPermission.FACULTY_VIEW)
   @UsePipes(new ValidationPipe({ transform: true }))
   async findAll(@Query() queryFacultyDto: QueryFacultyDto) {
     return this.facultyService.findAll(queryFacultyDto);
