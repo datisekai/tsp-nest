@@ -128,6 +128,27 @@ export class UserService {
       .getMany();
   }
 
+  async findByCodeAndCheckClass(
+    userCode: string,
+    classId: number,
+  ): Promise<User | null> {
+    const user = await this.userRepository.findOne({
+      where: { code: userCode },
+      relations: ['classes'], // Load cả danh sách classes của user
+    });
+
+    if (!user) {
+      return null; // Không tìm thấy user
+    }
+
+    // Kiểm tra user có thuộc class với id classId hay không
+    const isInClass = user.classes.some(
+      (classEntity) => classEntity.id === classId,
+    );
+
+    return isInClass ? user : null;
+  }
+
   async create(createUserDto: CreateUserDto): Promise<User> {
     const user = this.userRepository.create(createUserDto);
 

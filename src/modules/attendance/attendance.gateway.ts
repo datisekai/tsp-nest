@@ -8,6 +8,7 @@ import { Server } from 'socket.io';
 import QRCode from 'qrcode';
 import { AttendanceMessage, AttendanceRoom } from './attendance.dto';
 import * as jwt from 'jsonwebtoken';
+import { UserService } from '../user/user.service';
 
 @WebSocketGateway({ cors: true })
 export class AttendanceGateway implements OnGatewayInit {
@@ -15,6 +16,10 @@ export class AttendanceGateway implements OnGatewayInit {
   server: Server;
 
   private rooms: { [key: string]: AttendanceRoom } = {};
+
+  constructor(
+    private readonly userService: UserService, // Inject AttendanceService
+  ) {}
 
   afterInit(server: Server) {
     console.log('WebSocket initialized');
@@ -34,7 +39,6 @@ export class AttendanceGateway implements OnGatewayInit {
         attendees: [],
         isOpen: false,
       };
-      this.generateQRCode(this.rooms[classId]); // Tạo QR cho phòng mới
       client.emit('roomCreated', classId);
     } else {
       client.emit('roomExists', classId);
@@ -52,6 +56,10 @@ export class AttendanceGateway implements OnGatewayInit {
         classId,
         isOpen,
       });
+
+      if (isOpen) {
+        this.generateQRCode(this.rooms[classId]); // Tạo QR cho phòng mới
+      }
     }
   }
   private async generateQRCode(room: AttendanceRoom) {
@@ -73,13 +81,19 @@ export class AttendanceGateway implements OnGatewayInit {
     this.server.to(room.classId.toString()).emit('newQRCode', room.qrCode);
 
     // Tạo mã QR mới sau mỗi 3 giây
-    setTimeout(() => this.generateQRCode(room), room.expirationTime);
+    if (room.isOpen) {
+      setTimeout(() => this.generateQRCode(room), room.expirationTime);
+    }
   }
 
   @SubscribeMessage(AttendanceMessage.CHECK_QRCODE)
-  public handleCheckQRCode(
+  public async handleCheckQRCode(
     client: any,
-    { id, classId, qrCode }: { id: string; classId: string; qrCode: string },
+    {
+      code,
+      classId,
+      qrCode,
+    }: { code: string; classId: string; qrCode: string },
   ) {
     const room = this.rooms[classId]; // Truy xuất phòng bằng classId
 
@@ -103,20 +117,35 @@ export class AttendanceGateway implements OnGatewayInit {
         // Kiểm tra thời gian hết hạn của mã QR
         if (currentTime - decoded.createdAt < room.expirationTime) {
           console.log(
-            `Sinh viên với mã ID: ${id} đã điểm danh thành công trong phòng ${classId}`,
+            `Sinh viên với mã sv: ${code} đã điểm danh thành công trong phòng ${classId}`,
           );
 
           // Nếu sinh viên chưa được điểm danh, thêm họ vào danh sách attendees
-          // if (!room.attendees.includes(id)) {
-          //   room.attendees.push(id);
+          if (!room.attendees.some((item) => item.code === code)) {
+            const student = await this.userService.findByCodeAndCheckClass(
+              code,
+              +classId,
+            );
 
-          //   // Thêm client vào room
-          //   client.join(classId);
-          //   console.log(`Sinh viên ${id} đã được thêm vào room ${classId}`);
+            if (!student) {
+              return {
+                success: false,
+                message: 'Sinh viên không thuộc lớp này.',
+              };
+            }
+            room.attendees.push({
+              code: student.code,
+              name: student.name,
+              time: Date.now(),
+            });
 
-          //   // Phát sự kiện cập nhật danh sách sinh viên đã điểm danh tới tất cả sinh viên trong phòng
-          //   this.server.to(classId).emit('updateAttendees', room.attendees);
-          // }
+            // Thêm client vào room
+            client.join(classId);
+            console.log(`Sinh viên ${code} đã được thêm vào room ${classId}`);
+
+            // Phát sự kiện cập nhật danh sách sinh viên đã điểm danh tới tất cả sinh viên trong phòng
+            this.server.to(classId).emit('updateAttendees', room.attendees);
+          }
 
           return { success: true, message: 'Điểm danh thành công!' };
         } else {

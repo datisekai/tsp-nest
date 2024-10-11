@@ -23,7 +23,7 @@ export class AssignPermissionsDto {
     description: 'Array of Permission IDs to assign to the role',
   })
   @IsArray()
-  @ArrayNotEmpty()
+  // @ArrayNotEmpty()
   permissionIds: number[];
 }
 

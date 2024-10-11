@@ -12,7 +12,7 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 interface Attendee {
   code: string;
   name: string;
-  time: Date;
+  time: number;
 }
 
 export interface AttendanceRoom {
