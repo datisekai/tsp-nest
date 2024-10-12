@@ -21,6 +21,9 @@ export class Attendance extends BaseEntity {
   @Column({ type: 'boolean', default: false })
   isOpen: boolean;
 
+  @Column({ type: 'varchar' })
+  secretKey: string;
+
   @ManyToOne(() => Class, (entity) => entity.attendances)
   class: Class;
 

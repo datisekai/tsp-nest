@@ -22,7 +22,7 @@ export interface AttendanceRoom {
   lastGeneratedTime: number; // Thời gian tạo mã QR gần nhất
   attendees: Attendee[];
   isOpen: boolean;
-  ownerId: number;
+  secretKey: string;
 }
 
 export enum AttendanceMessage {
@@ -31,6 +31,9 @@ export enum AttendanceMessage {
   CHECK_QRCODE = 'checkQRCode',
   DELETE_ROOM = 'deleteRoom',
   ROOM_STATUS_UPDATED = 'roomStatusUpdated',
+  UPDATE_ATTENDEES = 'updateAttendees',
+  NEW_QRCODE = 'newQRCode',
+  ROOM_DELETED = 'roomDeleted',
 }
 
 export class CreateAttendanceDto {

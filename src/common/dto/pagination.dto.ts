@@ -15,6 +15,6 @@ export class PaginationDto {
   @Type(() => Number) // Chuyển đổi từ string sang number
   @IsInt()
   @Min(1)
-  @Max(100)
+  @Max(10000)
   limit?: number = 10;
 }

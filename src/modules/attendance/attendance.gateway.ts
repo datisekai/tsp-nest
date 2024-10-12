@@ -27,42 +27,56 @@ export class AttendanceGateway implements OnGatewayInit {
   @SubscribeMessage(AttendanceMessage.CREATE_ROOM)
   public handleCreateRoom(
     client: any,
-    { classId, ownerId }: { classId: number; ownerId: number },
+    { classId, secretKey }: { classId: number; secretKey: string },
   ) {
-    if (!this.rooms[classId]) {
+    const room = this.rooms[classId];
+    if (room) {
       this.rooms[classId] = {
         classId,
-        ownerId,
+        secretKey,
         qrCode: '',
         expirationTime: 3000, // 3 giây
         lastGeneratedTime: 0,
         attendees: [],
         isOpen: false,
       };
-      client.emit('roomCreated', classId);
-    } else {
-      client.emit('roomExists', classId);
+      return this.generateSuccessResponse(
+        'Tạo phòng thành công',
+        this.rooms[classId],
+      );
     }
+    return this.generateErrorResponse('Phòng đã tồn tại');
   }
 
   @SubscribeMessage(AttendanceMessage.UPDATE_STATUS_ROOM)
   public handleUpdateStatusRoom(
     client: any,
-    { isOpen, classId }: { classId: string; isOpen: boolean },
+    {
+      isOpen,
+      classId,
+      secretKey,
+    }: { classId: string; isOpen: boolean; secretKey: string },
   ) {
-    if (this.rooms[classId]) {
-      this.rooms[classId].isOpen = !isOpen;
-      this.server.emit(AttendanceMessage.ROOM_STATUS_UPDATED, {
-        classId,
-        isOpen,
-      });
-
-      if (isOpen) {
-        this.generateQRCode(this.rooms[classId]); // Tạo QR cho phòng mới
-      }
+    const room = this.rooms[classId];
+    if (!room || (room && room.secretKey !== secretKey)) {
+      return this.generateErrorResponse('Phòng không tồn tại');
     }
+    room.isOpen = !isOpen;
+    this.server
+      .to(room.classId.toString())
+      .emit(AttendanceMessage.ROOM_STATUS_UPDATED, { isOpen, classId });
+
+    if (isOpen) {
+      this.generateQRCode(classId); // Tạo QR cho phòng mới
+    }
+
+    return this.generateSuccessResponse('Cập nhật thành công', { isOpen });
   }
-  private async generateQRCode(room: AttendanceRoom) {
+  private async generateQRCode(classId: string) {
+    const room = this.rooms[classId];
+    if (!room.isOpen) {
+      return;
+    }
     // Tạo payload với classId và thời gian hiện tại
     const payload = {
       classId: room.classId,
@@ -81,9 +95,7 @@ export class AttendanceGateway implements OnGatewayInit {
     this.server.to(room.classId.toString()).emit('newQRCode', room.qrCode);
 
     // Tạo mã QR mới sau mỗi 3 giây
-    if (room.isOpen) {
-      setTimeout(() => this.generateQRCode(room), room.expirationTime);
-    }
+    setTimeout(() => this.generateQRCode(classId), room.expirationTime);
   }
 
   @SubscribeMessage(AttendanceMessage.CHECK_QRCODE)
@@ -95,77 +107,105 @@ export class AttendanceGateway implements OnGatewayInit {
       qrCode,
     }: { code: string; classId: string; qrCode: string },
   ) {
-    const room = this.rooms[classId]; // Truy xuất phòng bằng classId
+    const room = this.rooms[classId];
 
-    if (room) {
-      try {
-        // Giải mã mã QR
-        const decoded = jwt.verify(qrCode, process.env.JWT_SECRET) as {
-          classId: string;
-          createdAt: number;
-        };
-
-        // Kiểm tra mã QR có khớp với classId hay không
-        if (decoded.classId !== classId) {
-          return {
-            success: false,
-            message: 'Mã QR không hợp lệ cho phòng này.',
-          };
-        }
-
-        const currentTime = Date.now();
-        // Kiểm tra thời gian hết hạn của mã QR
-        if (currentTime - decoded.createdAt < room.expirationTime) {
-          console.log(
-            `Sinh viên với mã sv: ${code} đã điểm danh thành công trong phòng ${classId}`,
-          );
-
-          // Nếu sinh viên chưa được điểm danh, thêm họ vào danh sách attendees
-          if (!room.attendees.some((item) => item.code === code)) {
-            const student = await this.userService.findByCodeAndCheckClass(
-              code,
-              +classId,
-            );
-
-            if (!student) {
-              return {
-                success: false,
-                message: 'Sinh viên không thuộc lớp này.',
-              };
-            }
-            room.attendees.push({
-              code: student.code,
-              name: student.name,
-              time: Date.now(),
-            });
-
-            // Thêm client vào room
-            client.join(classId);
-            console.log(`Sinh viên ${code} đã được thêm vào room ${classId}`);
-
-            // Phát sự kiện cập nhật danh sách sinh viên đã điểm danh tới tất cả sinh viên trong phòng
-            this.server.to(classId).emit('updateAttendees', room.attendees);
-          }
-
-          return { success: true, message: 'Điểm danh thành công!' };
-        } else {
-          return { success: false, message: 'Mã QR đã hết hạn.' };
-        }
-      } catch (err) {
-        return { success: false, message: 'Mã QR không hợp lệ.' };
-      }
-    } else {
-      return { success: false, message: 'Phòng không tồn tại.' };
+    if (!room) {
+      return this.generateErrorResponse('Phòng không tồn tại.');
     }
+
+    const decoded: any = this.verifyQRCode(qrCode, classId);
+    if (!decoded.success) {
+      return decoded;
+    }
+
+    const isQRValid = this.isQRCodeValid(
+      decoded.createdAt,
+      room.expirationTime,
+    );
+    if (!isQRValid) {
+      return this.generateErrorResponse('Mã QR đã hết hạn.');
+    }
+
+    const hasCheckedIn = this.hasStudentCheckedIn(room, code);
+    if (!hasCheckedIn) {
+      const student = await this.userService.findByCodeAndCheckClass(
+        code,
+        +classId,
+      );
+      if (!student) {
+        return this.generateErrorResponse('Sinh viên không thuộc lớp này.');
+      }
+
+      this.addStudentToRoom(room, student, client, classId);
+
+      this.server
+        .to(classId)
+        .emit(AttendanceMessage.UPDATE_ATTENDEES, room.attendees);
+    }
+
+    return this.generateSuccessResponse('Điểm danh thành công!');
+  }
+
+  private verifyQRCode(qrCode: string, classId: string) {
+    try {
+      const decoded = jwt.verify(qrCode, process.env.JWT_SECRET) as {
+        classId: string;
+        createdAt: number;
+      };
+
+      if (decoded.classId !== classId) {
+        return this.generateErrorResponse('Mã QR không hợp lệ cho phòng này.');
+      }
+
+      return { success: true, ...decoded };
+    } catch (err) {
+      return this.generateErrorResponse('Mã QR không hợp lệ.');
+    }
+  }
+
+  private isQRCodeValid(createdAt: number, expirationTime: number) {
+    const currentTime = Date.now();
+    return currentTime - createdAt < expirationTime;
+  }
+
+  private hasStudentCheckedIn(room: any, code: string) {
+    return room.attendees.some((item: any) => item.code === code);
+  }
+
+  private addStudentToRoom(
+    room: any,
+    student: any,
+    client: any,
+    classId: string,
+  ) {
+    room.attendees.push({
+      code: student.code,
+      name: student.name,
+      time: Date.now(),
+    });
+
+    client.join(classId);
+    console.log(`Sinh viên ${student.code} đã được thêm vào room ${classId}`);
+  }
+
+  private generateErrorResponse(message: string, data?: any) {
+    return { success: false, message, data };
+  }
+
+  private generateSuccessResponse(message: string, data?: any) {
+    return { success: true, message, data };
   }
 
   @SubscribeMessage(AttendanceMessage.DELETE_ROOM)
   public handleDeleteRoom(client: any, classId: string) {
     if (this.rooms[classId]) {
       delete this.rooms[classId];
-      this.server.emit('roomDeleted', classId);
+
+      this.server.emit(AttendanceMessage.ROOM_DELETED, classId);
+
+      return this.generateSuccessResponse('Phòng đã được xoá', { classId });
     } else {
-      client.emit('roomNotFound', classId);
+      return this.generateErrorResponse('Phòng không tồn tại', { classId });
     }
   }
 }
