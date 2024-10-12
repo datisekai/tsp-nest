@@ -74,6 +74,7 @@ class UserData {
 }
 
 export class ImportUsersDto {
+  @ApiProperty()
   @IsArray()
   @ArrayNotEmpty()
   @ValidateNested({ each: true })

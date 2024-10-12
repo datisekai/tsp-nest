@@ -44,16 +44,16 @@ async function bootstrap() {
   app.useBodyParser('json', { limit: '50mb' });
 
   app.enableCors();
-  app.use('/colyseus/playground', playground);
-  app.use('/colyseus', monitor());
+  // app.use('/colyseus/playground', playground);
+  // app.use('/colyseus', monitor());
 
-  const server = new Server({
-    transport: new WebSocketTransport({
-      server: app.getHttpServer(),
-    }),
-  });
+  // const server = new Server({
+  //   transport: new WebSocketTransport({
+  //     server: app.getHttpServer(),
+  //   }),
+  // });
 
-  server.define('my_room', injectDeps(app, MainRoom));
+  // server.define('my_room', injectDeps(app, MainRoom));
 
   const config = new DocumentBuilder()
     .setTitle('TSP API Example')
@@ -87,8 +87,7 @@ async function bootstrap() {
   });
 
   const PORT = +process.env.PORT || 4099;
-  await app.init();
-  await server.listen(PORT).then(() => {
+  await app.listen(PORT).then(() => {
     console.log('app listion on port ' + PORT);
   });
 }

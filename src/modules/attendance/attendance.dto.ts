@@ -29,7 +29,7 @@ export interface AttendanceRoom {
 }
 
 export enum AttendanceMessage {
-  CREATE_ROOM = 'createRoom',
+  JOIN_OR_CREATE = 'joinOrCreate',
   UPDATE_STATUS_ROOM = 'updateStatusRoom',
   CHECK_QRCODE = 'checkQRCode',
   DELETE_ROOM = 'deleteRoom',
