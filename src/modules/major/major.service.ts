@@ -21,7 +21,7 @@ export class MajorService {
   ) {}
 
   async create(createMajorDto: CreateMajorDto): Promise<Major> {
-    const { name, facultyId, teacherIds } = createMajorDto;
+    const { name, facultyId, teacherIds, code } = createMajorDto;
 
     const faculty = await this.facultyService.findOne(facultyId);
     if (!faculty) {
@@ -36,6 +36,7 @@ export class MajorService {
       name,
       faculty,
       teachers,
+      code,
     });
 
     return this.majorRepository.save(major);

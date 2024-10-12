@@ -19,16 +19,24 @@ export class AttendanceService {
     private readonly attendeeRepository: Repository<Attendee>,
   ) {}
 
-  async create(createAttendanceDto: CreateAttendanceDto): Promise<Attendance> {
-    const attendance = this.attendanceRepository.create(createAttendanceDto);
+  async create(
+    createAttendanceDto: CreateAttendanceDto,
+    userId: number,
+  ): Promise<Attendance> {
+    const secretKey = Math.random().toString(36).substring(2);
+    const attendance = this.attendanceRepository.create({
+      ...createAttendanceDto,
+      user: { id: userId },
+      secretKey,
+    });
     return await this.attendanceRepository.save(attendance);
   }
   // Lấy danh sách Attendance với phân trang và lọc theo createdAt
-  async findAll({
-    createdAt,
-    limit,
-    page,
-  }: QueryAttendanceDto): Promise<{ data: Attendance[]; total: number }> {
+  async findAll(
+    dto: QueryAttendanceDto,
+    userId?: number,
+  ): Promise<{ data: Attendance[]; total: number }> {
+    const { title, isOpen, classId, limit, page } = dto;
     const query = this.attendanceRepository
       .createQueryBuilder('attendance')
       .leftJoinAndSelect('attendance.class', 'class')
@@ -36,9 +44,21 @@ export class AttendanceService {
       .leftJoinAndSelect('attendance.attendees', 'attendees')
       .orderBy('attendance.createdAt', 'DESC'); // Sắp xếp theo createdAt (mới nhất trước)
 
-    // Kiểm tra nếu có tham số lọc theo createdAt
-    if (createdAt) {
-      query.andWhere('attendance.createdAt >= :createdAt', { createdAt });
+    // Kiểm tra các điều kiện lọc
+    if (title) {
+      query.andWhere('attendance.title LIKE :title', { title: `%${title}%` });
+    }
+
+    if (isOpen !== undefined) {
+      query.andWhere('attendance.isOpen = :isOpen', { isOpen });
+    }
+
+    if (classId) {
+      query.andWhere('attendance.classId = :classId', { classId });
+    }
+
+    if (userId) {
+      query.andWhere('attendance.userId = :userId', { userId });
     }
 
     // Phân trang
@@ -49,7 +69,6 @@ export class AttendanceService {
 
     return { data, total };
   }
-
   async findOne(id: number): Promise<Attendance> {
     const attendance = await this.attendanceRepository.findOne({
       where: { id },

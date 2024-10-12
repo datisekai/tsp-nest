@@ -143,11 +143,11 @@ export class AttendanceGateway implements OnGatewayInit {
       }
 
       // Thêm sinh viên vào danh sách attendees
-      this.addStudentToRoom(room, student, client, classId);
+      this.addStudentToRoom(room, student, client, true);
 
       // Phát sự kiện cập nhật danh sách sinh viên đã điểm danh tới tất cả
       this.server
-        .to(classId)
+        .to(room.id.toString())
         .emit(AttendanceMessage.UPDATE_ATTENDEES, room.attendees);
     }
 
@@ -212,15 +212,15 @@ export class AttendanceGateway implements OnGatewayInit {
   }
 
   @SubscribeMessage(AttendanceMessage.DELETE_ROOM)
-  public handleDeleteRoom(client: any, classId: string) {
-    if (this.rooms[classId]) {
-      delete this.rooms[classId];
+  public handleDeleteRoom(client: any, id: string) {
+    if (this.rooms[id]) {
+      delete this.rooms[id];
 
-      this.server.emit(AttendanceMessage.ROOM_DELETED, classId);
+      this.server.emit(AttendanceMessage.ROOM_DELETED, id);
 
-      return this.generateSuccessResponse('Phòng đã được xoá', { classId });
+      return this.generateSuccessResponse('Phòng đã được xoá', { id });
     } else {
-      return this.generateErrorResponse('Phòng không tồn tại', { classId });
+      return this.generateErrorResponse('Phòng không tồn tại', { id });
     }
   }
 }

@@ -5,6 +5,8 @@ import { UserModule } from '../user/user.module';
 import { Attendance } from './attendance.entity';
 import { AttendanceService } from './attendance.service';
 import { Attendee } from './attendee.entity';
+import { AttendanceController } from './attendance.controller';
+import { AttendanceGateway } from './attendance.gateway';
 
 @Module({
   imports: [
@@ -12,8 +14,8 @@ import { Attendee } from './attendee.entity';
     UserModule,
     PermissionModule,
   ],
-  controllers: [],
-  providers: [AttendanceService],
-  exports: [AttendanceService],
+  controllers: [AttendanceController],
+  providers: [AttendanceService, AttendanceGateway],
+  exports: [AttendanceService, AttendanceGateway],
 })
 export class AttendanceModule {}

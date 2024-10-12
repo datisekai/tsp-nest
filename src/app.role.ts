@@ -10,6 +10,7 @@ export enum AppResource {
   NOTIFICATION = 'NOTIFICATION',
   META = 'META',
   LETTER = 'LETTER',
+  ATTENDANCE = 'ATTENDANCE',
 }
 
 export enum AppPermission {

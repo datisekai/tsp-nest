@@ -61,8 +61,8 @@ export class MajorController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(AppPermission.MAJOR_VIEW)
-  @ApiPermissions(AppPermission.MAJOR_VIEW)
+  @Permissions(AppPermission.MAJOR_VIEW, AppPermission.MAJOR_VIEW_OWN)
+  @ApiPermissions(AppPermission.MAJOR_VIEW, AppPermission.MAJOR_VIEW_OWN)
   async findOne(@Param('id') id: number): Promise<Major> {
     return this.majorService.findOne(id);
   }

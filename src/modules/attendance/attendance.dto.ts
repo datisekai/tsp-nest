@@ -1,7 +1,9 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsBoolean,
   IsDateString,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -52,20 +54,24 @@ export class CreateAttendanceDto {
   @IsNumber()
   @IsNotEmpty()
   classId: number;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsNotEmpty()
-  userId: number;
 }
 
 export class UpdateAttendanceDto extends PartialType(CreateAttendanceDto) {}
 
 export class QueryAttendanceDto extends PaginationDto {
-  @ApiPropertyOptional()
-  @IsDateString()
   @IsOptional()
-  createdAt: string;
+  @IsString()
+  title?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  @Type(() => Boolean)
+  isOpen?: boolean;
+
+  @IsOptional()
+  @IsInt()
+  @Type(() => Number)
+  classId?: number;
 }
 
 export class CreateAttendeeDto {

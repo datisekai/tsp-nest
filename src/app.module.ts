@@ -18,6 +18,7 @@ import { ClassModule } from './modules/class/class.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { MetaModule } from './modules/meta/meta.module';
 import { LetterModule } from './modules/letter/letter.module';
+import { AttendanceModule } from './modules/attendance/attendance.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { LetterModule } from './modules/letter/letter.module';
     NotificationModule,
     MetaModule,
     LetterModule,
+    AttendanceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

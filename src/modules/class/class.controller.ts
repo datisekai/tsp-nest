@@ -63,8 +63,8 @@ export class ClassController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(AppPermission.CLASS_VIEW)
-  @ApiPermissions(AppPermission.CLASS_VIEW)
+  @Permissions(AppPermission.CLASS_VIEW, AppPermission.CLASS_VIEW_OWN)
+  @ApiPermissions(AppPermission.CLASS_VIEW, AppPermission.CLASS_VIEW_OWN)
   async findOne(@Param('id') classId: number): Promise<Class> {
     return this.classService.findOne(classId);
   }

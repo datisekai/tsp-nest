@@ -70,8 +70,14 @@ export class NotificationController {
   // Lấy một thông báo theo ID
   @Get(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(AppPermission.NOTIFICATION_VIEW)
-  @ApiPermissions(AppPermission.NOTIFICATION_VIEW)
+  @Permissions(
+    AppPermission.NOTIFICATION_VIEW,
+    AppPermission.NOTIFICATION_VIEW_OWN,
+  )
+  @ApiPermissions(
+    AppPermission.NOTIFICATION_VIEW,
+    AppPermission.NOTIFICATION_VIEW_OWN,
+  )
   async findOne(@Param('id') id: number) {
     return this.notificationService.findOne(id);
   }

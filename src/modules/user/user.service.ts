@@ -102,7 +102,7 @@ export class UserService {
 
     // Lọc những codes không tồn tại
     const newUsersData = userData.filter(
-      (user) => !existingUserCodes.has(user.code),
+      (user) => !existingUserCodes.has(user.code.toString()),
     );
 
     // Tạo người dùng mới với name và code
