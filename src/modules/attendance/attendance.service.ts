@@ -6,9 +6,11 @@ import {
   CreateAttendanceDto,
   CreateAttendeeDto,
   QueryAttendanceDto,
+  QueryAttendeeDto,
   UpdateAttendanceDto,
 } from './attendance.dto';
 import { Attendee } from './attendee.entity';
+import { removeVietnameseDiacritics } from 'src/common/helpers';
 
 @Injectable()
 export class AttendanceService {
@@ -28,8 +30,60 @@ export class AttendanceService {
       ...createAttendanceDto,
       user: { id: userId },
       secretKey,
+      class: { id: createAttendanceDto.classId },
     });
     return await this.attendanceRepository.save(attendance);
+  }
+
+  async findAttendeeMe(
+    dto: QueryAttendeeDto,
+    userId: number,
+  ): Promise<{ data: Attendee[]; total: number }> {
+    const { limit = 10, page = 1, from, to, majorCode, majorName } = dto;
+    const query = this.attendeeRepository
+      .createQueryBuilder('attendee')
+      .leftJoinAndSelect('attendee.attendance', 'attendance')
+      .leftJoinAndSelect('attendance.class', 'class')
+      .leftJoinAndSelect('class.major', 'major')
+      .leftJoinAndSelect('class.teachers', 'teachers')
+      .orderBy('attendee.createdAt', 'DESC')
+      .where('attendee.user.id = :userId', { userId })
+      .andWhere('attendee.isSuccess = :isSuccess', { isSuccess: true })
+      .select([
+        'attendee.id',
+        'attendee.createdAt',
+        'attendance.createdAt',
+        'class.name',
+        'major.code',
+        'major.name',
+        'teachers.name',
+        'teachers.code',
+      ])
+      .limit(limit)
+      .offset((page - 1) * limit);
+
+    if (majorCode) {
+      query.andWhere('major.code = :majorCode', { majorCode });
+    }
+
+    if (majorName) {
+      const normalizedMajorName =
+        removeVietnameseDiacritics(majorName).toLowerCase();
+      query.andWhere('LOWER(major.name) LIKE :majorName', {
+        majorName: `%${normalizedMajorName}%`,
+      });
+    }
+
+    if (from) {
+      query.andWhere('attendee.createdAt >= :from', { from: new Date(from) });
+    }
+
+    if (to) {
+      query.andWhere('attendee.createdAt <= :to', { to: new Date(to) });
+    }
+
+    const [data, total] = await query.getManyAndCount();
+    return { data, total };
   }
   // Lấy danh sách Attendance với phân trang và lọc theo createdAt
   async findAll(

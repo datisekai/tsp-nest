@@ -20,10 +20,12 @@ import { User as UserEntity } from '../user/user.entity';
 import {
   CreateAttendanceDto,
   QueryAttendanceDto,
+  QueryAttendeeDto,
   UpdateAttendanceDto,
 } from './attendance.dto';
 import { Attendance } from './attendance.entity';
 import { AttendanceService } from './attendance.service';
+import { Attendee } from './attendee.entity';
 
 @ApiTags(AppResource.ATTENDANCE)
 @Controller('api.attendance')
@@ -40,6 +42,18 @@ export class AttendanceController {
     @User() user: UserEntity,
   ): Promise<Attendance> {
     return await this.attendanceService.create(createAttendanceDto, user.id);
+  }
+
+  @Get('public/me')
+  @UseGuards(JwtAuthGuard)
+  async findAttendeeMe(
+    @Query() queryAttendeeDto: QueryAttendeeDto,
+    @User() user: UserEntity,
+  ): Promise<{ data: Attendee[]; total: number }> {
+    return await this.attendanceService.findAttendeeMe(
+      queryAttendeeDto,
+      user.id,
+    );
   }
 
   // Lấy danh sách Attendance (có phân trang và lọc)

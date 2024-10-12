@@ -74,6 +74,27 @@ export class QueryAttendanceDto extends PaginationDto {
   classId?: number;
 }
 
+export class QueryAttendeeDto extends PaginationDto {
+  @ApiPropertyOptional({ description: 'YYYY-MM-DD' })
+  @IsOptional()
+  from: string;
+
+  @ApiPropertyOptional({ description: 'YYYY-MM-DD' })
+  @IsOptional()
+  to: Date;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsInt()
+  @Type(() => Number)
+  majorCode?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  majorName?: string;
+}
+
 export class CreateAttendeeDto {
   @ApiProperty()
   @IsNotEmpty()
