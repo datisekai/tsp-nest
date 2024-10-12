@@ -9,6 +9,8 @@ import QRCode from 'qrcode';
 import { AttendanceMessage, AttendanceRoom } from './attendance.dto';
 import * as jwt from 'jsonwebtoken';
 import { UserService } from '../user/user.service';
+import { AttendanceService } from './attendance.service';
+import { User } from '../user/user.entity';
 
 @WebSocketGateway({ cors: true })
 export class AttendanceGateway implements OnGatewayInit {
@@ -18,7 +20,8 @@ export class AttendanceGateway implements OnGatewayInit {
   private rooms: { [key: string]: AttendanceRoom } = {};
 
   constructor(
-    private readonly userService: UserService, // Inject AttendanceService
+    private readonly userService: UserService,
+    private readonly attendanceService: AttendanceService,
   ) {}
 
   afterInit(server: Server) {
@@ -27,11 +30,16 @@ export class AttendanceGateway implements OnGatewayInit {
   @SubscribeMessage(AttendanceMessage.CREATE_ROOM)
   public handleCreateRoom(
     client: any,
-    { classId, secretKey }: { classId: number; secretKey: string },
+    {
+      classId,
+      secretKey,
+      id,
+    }: { classId: number; secretKey: string; id: number },
   ) {
-    const room = this.rooms[classId];
+    const room = this.rooms[id];
     if (room) {
-      this.rooms[classId] = {
+      this.rooms[id] = {
+        id,
         classId,
         secretKey,
         qrCode: '',
@@ -42,7 +50,7 @@ export class AttendanceGateway implements OnGatewayInit {
       };
       return this.generateSuccessResponse(
         'Tạo phòng thành công',
-        this.rooms[classId],
+        this.rooms[id],
       );
     }
     return this.generateErrorResponse('Phòng đã tồn tại');
@@ -53,32 +61,33 @@ export class AttendanceGateway implements OnGatewayInit {
     client: any,
     {
       isOpen,
-      classId,
+      id,
       secretKey,
-    }: { classId: string; isOpen: boolean; secretKey: string },
+    }: { id: string; isOpen: boolean; secretKey: string },
   ) {
-    const room = this.rooms[classId];
+    const room = this.rooms[id];
     if (!room || (room && room.secretKey !== secretKey)) {
       return this.generateErrorResponse('Phòng không tồn tại');
     }
     room.isOpen = !isOpen;
     this.server
-      .to(room.classId.toString())
-      .emit(AttendanceMessage.ROOM_STATUS_UPDATED, { isOpen, classId });
+      .to(room.id.toString())
+      .emit(AttendanceMessage.ROOM_STATUS_UPDATED, { isOpen, id });
 
     if (isOpen) {
-      this.generateQRCode(classId); // Tạo QR cho phòng mới
+      this.generateQRCode(id); // Tạo QR cho phòng mới
     }
 
     return this.generateSuccessResponse('Cập nhật thành công', { isOpen });
   }
-  private async generateQRCode(classId: string) {
-    const room = this.rooms[classId];
+  private async generateQRCode(id: string) {
+    const room = this.rooms[id];
     if (!room.isOpen) {
       return;
     }
-    // Tạo payload với classId và thời gian hiện tại
+    // Tạo payload với id và thời gian hiện tại
     const payload = {
+      id: room.id,
       classId: room.classId,
       createdAt: Date.now(),
     };
@@ -92,40 +101,37 @@ export class AttendanceGateway implements OnGatewayInit {
     room.qrCode = await QRCode.toDataURL(token);
     room.lastGeneratedTime = Date.now();
 
-    this.server.to(room.classId.toString()).emit('newQRCode', room.qrCode);
+    this.server.to(room.id.toString()).emit('newQRCode', room.qrCode);
 
     // Tạo mã QR mới sau mỗi 3 giây
-    setTimeout(() => this.generateQRCode(classId), room.expirationTime);
+    setTimeout(() => this.generateQRCode(id), room.expirationTime);
   }
 
   @SubscribeMessage(AttendanceMessage.CHECK_QRCODE)
   public async handleCheckQRCode(
     client: any,
-    {
-      code,
-      classId,
-      qrCode,
-    }: { code: string; classId: string; qrCode: string },
+    { code, qrCode }: { code: string; qrCode: string },
   ) {
-    const room = this.rooms[classId];
-
-    if (!room) {
-      return this.generateErrorResponse('Phòng không tồn tại.');
-    }
-
-    const decoded: any = this.verifyQRCode(qrCode, classId);
+    // Giải mã mã QR để lấy classId
+    const decoded: any = this.verifyQRCode(qrCode);
     if (!decoded.success) {
       return decoded;
     }
 
-    const isQRValid = this.isQRCodeValid(
-      decoded.createdAt,
-      room.expirationTime,
-    );
+    const { classId, createdAt, id } = decoded;
+
+    const room = this.rooms[id];
+    if (!room) {
+      return this.generateErrorResponse('Phòng không tồn tại.');
+    }
+
+    // Kiểm tra thời gian hết hạn của mã QR
+    const isQRValid = this.isQRCodeValid(createdAt, room.expirationTime);
     if (!isQRValid) {
       return this.generateErrorResponse('Mã QR đã hết hạn.');
     }
 
+    // Kiểm tra sinh viên đã điểm danh chưa
     const hasCheckedIn = this.hasStudentCheckedIn(room, code);
     if (!hasCheckedIn) {
       const student = await this.userService.findByCodeAndCheckClass(
@@ -136,8 +142,10 @@ export class AttendanceGateway implements OnGatewayInit {
         return this.generateErrorResponse('Sinh viên không thuộc lớp này.');
       }
 
+      // Thêm sinh viên vào danh sách attendees
       this.addStudentToRoom(room, student, client, classId);
 
+      // Phát sự kiện cập nhật danh sách sinh viên đã điểm danh tới tất cả
       this.server
         .to(classId)
         .emit(AttendanceMessage.UPDATE_ATTENDEES, room.attendees);
@@ -146,18 +154,20 @@ export class AttendanceGateway implements OnGatewayInit {
     return this.generateSuccessResponse('Điểm danh thành công!');
   }
 
-  private verifyQRCode(qrCode: string, classId: string) {
+  private verifyQRCode(qrCode: string) {
     try {
       const decoded = jwt.verify(qrCode, process.env.JWT_SECRET) as {
+        id: number;
         classId: string;
         createdAt: number;
       };
 
-      if (decoded.classId !== classId) {
-        return this.generateErrorResponse('Mã QR không hợp lệ cho phòng này.');
-      }
-
-      return { success: true, ...decoded };
+      return {
+        success: true,
+        id: decoded.id,
+        classId: decoded.classId,
+        createdAt: decoded.createdAt,
+      };
     } catch (err) {
       return this.generateErrorResponse('Mã QR không hợp lệ.');
     }
@@ -173,19 +183,24 @@ export class AttendanceGateway implements OnGatewayInit {
   }
 
   private addStudentToRoom(
-    room: any,
-    student: any,
+    room: AttendanceRoom,
+    user: User,
     client: any,
-    classId: string,
+    isSuccess: boolean,
   ) {
+    this.attendanceService.addAttendee({
+      attendanceId: room.id,
+      isSuccess,
+      userId: user.id,
+    });
     room.attendees.push({
-      code: student.code,
-      name: student.name,
+      code: user.code,
+      name: user.name,
       time: Date.now(),
     });
 
-    client.join(classId);
-    console.log(`Sinh viên ${student.code} đã được thêm vào room ${classId}`);
+    client.join(room.id.toString());
+    console.log(`Sinh viên ${user.code} đã được thêm vào room ${user.id}`);
   }
 
   private generateErrorResponse(message: string, data?: any) {

@@ -18,6 +18,10 @@ export class CreateMajorDto {
 
   @ApiProperty()
   @IsNotEmpty()
+  code: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
   @IsNumber()
   facultyId: number; // ID của Faculty mà Major thuộc về
 
@@ -39,6 +43,10 @@ export class QueryMajorDto extends PaginationDto {
   @IsInt()
   @IsOptional()
   facultyId?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  code?: string;
 
   @ApiPropertyOptional({ description: 'Array of teacher IDs to filter majors' })
   @IsArray()

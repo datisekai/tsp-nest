@@ -16,7 +16,8 @@ interface Attendee {
 }
 
 export interface AttendanceRoom {
-  classId: number; // ID duy nhất của phòng
+  id: number;
+  classId: number;
   qrCode: string; // Mã QR của phòng
   expirationTime: number; // Thời gian sống của mã QR
   lastGeneratedTime: number; // Thời gian tạo mã QR gần nhất

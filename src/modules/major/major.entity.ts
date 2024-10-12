@@ -16,6 +16,9 @@ export class Major extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ type: 'varchar', length: 255, unique: true })
+  code: string;
+
   @Column({ type: 'varchar', length: 255 })
   name: string; // Tên của Major
 

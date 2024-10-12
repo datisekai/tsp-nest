@@ -45,7 +45,14 @@ export class MajorService {
     queryMajorDto: QueryMajorDto,
     userId?: number,
   ): Promise<{ data: Major[]; total: number }> {
-    const { name, facultyId, teacherIds, page = 1, limit = 10 } = queryMajorDto;
+    const {
+      name,
+      facultyId,
+      teacherIds,
+      page = 1,
+      limit = 10,
+      code,
+    } = queryMajorDto;
 
     // Tạo QueryBuilder cho Major
     const queryBuilder = this.majorRepository
@@ -60,6 +67,10 @@ export class MajorService {
     // Tìm kiếm theo tên nếu có
     if (name) {
       queryBuilder.andWhere('major.name LIKE :name', { name: `%${name}%` });
+    }
+
+    if (code) {
+      queryBuilder.andWhere('major.code LIKE :code', { code: `%${code}%` });
     }
 
     // Tìm kiếm theo facultyId nếu có
@@ -94,7 +105,7 @@ export class MajorService {
   }
 
   async update(id: number, updateMajorDto: UpdateMajorDto): Promise<Major> {
-    const { name, facultyId, teacherIds } = updateMajorDto;
+    const { name, facultyId, teacherIds, code } = updateMajorDto;
 
     const major = await this.majorRepository.findOne({ where: { id } });
     if (!major) {
@@ -102,6 +113,7 @@ export class MajorService {
     }
 
     if (name) major.name = name;
+    if (code) major.code = code;
     if (facultyId) {
       const faculty = await this.facultyService.findOne(facultyId);
       if (!faculty) {
