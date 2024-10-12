@@ -10,6 +10,8 @@ import {
   QueryMajorDto,
   UpdateMajorDto,
 } from './major.dto';
+import { User } from '../user/user.entity';
+import { UserType } from '../user/user.dto';
 
 @Injectable()
 export class MajorService {
@@ -44,7 +46,7 @@ export class MajorService {
 
   async findAll(
     queryMajorDto: QueryMajorDto,
-    userId?: number,
+    user: User,
   ): Promise<{ data: Major[]; total: number }> {
     const {
       name,
@@ -61,8 +63,8 @@ export class MajorService {
       .leftJoinAndSelect('major.faculty', 'faculty')
       .leftJoinAndSelect('major.teachers', 'teacher');
 
-    if (userId) {
-      queryBuilder.andWhere('teacher.id = :userId', { userId });
+    if (user.type !== UserType.MASTER) {
+      queryBuilder.andWhere('teacher.id = :userId', { userId: user.id });
     }
 
     // Tìm kiếm theo tên nếu có

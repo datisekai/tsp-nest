@@ -63,29 +63,16 @@ export class AttendanceController {
   @ApiPermissions(AppPermission.ATTENDANCE_VIEW)
   async findAll(
     @Query() queryAttendanceDto: QueryAttendanceDto,
-  ): Promise<{ data: Attendance[]; total: number }> {
-    return await this.attendanceService.findAll(queryAttendanceDto);
-  }
-
-  @Get('me')
-  @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(AppPermission.ATTENDANCE_VIEW_OWN)
-  @ApiPermissions(AppPermission.ATTENDANCE_VIEW_OWN)
-  async findAllOwn(
-    @Query() queryAttendanceDto: QueryAttendanceDto,
     @User() user: UserEntity,
   ): Promise<{ data: Attendance[]; total: number }> {
-    return await this.attendanceService.findAll(queryAttendanceDto, user.id);
+    return await this.attendanceService.findAll(queryAttendanceDto, user);
   }
 
   // Lấy thông tin Attendance theo ID
   @Get(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(AppPermission.ATTENDANCE_VIEW_OWN, AppPermission.ATTENDANCE_VIEW)
-  @ApiPermissions(
-    AppPermission.ATTENDANCE_VIEW_OWN,
-    AppPermission.ATTENDANCE_VIEW,
-  )
+  @Permissions(AppPermission.ATTENDANCE_VIEW)
+  @ApiPermissions(AppPermission.ATTENDANCE_VIEW)
   async findOne(@Param('id') id: number): Promise<Attendance> {
     const attendance = await this.attendanceService.findOne(id);
     if (!attendance) {

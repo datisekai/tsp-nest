@@ -12,6 +12,8 @@ import {
   QueryClassDto,
   ImportUsersDto,
 } from './class.dto';
+import { User } from '../user/user.entity';
+import { UserType } from '../user/user.dto';
 
 @Injectable()
 export class ClassService {
@@ -47,7 +49,7 @@ export class ClassService {
 
   async findAll(
     queryClassDto: QueryClassDto,
-    userId?: number,
+    user: User,
   ): Promise<{ data: Class[]; total: number }> {
     const { name, majorId, teacherIds, page = 1, limit = 10 } = queryClassDto;
 
@@ -56,8 +58,8 @@ export class ClassService {
       .leftJoinAndSelect('class.major', 'major')
       .leftJoinAndSelect('class.teachers', 'teacher');
 
-    if (userId) {
-      queryBuilder.andWhere('teacher.id = :userId', { userId });
+    if (user.type !== UserType.MASTER) {
+      queryBuilder.andWhere('teacher.id = :userId', { userId: user.id });
     }
 
     if (name) {

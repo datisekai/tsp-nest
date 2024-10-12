@@ -44,25 +44,15 @@ export class MajorController {
   // @ApiPermissions(AppPermission.MAJOR_VIEW)
   async findAll(
     @Query() queryMajorDto: QueryMajorDto,
-  ): Promise<{ data: Major[]; total: number }> {
-    return this.majorService.findAll(queryMajorDto);
-  }
-
-  @Get('me')
-  @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(AppPermission.MAJOR_VIEW_OWN, AppPermission.MAJOR_VIEW)
-  @ApiPermissions(AppPermission.MAJOR_VIEW_OWN, AppPermission.MAJOR_VIEW)
-  async findAllOwn(
-    @Query() queryMajorDto: QueryMajorDto,
     @User() user: UserEntity,
   ): Promise<{ data: Major[]; total: number }> {
-    return this.majorService.findAll(queryMajorDto, user.id);
+    return this.majorService.findAll(queryMajorDto, user);
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(AppPermission.MAJOR_VIEW, AppPermission.MAJOR_VIEW_OWN)
-  @ApiPermissions(AppPermission.MAJOR_VIEW, AppPermission.MAJOR_VIEW_OWN)
+  @Permissions(AppPermission.MAJOR_VIEW)
+  @ApiPermissions(AppPermission.MAJOR_VIEW)
   async findOne(@Param('id') id: number): Promise<Major> {
     return this.majorService.findOne(id);
   }

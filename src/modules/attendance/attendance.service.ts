@@ -11,6 +11,8 @@ import {
 } from './attendance.dto';
 import { Attendee } from './attendee.entity';
 import { removeVietnameseDiacritics } from 'src/common/helpers';
+import { User } from '../user/user.entity';
+import { UserType } from '../user/user.dto';
 
 @Injectable()
 export class AttendanceService {
@@ -88,14 +90,33 @@ export class AttendanceService {
   // Lấy danh sách Attendance với phân trang và lọc theo createdAt
   async findAll(
     dto: QueryAttendanceDto,
-    userId?: number,
+    user: User,
   ): Promise<{ data: Attendance[]; total: number }> {
-    const { title, isOpen, classId, limit, page } = dto;
+    const { title, isOpen, classId, limit = 10, page = 1 } = dto;
     const query = this.attendanceRepository
       .createQueryBuilder('attendance')
-      .leftJoinAndSelect('attendance.class', 'class')
-      .leftJoinAndSelect('attendance.user', 'user')
-      .leftJoinAndSelect('attendance.attendees', 'attendees')
+      .select([
+        'attendance.id',
+        'attendance.createdAt',
+        'attendance.updatedAt',
+        'attendance.isOpen',
+        'attendance.title',
+        'attendance.secretKey',
+        'class.id',
+        'class.name',
+        'major.code',
+        'major.id',
+        'major.name',
+        'user.code',
+        'user.name',
+        'teachers.code',
+        'teachers.name',
+      ])
+      .leftJoin('attendance.class', 'class')
+      .leftJoin('class.major', 'major')
+      .leftJoin('class.teachers', 'teachers')
+      .leftJoin('attendance.user', 'user')
+      // .leftJoin('attendance.attendees', 'attendees')
       .orderBy('attendance.createdAt', 'DESC'); // Sắp xếp theo createdAt (mới nhất trước)
 
     // Kiểm tra các điều kiện lọc
@@ -111,8 +132,8 @@ export class AttendanceService {
       query.andWhere('attendance.classId = :classId', { classId });
     }
 
-    if (userId) {
-      query.andWhere('attendance.userId = :userId', { userId });
+    if (user.type !== UserType.MASTER) {
+      query.andWhere('attendance.userId = :userId', { userId: user.id });
     }
 
     // Phân trang

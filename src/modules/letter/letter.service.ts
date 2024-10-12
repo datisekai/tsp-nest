@@ -10,6 +10,8 @@ import {
 } from './letter.dto';
 import { ClassService } from '../class/class.service';
 import { UserService } from '../user/user.service';
+import { User } from '../user/user.entity';
+import { UserType } from '../user/user.dto';
 
 @Injectable()
 export class LetterService {
@@ -56,11 +58,11 @@ export class LetterService {
   // Lấy tất cả đơn với phân trang và bộ lọc theo trạng thái, lớp, người tạo, ngày tạo và ngày duyệt
   async findAll(
     query: QueryLetterDto,
+    user: User,
   ): Promise<{ data: Letter[]; total: number }> {
     const {
       status,
       classId,
-      userId,
       createdAt,
       approvedAt,
       page = 1,
@@ -80,8 +82,8 @@ export class LetterService {
       queryBuilder.andWhere('letter.class.id = :classId', { classId });
     }
 
-    if (userId) {
-      queryBuilder.andWhere('letter.user.id = :userId', { userId });
+    if (user.type !== UserType.MASTER) {
+      queryBuilder.andWhere('letter.user.id = :userId', { userId: user.id });
     }
 
     if (createdAt) {

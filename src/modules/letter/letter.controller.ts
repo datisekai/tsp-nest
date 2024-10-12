@@ -44,25 +44,15 @@ export class LetterController {
   @ApiPermissions(AppPermission.LETTER_VIEW)
   async findAll(
     @Query() queryLetterDto: QueryLetterDto,
-  ): Promise<{ data: Letter[]; total: number }> {
-    return this.letterService.findAll(queryLetterDto);
-  }
-
-  @Get('me')
-  @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(AppPermission.LETTER_VIEW_OWN)
-  @ApiPermissions(AppPermission.LETTER_VIEW_OWN)
-  async findLettersByTeacher(
-    @Query() queryLetterDto: QueryLetterDto,
     @User() user: UserEntity,
   ): Promise<{ data: Letter[]; total: number }> {
-    return this.letterService.findLettersByTeacher(user.id, queryLetterDto);
+    return this.letterService.findAll(queryLetterDto, user);
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(AppPermission.LETTER_VIEW, AppPermission.LETTER_VIEW_OWN)
-  @ApiPermissions(AppPermission.LETTER_VIEW, AppPermission.LETTER_VIEW_OWN)
+  @Permissions(AppPermission.LETTER_VIEW)
+  @ApiPermissions(AppPermission.LETTER_VIEW)
   async findOne(@Param('id') id: number): Promise<Letter> {
     return this.letterService.findOne(id);
   }

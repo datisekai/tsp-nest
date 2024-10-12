@@ -46,25 +46,15 @@ export class ClassController {
   @Get()
   async findAll(
     @Query() queryClassDto: QueryClassDto,
-  ): Promise<{ data: Class[]; total: number }> {
-    return this.classService.findAll(queryClassDto);
-  }
-
-  @Get('me')
-  @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(AppPermission.CLASS_VIEW_OWN, AppPermission.CLASS_VIEW)
-  @ApiPermissions(AppPermission.CLASS_VIEW_OWN, AppPermission.CLASS_VIEW)
-  async findAllOwn(
-    @Query() queryClassDto: QueryClassDto,
     @User() user: UserEntity,
   ): Promise<{ data: Class[]; total: number }> {
-    return this.classService.findAll(queryClassDto, user.id);
+    return this.classService.findAll(queryClassDto, user);
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(AppPermission.CLASS_VIEW, AppPermission.CLASS_VIEW_OWN)
-  @ApiPermissions(AppPermission.CLASS_VIEW, AppPermission.CLASS_VIEW_OWN)
+  @Permissions(AppPermission.CLASS_VIEW)
+  @ApiPermissions(AppPermission.CLASS_VIEW)
   async findOne(@Param('id') classId: number): Promise<Class> {
     return this.classService.findOne(classId);
   }

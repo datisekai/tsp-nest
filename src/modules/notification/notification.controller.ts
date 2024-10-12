@@ -48,36 +48,18 @@ export class NotificationController {
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.NOTIFICATION_VIEW)
   @ApiPermissions(AppPermission.NOTIFICATION_VIEW)
-  async findAll(@Query() queryNotificationDto: QueryNotificationDto) {
-    return this.notificationService.findAll(queryNotificationDto);
-  }
-
-  // Lấy thông báo theo owner (người tạo) với phân trang
-  @Get('me')
-  @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(AppPermission.NOTIFICATION_VIEW_OWN)
-  @ApiPermissions(AppPermission.NOTIFICATION_VIEW_OWN)
-  async findAllByOwner(
+  async findAll(
     @Query() queryNotificationDto: QueryNotificationDto,
     @User() user: UserEntity,
   ) {
-    return this.notificationService.findAllByOwner(
-      user.id,
-      queryNotificationDto,
-    );
+    return this.notificationService.findAll(queryNotificationDto, user);
   }
 
-  // Lấy một thông báo theo ID
+  // Lấy thông báo theo owner (người tạo) với phân trang
   @Get(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(
-    AppPermission.NOTIFICATION_VIEW,
-    AppPermission.NOTIFICATION_VIEW_OWN,
-  )
-  @ApiPermissions(
-    AppPermission.NOTIFICATION_VIEW,
-    AppPermission.NOTIFICATION_VIEW_OWN,
-  )
+  @Permissions(AppPermission.NOTIFICATION_VIEW)
+  @ApiPermissions(AppPermission.NOTIFICATION_VIEW)
   async findOne(@Param('id') id: number) {
     return this.notificationService.findOne(id);
   }

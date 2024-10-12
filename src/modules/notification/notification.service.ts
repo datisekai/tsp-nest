@@ -10,6 +10,8 @@ import {
 import { ClassService } from '../class/class.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { UserService } from '../user/user.service';
+import { User } from '../user/user.entity';
+import { UserType } from '../user/user.dto';
 
 @Injectable()
 export class NotificationService {
@@ -81,6 +83,7 @@ export class NotificationService {
   // Lấy tất cả thông báo với phân trang và tìm kiếm theo name, class
   async findAll(
     queryNotificationDto: QueryNotificationDto,
+    user: User,
   ): Promise<{ data: Notification[]; total: number }> {
     const { name, classId, page = 1, limit = 10 } = queryNotificationDto;
 
@@ -94,37 +97,9 @@ export class NotificationService {
         name: `%${name}%`,
       });
     }
-
-    // Tìm kiếm theo classId nếu có
-    if (classId) {
-      queryBuilder.andWhere('notification.class.id = :classId', { classId });
-    }
-
-    // Phân trang
-    const [data, total] = await queryBuilder
-      .skip((page - 1) * limit) // Tính toán offset
-      .take(limit) // Số bản ghi mỗi trang
-      .orderBy('notification.createdAt', 'DESC') // Sắp xếp theo thời gian tạo mới nhất
-      .getManyAndCount();
-
-    return { data, total };
-  }
-
-  async findAllByOwner(
-    ownerId: number,
-    queryNotificationDto: QueryNotificationDto,
-  ): Promise<{ data: Notification[]; total: number }> {
-    const { name, classId, page = 1, limit = 10 } = queryNotificationDto;
-
-    const queryBuilder = this.notificationRepository
-      .createQueryBuilder('notification')
-      .leftJoinAndSelect('notification.class', 'class')
-      .where('notification.creator.id = :ownerId', { ownerId });
-
-    // Tìm kiếm theo name nếu có
-    if (name) {
-      queryBuilder.andWhere('notification.name LIKE :name', {
-        name: `%${name}%`,
+    if (user.type !== UserType.MASTER) {
+      queryBuilder.andWhere('notification.creator.id = :ownerId', {
+        ownerId: user.id,
       });
     }
 
