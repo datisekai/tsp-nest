@@ -51,7 +51,14 @@ export class ClassService {
     queryClassDto: QueryClassDto,
     user: User,
   ): Promise<{ data: Class[]; total: number }> {
-    const { name, majorId, teacherIds, page = 1, limit = 10 } = queryClassDto;
+    const {
+      name,
+      majorId,
+      teacherIds,
+      page = 1,
+      limit = 10,
+      pagination,
+    } = queryClassDto;
 
     const queryBuilder = this.classRepository
       .createQueryBuilder('class')
@@ -74,9 +81,11 @@ export class ClassService {
       queryBuilder.andWhere('teacher.id IN (:...teacherIds)', { teacherIds });
     }
 
+    if (pagination) {
+      queryBuilder.skip((page - 1) * limit).take(limit);
+    }
+
     const [data, total] = await queryBuilder
-      .skip((page - 1) * limit)
-      .take(limit)
       .orderBy('class.createdAt', 'DESC')
       .getManyAndCount();
 
@@ -122,9 +131,9 @@ export class ClassService {
     return this.classRepository.save(classEntity);
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: number): Promise<Class> {
     const classEntity = await this.findOne(id);
-    await this.classRepository.remove(classEntity);
+    return await this.classRepository.remove(classEntity);
   }
 
   async assignTeachersToClass(

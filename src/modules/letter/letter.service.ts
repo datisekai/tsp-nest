@@ -67,6 +67,7 @@ export class LetterService {
       approvedAt,
       page = 1,
       limit = 10,
+      pagination,
     } = query;
 
     const queryBuilder = this.letterRepository
@@ -99,10 +100,14 @@ export class LetterService {
         },
       );
     }
+    if (pagination) {
+      queryBuilder
+        .skip((page - 1) * limit) // Phân trang
+        .take(limit);
+    }
 
     const [data, total] = await queryBuilder
-      .skip((page - 1) * limit) // Phân trang
-      .take(limit)
+
       .orderBy('letter.createdAt', 'DESC')
       .getManyAndCount();
 

@@ -18,7 +18,7 @@ export class FacultyService {
   async findAll(
     queryDto: QueryFacultyDto,
   ): Promise<{ data: Faculty[]; total: number }> {
-    const { name, page = 1, limit = 10 } = queryDto;
+    const { name, page = 1, limit = 10, pagination } = queryDto;
 
     const queryBuilder = this.facultyRepository.createQueryBuilder('faculty');
 
@@ -28,7 +28,9 @@ export class FacultyService {
     }
 
     // Apply pagination
-    queryBuilder.skip((page - 1) * limit).take(limit);
+    if (pagination) {
+      queryBuilder.skip((page - 1) * limit).take(limit);
+    }
     queryBuilder.orderBy('faculty.createdAt', 'DESC');
 
     // Execute the query and get results with total count

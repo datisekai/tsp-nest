@@ -21,7 +21,7 @@ export class RoleService {
   async findAll(
     queryRoleDto: QueryRoleDto,
   ): Promise<{ data: Role[]; total: number }> {
-    const { name, page = 1, limit = 10 } = queryRoleDto;
+    const { name, page = 1, limit = 10, pagination } = queryRoleDto;
 
     const queryBuilder = this.roleRepository.createQueryBuilder('role');
 
@@ -30,10 +30,15 @@ export class RoleService {
       queryBuilder.where('role.name LIKE :name', { name: `%${name}%` });
     }
 
+    if (pagination) {
+      queryBuilder
+        .skip((page - 1) * limit) // Offset
+        .take(limit);
+    }
+
     // Tính toán offset và limit cho phân trang
     const [data, total] = await queryBuilder
-      .skip((page - 1) * limit) // Offset
-      .take(limit)
+
       .orderBy('role.createdAt', 'DESC') // Limit
       .getManyAndCount(); // Trả về cả dữ liệu và tổng số bản ghi
 

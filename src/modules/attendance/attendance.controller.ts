@@ -81,6 +81,14 @@ export class AttendanceController {
     return attendance;
   }
 
+  @Get(':id/attendees')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.ATTENDANCE_VIEW)
+  @ApiPermissions(AppPermission.ATTENDANCE_VIEW)
+  async findAttendees(@Param('id') id: number): Promise<{ data: Attendee[] }> {
+    return await this.attendanceService.findAttendees(id);
+  }
+
   // Cập nhật thông tin Attendance theo ID
   @Put(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -98,7 +106,7 @@ export class AttendanceController {
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.ATTENDANCE_DELETE)
   @ApiPermissions(AppPermission.ATTENDANCE_DELETE)
-  async remove(@Param('id') id: number): Promise<void> {
+  async remove(@Param('id') id: number): Promise<Attendance> {
     return await this.attendanceService.remove(id);
   }
 }

@@ -92,7 +92,7 @@ export class AttendanceService {
     dto: QueryAttendanceDto,
     user: User,
   ): Promise<{ data: Attendance[]; total: number }> {
-    const { title, isOpen, classId, limit = 10, page = 1 } = dto;
+    const { title, isOpen, classId, limit = 10, page = 1, pagination } = dto;
     const query = this.attendanceRepository
       .createQueryBuilder('attendance')
       .select([
@@ -102,6 +102,7 @@ export class AttendanceService {
         'attendance.isOpen',
         'attendance.title',
         'attendance.secretKey',
+        'attendance.expirationTime',
         'class.id',
         'class.name',
         'major.code',
@@ -111,12 +112,16 @@ export class AttendanceService {
         'user.name',
         'teachers.code',
         'teachers.name',
+        'attendees.createdAt',
+        'attendee_user.name',
+        'attendee_user.code',
       ])
       .leftJoin('attendance.class', 'class')
       .leftJoin('class.major', 'major')
       .leftJoin('class.teachers', 'teachers')
       .leftJoin('attendance.user', 'user')
-      // .leftJoin('attendance.attendees', 'attendees')
+      .leftJoin('attendance.attendees', 'attendees')
+      .leftJoin('attendees.user', 'attendee_user')
       .orderBy('attendance.createdAt', 'DESC'); // Sắp xếp theo createdAt (mới nhất trước)
 
     // Kiểm tra các điều kiện lọc
@@ -136,23 +141,44 @@ export class AttendanceService {
       query.andWhere('attendance.userId = :userId', { userId: user.id });
     }
 
+    if (pagination) {
+      query
+        .skip((page - 1) * limit) // Bỏ qua các bản ghi trước đó
+        .take(limit); // Giới hạn số lượng bản ghi trên mỗi trang
+    }
+
     // Phân trang
-    const [data, total] = await query
-      .skip((page - 1) * limit) // Bỏ qua các bản ghi trước đó
-      .take(limit) // Giới hạn số lượng bản ghi trên mỗi trang
-      .getManyAndCount();
+    const [data, total] = await query.getManyAndCount();
 
     return { data, total };
   }
   async findOne(id: number): Promise<Attendance> {
     const attendance = await this.attendanceRepository.findOne({
       where: { id },
-      relations: ['user'],
+      relations: ['user', 'class'],
     });
     if (!attendance) {
       throw new NotFoundException(`Attendance với ID ${id} không tồn tại`);
     }
     return attendance;
+  }
+
+  async findAttendees(id: number): Promise<{ data: Attendee[] }> {
+    const query = this.attendeeRepository
+      .createQueryBuilder('attendee')
+      .select([
+        'attendee.id',
+        'attendee.createdAt',
+        'attendee.isSuccess',
+        'user.code',
+        'user.name',
+        'user.email',
+        'user.phone',
+      ])
+      .where('attendee.attendanceId = :id', { id })
+      .leftJoin('attendee.user', 'user');
+    const data = await query.getMany();
+    return { data };
   }
 
   async addAttendee(createAttendeeDto: CreateAttendeeDto): Promise<Attendee> {
@@ -177,8 +203,8 @@ export class AttendanceService {
   }
 
   // Xóa Attendance theo ID
-  async remove(id: number): Promise<void> {
+  async remove(id: number): Promise<Attendance> {
     const attendance = await this.findOne(id);
-    await this.attendanceRepository.remove(attendance);
+    return await this.attendanceRepository.remove(attendance);
   }
 }

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
   IsDateString,
@@ -11,7 +11,7 @@ import {
 } from 'class-validator';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
-interface Attendee {
+export interface Attendee {
   code: string;
   name: string;
   time: number;
@@ -51,26 +51,40 @@ export class CreateAttendanceDto {
   isOpen: boolean;
 
   @ApiProperty()
-  @IsNumber()
   @IsNotEmpty()
-  classId: number;
+  @IsInt()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return parseInt(value, 10);
+    }
+    return value;
+  })
+  classId?: number;
 }
 
 export class UpdateAttendanceDto extends PartialType(CreateAttendanceDto) {}
 
 export class QueryAttendanceDto extends PaginationDto {
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   title?: string;
 
+  @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
   @Type(() => Boolean)
   isOpen?: boolean;
 
+  @ApiPropertyOptional()
   @IsOptional()
   @IsInt()
-  @Type(() => Number)
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return parseInt(value, 10);
+    }
+    return value;
+  })
   classId?: number;
 }
 

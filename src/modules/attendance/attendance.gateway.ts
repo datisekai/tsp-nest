@@ -10,6 +10,7 @@ import * as jwt from 'jsonwebtoken';
 import { UserService } from '../user/user.service';
 import { AttendanceService } from './attendance.service';
 import { User } from '../user/user.entity';
+import { Attendee } from './attendance.dto';
 
 @WebSocketGateway({ cors: true })
 export class AttendanceGateway implements OnGatewayInit {
@@ -27,11 +28,23 @@ export class AttendanceGateway implements OnGatewayInit {
     console.log('WebSocket initialized');
   }
   @SubscribeMessage(AttendanceMessage.JOIN_OR_CREATE)
-  public handleCreateRoom(
+  public handleJoinOrCreate(
     client: any,
-    data: { classId: number; secretKey: string; id: number },
+    data: {
+      classId: number;
+      secretKey: string;
+      id: number;
+      attendees?: Attendee[];
+      expirationTime?: number;
+    },
   ) {
-    const { classId, id, secretKey } = data;
+    const {
+      classId,
+      id,
+      secretKey,
+      attendees = [],
+      expirationTime = 3000,
+    } = data;
     console.log('called', data);
     const room = this.rooms[id];
     if (!room) {
@@ -40,9 +53,9 @@ export class AttendanceGateway implements OnGatewayInit {
         classId,
         secretKey,
         qrCode: '',
-        expirationTime: 10000, // 3 giây
+        expirationTime: expirationTime, // 3 giây
         lastGeneratedTime: 0,
-        attendees: [],
+        attendees,
         isOpen: false,
       };
       client.join(id.toString());
@@ -53,7 +66,7 @@ export class AttendanceGateway implements OnGatewayInit {
     }
     client.join(id.toString());
 
-    return this.generateSuccessResponse('Tham gia phòng thành công');
+    return this.generateSuccessResponse('Tham gia phòng thành công', room);
   }
 
   @SubscribeMessage(AttendanceMessage.UPDATE_STATUS_ROOM)
@@ -74,7 +87,8 @@ export class AttendanceGateway implements OnGatewayInit {
     room.isOpen = isOpen;
     this.server
       .to(room.id.toString())
-      .emit(AttendanceMessage.ROOM_STATUS_UPDATED, { isOpen, id });
+      .emit(AttendanceMessage.ROOM_STATUS_UPDATED, room);
+    this.attendanceService.update(room.id, { isOpen });
 
     if (isOpen) {
       this.generateQRCode(id); // Tạo QR cho phòng mới
@@ -104,7 +118,7 @@ export class AttendanceGateway implements OnGatewayInit {
     room.qrCode = token;
     room.lastGeneratedTime = Date.now();
 
-    this.server.to(room.id.toString()).emit('newQRCode', room.qrCode);
+    this.server.to(room.id.toString()).emit('newQRCode', room);
 
     // Tạo mã QR mới sau mỗi 3 giây
     setTimeout(() => this.generateQRCode(id), room.expirationTime);
@@ -196,13 +210,13 @@ export class AttendanceGateway implements OnGatewayInit {
       isSuccess,
       userId: user.id,
     });
-    room.attendees.push({
+    room.attendees.unshift({
       code: user.code,
       name: user.name,
       time: Date.now(),
     });
 
-    client.join(room.id.toString());
+    // client.join(room.id.toString());
     console.log(`Sinh viên ${user.code} đã được thêm vào room ${room.id}`);
   }
 

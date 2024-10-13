@@ -85,7 +85,13 @@ export class NotificationService {
     queryNotificationDto: QueryNotificationDto,
     user: User,
   ): Promise<{ data: Notification[]; total: number }> {
-    const { name, classId, page = 1, limit = 10 } = queryNotificationDto;
+    const {
+      name,
+      classId,
+      page = 1,
+      limit = 10,
+      pagination,
+    } = queryNotificationDto;
 
     const queryBuilder = this.notificationRepository
       .createQueryBuilder('notification')
@@ -108,10 +114,15 @@ export class NotificationService {
       queryBuilder.andWhere('notification.class.id = :classId', { classId });
     }
 
+    if (pagination) {
+      queryBuilder
+        .skip((page - 1) * limit) // Tính toán offset
+        .take(limit); // Số bản ghi mỗi trang
+    }
+
     // Phân trang
     const [data, total] = await queryBuilder
-      .skip((page - 1) * limit) // Tính toán offset
-      .take(limit) // Số bản ghi mỗi trang
+
       .orderBy('notification.createdAt', 'DESC') // Sắp xếp theo thời gian tạo mới nhất
       .getManyAndCount();
 

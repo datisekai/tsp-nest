@@ -32,4 +32,7 @@ export class Attendance extends BaseEntity {
 
   @ManyToOne(() => User, (entity) => entity.attendances)
   user: User;
+
+  @Column({ type: 'int', default: 3000 })
+  expirationTime: number;
 }

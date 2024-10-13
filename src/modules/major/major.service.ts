@@ -55,6 +55,7 @@ export class MajorService {
       page = 1,
       limit = 10,
       code,
+      pagination,
     } = queryMajorDto;
 
     // Tạo QueryBuilder cho Major
@@ -86,10 +87,15 @@ export class MajorService {
       queryBuilder.andWhere('teacher.id IN (:...teacherIds)', { teacherIds });
     }
 
+    if (pagination) {
+      queryBuilder
+        .skip((page - 1) * limit) // Offset
+        .take(limit); // Limit số bản ghi mỗi lần
+    }
+
     // Tính toán offset và limit cho phân trang
     const [data, total] = await queryBuilder
-      .skip((page - 1) * limit) // Offset
-      .take(limit) // Limit số bản ghi mỗi lần
+
       .orderBy('major.createdAt', 'DESC') // Sắp xếp theo thời gian tạo mới nhất
       .getManyAndCount(); // Trả về cả dữ liệu và tổng số bản ghi
 

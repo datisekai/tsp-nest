@@ -23,6 +23,7 @@ export class UserService {
       name,
       phone,
       type, // Thêm điều kiện lọc theo type (teacher/student)
+      pagination,
     } = queryDto;
 
     const queryBuilder = this.userRepository.createQueryBuilder('user');
@@ -56,7 +57,9 @@ export class UserService {
     }
 
     // Paginate results
-    queryBuilder.skip((page - 1) * limit).take(limit);
+    if (pagination) {
+      queryBuilder.skip((page - 1) * limit).take(limit);
+    }
     queryBuilder.orderBy('user.createdAt', 'DESC');
 
     // Execute the query and get the data and total count

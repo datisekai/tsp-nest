@@ -74,8 +74,8 @@ export class ClassController {
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.CLASS_DELETE)
   @ApiPermissions(AppPermission.CLASS_DELETE)
-  async deleteClass(@Param('id') classId: number): Promise<void> {
-    return this.classService.delete(classId);
+  async deleteClass(@Param('id') classId: number): Promise<Class> {
+    return await this.classService.delete(classId);
   }
 
   @Patch(':id/assign-teachers')
