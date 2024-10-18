@@ -2,6 +2,7 @@ import { BaseEntity } from 'src/common/entities/base.entity';
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -31,6 +32,7 @@ export class Attendance extends BaseEntity {
   attendees: Attendee[];
 
   @ManyToOne(() => User, (entity) => entity.attendances)
+  @JoinColumn({ name: 'userId' })
   user: User;
 
   @Column({ type: 'int', default: 3000 })

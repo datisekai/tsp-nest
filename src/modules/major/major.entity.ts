@@ -10,6 +10,7 @@ import { BaseEntity } from '../../common/entities/base.entity';
 import { Class } from '../class/class.entity';
 import { Faculty } from '../faculty/faculty.entity';
 import { User } from '../user/user.entity';
+import { Chapter } from '../question/chapter/chapter.entity';
 
 @Entity()
 export class Major extends BaseEntity {
@@ -27,6 +28,9 @@ export class Major extends BaseEntity {
 
   @OneToMany(() => Class, (classEntity) => classEntity.major)
   classes: Class[];
+
+  @OneToMany(() => Chapter, (chapterEntity) => chapterEntity.major)
+  chapters: Chapter[];
 
   @ManyToMany(() => User, (teacher) => teacher.majors)
   teachers: User[];

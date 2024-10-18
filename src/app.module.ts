@@ -19,6 +19,7 @@ import { NotificationModule } from './modules/notification/notification.module';
 import { MetaModule } from './modules/meta/meta.module';
 import { LetterModule } from './modules/letter/letter.module';
 import { AttendanceModule } from './modules/attendance/attendance.module';
+import { QuestionModule } from './modules/question/question.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { AttendanceModule } from './modules/attendance/attendance.module';
     MetaModule,
     LetterModule,
     AttendanceModule,
+    QuestionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
