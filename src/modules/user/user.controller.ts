@@ -13,7 +13,12 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { PermissionGuard } from '../auth/guards/permission.guard';
-import { CreateUserDto, QueryUserDto, UpdateUserDto } from './user.dto';
+import {
+  CreateUserDto,
+  QueryTeacherDto,
+  QueryUserDto,
+  UpdateUserDto,
+} from './user.dto';
 import { UserService } from './user.service';
 import { AppPermission, AppResource } from '../../app.role';
 import { Permissions, User } from '../../common/decorators';
@@ -33,6 +38,13 @@ export class UserController {
   @UsePipes(new ValidationPipe({ transform: true })) // Automatically applies validation
   async findAll(@Query() queryDto: QueryUserDto) {
     return this.userService.findAll(queryDto);
+  }
+
+  @Get('/public/teachers')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UsePipes(new ValidationPipe({ transform: true })) // Automatically applies validation
+  async findTeachers(@Query() queryDto: QueryTeacherDto) {
+    return this.userService.findTeachers(queryDto);
   }
 
   @Get(':id')

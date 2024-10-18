@@ -1,7 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateUserDto, QueryUserDto, UpdateUserDto } from './user.dto';
+import {
+  CreateUserDto,
+  QueryTeacherDto,
+  QueryUserDto,
+  UpdateUserDto,
+  UserType,
+} from './user.dto';
 import { User } from './user.entity';
 
 @Injectable()
@@ -66,6 +72,36 @@ export class UserService {
     const [data, total] = await queryBuilder.getManyAndCount();
 
     return { data, total };
+  }
+
+  async findTeachers(dto: QueryTeacherDto): Promise<{ data: User[] }> {
+    const { code, name } = dto;
+
+    const queryBuilder = this.userRepository.createQueryBuilder('user');
+
+    if (code) {
+      queryBuilder.andWhere('user.code LIKE :code', { code: `%${code}%` });
+    }
+
+    if (name) {
+      queryBuilder.andWhere('user.name LIKE :name', { name: `%${name}%` });
+    }
+
+    queryBuilder.andWhere('user.type != :type', { type: UserType.MASTER });
+    queryBuilder.andWhere('user.type != :type', { type: UserType.STUDENT });
+    queryBuilder.select([
+      'user.id',
+      'user.code',
+      'user.name',
+      'user.avatar',
+      'user.email',
+    ]);
+
+    queryBuilder.orderBy('user.createdAt', 'DESC');
+
+    const data = await queryBuilder.getMany();
+
+    return { data };
   }
 
   async findOne(id: number, hasPermission = false): Promise<User> {

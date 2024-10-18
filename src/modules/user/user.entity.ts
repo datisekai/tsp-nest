@@ -1,26 +1,24 @@
+import { hash } from 'bcryptjs';
 import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  Unique,
   BeforeInsert,
   BeforeUpdate,
-  ManyToMany,
+  Column,
+  Entity,
   JoinTable,
+  ManyToMany,
+  ManyToOne,
   OneToMany,
+  PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
-import { Role } from '../role/role.entity';
-import { UserType } from './user.dto';
-import { hash } from 'bcryptjs';
-import { Class } from '../class/class.entity';
-import { Major } from '../major/major.entity';
 import { BaseEntity } from '../../common/entities/base.entity';
-import { Letter } from '../letter/letter.entity';
 import { Attendance } from '../attendance/attendance.entity';
 import { Attendee } from '../attendance/attendee.entity';
+import { Class } from '../class/class.entity';
+import { Letter } from '../letter/letter.entity';
+import { Major } from '../major/major.entity';
+import { Role } from '../role/role.entity';
+import { UserType } from './user.dto';
 @Entity()
 @Unique(['code', 'deviceUid'])
 export class User extends BaseEntity {
