@@ -153,12 +153,14 @@ export class AttendanceService {
 
     return { data, total };
   }
-  async findOne(id: number, user: User): Promise<Attendance> {
+  async findOne(id: number, user?: User): Promise<Attendance> {
     const attendance = await this.attendanceRepository.findOne({
       where: { id },
       relations: ['user', 'class'],
     });
-    checkUserPermission(attendance.user.id, user);
+    if (user) {
+      checkUserPermission(attendance.user.id, user);
+    }
     if (!attendance) {
       throw new NotFoundException(`Attendance với ID ${id} không tồn tại`);
     }
@@ -198,7 +200,7 @@ export class AttendanceService {
   async update(
     id: number,
     updateAttendanceDto: UpdateAttendanceDto,
-    user: User,
+    user?: User,
   ): Promise<Attendance> {
     const attendance = await this.findOne(id, user);
     Object.assign(attendance, updateAttendanceDto);
