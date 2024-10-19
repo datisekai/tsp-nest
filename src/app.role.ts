@@ -11,6 +11,12 @@ export enum AppResource {
   META = 'META',
   LETTER = 'LETTER',
   ATTENDANCE = 'ATTENDANCE',
+  QUESTION = 'QUESTION',
+  SUBMISSION = 'SUBMISSION',
+  CHAPTER = 'CHAPTER',
+  DIFFICULTY = 'DIFFICULTY',
+  GOOGLEAI = 'GOOGLEAI',
+  EXAM = 'EXAM',
 }
 
 export enum AppPermission {
@@ -72,4 +78,6 @@ export enum AppPermission {
   EXAM_DELETE = 'exam:delete',
   META_VIEW = 'meta:view',
   META_UPDATE = 'meta:update',
+  DIFFICULTY_CREATE = 'difficulty:create',
+  DIFFICULTY_DELETE = 'difficulty:delete',
 }

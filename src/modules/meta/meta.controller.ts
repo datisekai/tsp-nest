@@ -22,9 +22,22 @@ export class MetaController {
     return this.metaService.updateMeta(META_KEY.SETTING, updateMetaDto);
   }
 
+  @Patch(META_KEY.PROMPT)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.META_UPDATE)
+  @ApiPermissions(AppPermission.META_UPDATE)
+  async updatePrompt(@Body() updateMetaDto: UpdateMetaDto) {
+    return this.metaService.updateMeta(META_KEY.PROMPT, updateMetaDto);
+  }
+
   // Lấy meta theo key
   @Get(META_KEY.SETTING)
   async getMeta() {
     return this.metaService.getMetaByKey(META_KEY.SETTING);
+  }
+
+  @Get(META_KEY.PROMPT)
+  async getPrompt() {
+    return this.metaService.getMetaByKey(META_KEY.PROMPT);
   }
 }

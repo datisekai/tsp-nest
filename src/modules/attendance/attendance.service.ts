@@ -13,6 +13,7 @@ import { Attendee } from './attendee.entity';
 import { removeVietnameseDiacritics } from 'src/common/helpers';
 import { User } from '../user/user.entity';
 import { UserType } from '../user/user.dto';
+import { checkUserPermission } from 'src/common/helpers/checkPermission';
 
 @Injectable()
 export class AttendanceService {
@@ -138,7 +139,7 @@ export class AttendanceService {
     }
 
     if (user.type !== UserType.MASTER) {
-      query.andWhere('attendance.userId = :userId', { userId: user.id });
+      query.andWhere('attendance.user.id = :userId', { userId: user.id });
     }
 
     if (pagination) {
@@ -152,11 +153,14 @@ export class AttendanceService {
 
     return { data, total };
   }
-  async findOne(id: number): Promise<Attendance> {
+  async findOne(id: number, user?: User): Promise<Attendance> {
     const attendance = await this.attendanceRepository.findOne({
       where: { id },
       relations: ['user', 'class'],
     });
+    if (user) {
+      checkUserPermission(attendance.user.id, user);
+    }
     if (!attendance) {
       throw new NotFoundException(`Attendance với ID ${id} không tồn tại`);
     }
@@ -196,15 +200,16 @@ export class AttendanceService {
   async update(
     id: number,
     updateAttendanceDto: UpdateAttendanceDto,
+    user?: User,
   ): Promise<Attendance> {
-    const attendance = await this.findOne(id);
+    const attendance = await this.findOne(id, user);
     Object.assign(attendance, updateAttendanceDto);
     return await this.attendanceRepository.save(attendance);
   }
 
   // Xóa Attendance theo ID
-  async remove(id: number): Promise<Attendance> {
-    const attendance = await this.findOne(id);
+  async remove(id: number, user: User): Promise<Attendance> {
+    const attendance = await this.findOne(id, user);
     return await this.attendanceRepository.remove(attendance);
   }
 }

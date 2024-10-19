@@ -73,8 +73,11 @@ export class AttendanceController {
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.ATTENDANCE_VIEW)
   @ApiPermissions(AppPermission.ATTENDANCE_VIEW)
-  async findOne(@Param('id') id: number): Promise<Attendance> {
-    const attendance = await this.attendanceService.findOne(id);
+  async findOne(
+    @Param('id') id: number,
+    @User() user: UserEntity,
+  ): Promise<Attendance> {
+    const attendance = await this.attendanceService.findOne(id, user);
     if (!attendance) {
       throw new NotFoundException(`Attendance với ID ${id} không tồn tại`);
     }
@@ -97,8 +100,9 @@ export class AttendanceController {
   async update(
     @Param('id') id: number,
     @Body() updateAttendanceDto: UpdateAttendanceDto,
+    @User() user: UserEntity,
   ): Promise<Attendance> {
-    return await this.attendanceService.update(id, updateAttendanceDto);
+    return await this.attendanceService.update(id, updateAttendanceDto, user);
   }
 
   // Xóa Attendance theo ID
@@ -106,7 +110,10 @@ export class AttendanceController {
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.ATTENDANCE_DELETE)
   @ApiPermissions(AppPermission.ATTENDANCE_DELETE)
-  async remove(@Param('id') id: number): Promise<Attendance> {
-    return await this.attendanceService.remove(id);
+  async remove(
+    @Param('id') id: number,
+    @User() user: UserEntity,
+  ): Promise<Attendance> {
+    return await this.attendanceService.remove(id, user);
   }
 }

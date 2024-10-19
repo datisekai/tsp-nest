@@ -32,6 +32,7 @@ export class MetaService {
   // Lấy Meta theo key
   async getMetaByKey(key: string): Promise<Meta> {
     const meta = await this.metaRepository.findOne({ where: { key } });
+    console.log('meta', meta);
 
     if (!meta) {
       throw new NotFoundException(`Meta with key ${key} not found`);

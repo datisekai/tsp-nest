@@ -114,3 +114,15 @@ export class QueryUserDto extends PaginationDto {
   @IsOptional()
   type?: UserType; // Thêm field để tìm kiếm theo type
 }
+
+export class QueryTeacherDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  code?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  name?: string;
+}

@@ -246,4 +246,13 @@ export class ClassService {
 
     return this.classRepository.save(classEntity);
   }
+
+  async checkExistedUser(classId: number, userId: number) {
+    const classExist = await this.findOne(classId);
+
+    // Kiểm tra xem userId có nằm trong danh sách người dùng của lớp không
+    const userExists = classExist.users.some((user) => user.id === userId);
+
+    return userExists; // Trả về true nếu người dùng tồn tại, ngược lại false
+  }
 }
