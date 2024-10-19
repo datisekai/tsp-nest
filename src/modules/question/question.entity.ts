@@ -1,8 +1,9 @@
 import {
-  BaseEntity,
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -13,6 +14,8 @@ import { Difficulty } from './difficulty/difficulty.entity';
 import { QuestionType } from './question.dto';
 import { TestCase } from './testcase/testcase.entity';
 import { Submission } from './submission/submission.entity';
+import { Exam } from '../exam/exam.entity';
+import { BaseEntity } from 'src/common/entities/base.entity';
 
 @Entity()
 export class Question extends BaseEntity {
@@ -42,7 +45,6 @@ export class Question extends BaseEntity {
   chapter: Chapter;
 
   @ManyToOne(() => User, (user) => user.id)
-  @JoinColumn({ name: 'userId' })
   user: User;
 
   @Column({ type: 'json', nullable: true })
@@ -52,5 +54,15 @@ export class Question extends BaseEntity {
   testCases: TestCase[]; // Các test case của bài tập
 
   @OneToMany(() => Submission, (submission) => submission.question)
-  submissions: Submission[]; // Các lần nộp bài liên quan đến câu hỏi
+  submissions: Submission[];
+
+  @Column({ type: 'simple-array', nullable: true })
+  acceptedLanguages: number[];
+
+  @Column({ type: 'simple-json', nullable: true })
+  initCode: { [key: string | number]: string };
+
+  @ManyToMany(() => Exam, (exam) => exam.questions)
+  @JoinTable() // Tạo bảng liên kết giữa Question và Exam
+  exams: Exam[];
 }

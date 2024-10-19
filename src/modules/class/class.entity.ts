@@ -12,6 +12,7 @@ import { Notification } from '../notification/notification.entity';
 import { BaseEntity } from '../../common/entities/base.entity';
 import { Letter } from '../letter/letter.entity';
 import { Attendance } from '../attendance/attendance.entity';
+import { Exam } from '../exam/exam.entity';
 
 @Entity()
 export class Class extends BaseEntity {
@@ -41,4 +42,7 @@ export class Class extends BaseEntity {
     (notificationEntity) => notificationEntity.class,
   )
   notifications: Notification[];
+
+  @OneToMany(() => Exam, (exam) => exam.class) // Liên kết với bài thi
+  exams: Exam[];
 }

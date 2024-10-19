@@ -3,6 +3,7 @@ import { IsString, IsNotEmpty, IsJSON } from 'class-validator';
 
 export enum META_KEY {
   SETTING = 'setting',
+  PROMPT = 'prompt',
 }
 export class UpdateMetaDto {
   @ApiProperty()

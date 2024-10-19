@@ -23,6 +23,7 @@ export class SubmissionController {
       user.id,
       submitMultipleChoiceDto.questionId,
       submitMultipleChoiceDto.answer,
+      submitMultipleChoiceDto.examId,
     );
   }
 
@@ -32,11 +33,6 @@ export class SubmissionController {
     @Body() submitCodeDto: SubmitCodeDto,
     @User() user: UserEntity,
   ) {
-    return this.submissionService.submitCode(
-      user.id,
-      submitCodeDto.questionId,
-      submitCodeDto.language,
-      submitCodeDto.code,
-    );
+    return this.submissionService.submitCode(submitCodeDto, user);
   }
 }

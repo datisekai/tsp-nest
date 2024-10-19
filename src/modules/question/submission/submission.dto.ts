@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, isNumber } from 'class-validator';
 
 export class SubmitMultipleChoiceDto {
   @ApiProperty()
@@ -30,8 +30,8 @@ export class SubmitCodeDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsString()
-  language: string;
+  @IsNumber()
+  languageId: number;
 
   @ApiProperty()
   @IsNotEmpty()

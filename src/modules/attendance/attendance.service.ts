@@ -139,7 +139,7 @@ export class AttendanceService {
     }
 
     if (user.type !== UserType.MASTER) {
-      query.andWhere('attendance.userId = :userId', { userId: user.id });
+      query.andWhere('attendance.user.id = :userId', { userId: user.id });
     }
 
     if (pagination) {

@@ -39,7 +39,7 @@ export class QuestionService {
     }
 
     if (user.type !== UserType.MASTER) {
-      query.andWhere('question.userId = :userId', { userId: user.id });
+      query.andWhere('question.user.id = :userId', { userId: user.id });
     }
 
     const [data, total] = await query.getManyAndCount();
@@ -59,6 +59,8 @@ export class QuestionService {
       chapterId,
       choices,
       testCases,
+      acceptedLanguages,
+      initCode,
     } = createQuestionDto;
 
     const question = this.questionRepository.create({
@@ -69,6 +71,8 @@ export class QuestionService {
       difficulty: { id: difficultyId } as Difficulty,
       chapter: { id: chapterId } as Chapter,
       choices,
+      acceptedLanguages,
+      initCode,
     });
 
     const savedQuestion = await this.questionRepository.save(question);
@@ -87,16 +91,33 @@ export class QuestionService {
     return savedQuestion;
   }
 
-  async getQuestionById(id: number, user: User): Promise<Question> {
+  async getQuestionById(id: number, user?: User): Promise<Question> {
     const question = await this.questionRepository.findOne({
       where: { id },
       relations: ['difficulty', 'chapter', 'user', 'testCases'],
     });
-    checkUserPermission(question.user.id, user);
+    if (user) {
+      checkUserPermission(question.user.id, user);
+    }
     if (!question) {
       throw new NotFoundException(`Question with ID ${id} not found`);
     }
     return question;
+  }
+
+  async getQuestionByExamId(examId: number, user?: User): Promise<Question[]> {
+    const questions = await this.questionRepository.find({
+      where: { exams: { id: examId } },
+    });
+
+    questions.forEach((item) => {
+      item.choices = item.choices.map((choice) => ({
+        text: choice.text,
+        isCorrect: undefined,
+      }));
+    });
+
+    return questions;
   }
 
   async updateQuestion(

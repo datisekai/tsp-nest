@@ -6,20 +6,21 @@ import { AccessControlModule, RolesBuilder } from 'nest-access-control';
 import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AttendanceModule } from './modules/attendance/attendance.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { ClassModule } from './modules/class/class.module';
+import { FacultyModule } from './modules/faculty/faculty.module';
+import { GoogleAIModule } from './modules/googleai/googleai.module';
+import { InitModule } from './modules/init/init.module';
+import { LetterModule } from './modules/letter/letter.module';
+import { MajorModule } from './modules/major/major.module';
+import { MetaModule } from './modules/meta/meta.module';
+import { NotificationModule } from './modules/notification/notification.module';
+import { PermissionModule } from './modules/permission/permission.module';
+import { QuestionModule } from './modules/question/question.module';
+import { RoleModule } from './modules/role/role.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { UserModule } from './modules/user/user.module';
-import { PermissionModule } from './modules/permission/permission.module';
-import { RoleModule } from './modules/role/role.module';
-import { FacultyModule } from './modules/faculty/faculty.module';
-import { InitModule } from './modules/init/init.module';
-import { MajorModule } from './modules/major/major.module';
-import { ClassModule } from './modules/class/class.module';
-import { NotificationModule } from './modules/notification/notification.module';
-import { MetaModule } from './modules/meta/meta.module';
-import { LetterModule } from './modules/letter/letter.module';
-import { AttendanceModule } from './modules/attendance/attendance.module';
-import { QuestionModule } from './modules/question/question.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { QuestionModule } from './modules/question/question.module';
     LetterModule,
     AttendanceModule,
     QuestionModule,
+    GoogleAIModule,
   ],
   controllers: [AppController],
   providers: [AppService],

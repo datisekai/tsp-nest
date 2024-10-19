@@ -1,12 +1,16 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
   IsEnum,
+  IsInt,
+  IsJSON,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
@@ -49,6 +53,10 @@ export class CreateTestCaseDto {
   expectedOutput: string;
 }
 
+export class InitCodeDto {
+  [key: string]: string; // cho phép khóa là string và giá trị là string
+}
+
 export class CreateUpdateQuestionDto {
   @ApiProperty()
   @IsNotEmpty()
@@ -89,6 +97,18 @@ export class CreateUpdateQuestionDto {
   @IsOptional()
   @IsArray()
   testCases?: { input: string; expectedOutput: string }[]; // Test case cho câu hỏi viết code
+
+  @ApiPropertyOptional()
+  @IsOptional() // Nếu bạn không cần bắt buộc
+  @IsArray()
+  @IsInt({ each: true }) // Kiểm tra từng phần tử trong mảng là số nguyên
+  acceptedLanguages: number[];
+
+  @ApiPropertyOptional()
+  @IsOptional() // Nếu bạn không cần bắt buộc
+  @ValidateNested() // Để xác thực các thuộc tính bên trong
+  @Type(() => InitCodeDto) // Chuyển đổi kiểu
+  initCode: InitCodeDto; // Sử dụng DTO cho initCode
 }
 
 export class CreateChapterDto {

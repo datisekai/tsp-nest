@@ -1,5 +1,4 @@
 import {
-  BaseEntity,
   Column,
   Entity,
   PrimaryGeneratedColumn,
@@ -9,6 +8,7 @@ import {
 import { Major } from '../../major/major.entity';
 import { Question } from '../question.entity';
 import { User } from 'src/modules/user/user.entity';
+import { BaseEntity } from 'src/common/entities/base.entity';
 
 @Entity()
 export class Chapter extends BaseEntity {

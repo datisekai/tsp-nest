@@ -32,7 +32,6 @@ export class Attendance extends BaseEntity {
   attendees: Attendee[];
 
   @ManyToOne(() => User, (entity) => entity.attendances)
-  @JoinColumn({ name: 'userId' })
   user: User;
 
   @Column({ type: 'int', default: 3000 })
