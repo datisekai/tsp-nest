@@ -102,6 +102,15 @@ export class ClassService {
     }
     return classEntity;
   }
+  async findByIds(ids: number[]): Promise<Class[]> {
+    const classes = await this.classRepository.findByIds(ids);
+    if (!classes || classes.length === 0) {
+      throw new NotFoundException(
+        `Classes with IDS ${ids.toString()} not found`,
+      );
+    }
+    return classes;
+  }
 
   async update(id: number, updateClassDto: UpdateClassDto): Promise<Class> {
     const { name, majorId, teacherCodes } = updateClassDto;
