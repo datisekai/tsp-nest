@@ -41,6 +41,12 @@ export class QueryQuestionDto extends PaginationDto {
   isPublic?: boolean; // Lọc theo trạng thái công khai
 }
 
+export class QueryChapterDto extends PaginationDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  majorId: string;
+}
+
 export class CreateTestCaseDto {
   @ApiProperty()
   @IsNotEmpty()
@@ -80,13 +86,21 @@ export class CreateUpdateQuestionDto {
 
   @IsNotEmpty()
   @ApiProperty()
+  @Type(() => Number)
   @IsNumber()
   difficultyId: number; // ID độ khó
 
   @IsNotEmpty()
   @ApiProperty()
+  @Type(() => Number)
   @IsNumber()
   chapterId: number; // ID chương
+
+  @IsNotEmpty()
+  @ApiProperty()
+  @Type(() => Number)
+  @IsNumber()
+  majorId: number; // ID chương
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -112,16 +126,19 @@ export class CreateUpdateQuestionDto {
 }
 
 export class CreateChapterDto {
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   name: string;
 
+  @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
   majorId: number; // Chương thuộc major nào
 }
 
 export class CreateDifficultyDto {
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   level: string;

@@ -22,7 +22,8 @@ export class DifficultyService {
     return await this.difficultyRepository.remove(difficulty);
   }
 
-  async getAllDifficulties(): Promise<Difficulty[]> {
-    return this.difficultyRepository.find();
+  async getAllDifficulties(): Promise<{ data: Difficulty[] }> {
+    const difficulties = await this.difficultyRepository.find();
+    return { data: difficulties };
   }
 }

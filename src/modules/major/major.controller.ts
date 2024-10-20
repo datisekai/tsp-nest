@@ -76,6 +76,17 @@ export class MajorController {
     return this.majorService.delete(id);
   }
 
+  @Delete(':id/teacher/:teacherCode')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.MAJOR_UPDATE)
+  @ApiPermissions(AppPermission.MAJOR_UPDATE)
+  async deleteTeacher(
+    @Param('id') id: number,
+    @Param('teacherCode') teacherCode: string,
+  ): Promise<Major> {
+    return this.majorService.deleteTeacherToMajor(id, teacherCode);
+  }
+
   @Post(':id/assign-teachers')
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.MAJOR_UPDATE)

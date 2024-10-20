@@ -78,6 +78,17 @@ export class ClassController {
     return await this.classService.delete(classId);
   }
 
+  @Delete(':id/teacher/:teacherCode')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.CLASS_UPDATE)
+  @ApiPermissions(AppPermission.CLASS_UPDATE)
+  async deleteTeacher(
+    @Param('id') classId: number,
+    @Param('teacherCode') teacherCode: string,
+  ): Promise<Class> {
+    return await this.classService.deleteTeacherToClass(classId, teacherCode);
+  }
+
   @Patch(':id/assign-teachers')
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.CLASS_UPDATE)

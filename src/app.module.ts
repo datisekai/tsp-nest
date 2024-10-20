@@ -21,6 +21,7 @@ import { QuestionModule } from './modules/question/question.module';
 import { RoleModule } from './modules/role/role.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { UserModule } from './modules/user/user.module';
+import { LanguageModule } from './modules/language/language.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { UserModule } from './modules/user/user.module';
     AttendanceModule,
     QuestionModule,
     GoogleAIModule,
+    LanguageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

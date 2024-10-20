@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -14,7 +15,7 @@ import { JwtAuthGuard } from 'src/modules/auth/guards';
 import { PermissionGuard } from 'src/modules/auth/guards/permission.guard';
 import { ApiPermissions } from 'src/common/decorators/api.decorator';
 import { Permissions, User } from 'src/common/decorators';
-import { CreateChapterDto } from '../question.dto';
+import { CreateChapterDto, QueryChapterDto } from '../question.dto';
 import { User as UserEntity } from '../../user/user.entity';
 
 @ApiTags(AppResource.CHAPTER)
@@ -42,7 +43,7 @@ export class ChapterController {
   }
 
   @Get()
-  async getAllChapters() {
-    return this.chapterService.getAllChapters();
+  async getAllChapters(@Query() dto: QueryChapterDto) {
+    return this.chapterService.getAll(dto);
   }
 }

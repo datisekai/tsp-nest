@@ -49,6 +49,7 @@ export class QuestionService {
 
   async createQuestion(
     createQuestionDto: CreateUpdateQuestionDto,
+    user: User,
   ): Promise<Question> {
     const {
       title,
@@ -61,6 +62,7 @@ export class QuestionService {
       testCases,
       acceptedLanguages,
       initCode,
+      majorId,
     } = createQuestionDto;
 
     const question = this.questionRepository.create({
@@ -70,6 +72,8 @@ export class QuestionService {
       isPublic,
       difficulty: { id: difficultyId } as Difficulty,
       chapter: { id: chapterId } as Chapter,
+      major: { id: majorId },
+      user: { id: user.id },
       choices,
       acceptedLanguages,
       initCode,
@@ -94,7 +98,7 @@ export class QuestionService {
   async getQuestionById(id: number, user?: User): Promise<Question> {
     const question = await this.questionRepository.findOne({
       where: { id },
-      relations: ['difficulty', 'chapter', 'user', 'testCases'],
+      relations: ['difficulty', 'chapter', 'user', 'testCases', 'major'],
     });
     if (user) {
       checkUserPermission(question.user.id, user);

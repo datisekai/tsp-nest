@@ -16,6 +16,6 @@ export class GoogleAIController {
   async generateResponse(@Body() dto: GenerateCodeDto) {
     const codeFencing = await this.googleAIService.generateCode(dto);
 
-    return { data: removeCodeFencing(codeFencing) };
+    return { data: removeCodeFencing(codeFencing), languageId: dto.language };
   }
 }
