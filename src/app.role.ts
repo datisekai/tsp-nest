@@ -17,6 +17,7 @@ export enum AppResource {
   DIFFICULTY = 'DIFFICULTY',
   GOOGLEAI = 'GOOGLEAI',
   EXAM = 'EXAM',
+  LANGUAGE = 'LANGUAGE',
 }
 
 export enum AppPermission {

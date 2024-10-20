@@ -34,4 +34,17 @@ export class Judge0Service {
 
     return response.data;
   }
+
+  async getLanguages() {
+    if (!this.judgeUrl || !this.xAuthToken)
+      throw new NotFoundException('Judge0 URL or API key not found');
+    const response = await axios.get(`${this.judgeUrl}/languages`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Auth-Token': this.xAuthToken,
+      },
+    });
+
+    return response.data;
+  }
 }
