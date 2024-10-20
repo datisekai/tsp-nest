@@ -15,6 +15,7 @@ import { SubmissionController } from './submission/submission.controller';
 import { Submission } from './submission/submission.entity';
 import { SubmissionService } from './submission/submission.service';
 import { TestCase } from './testcase/testcase.entity';
+import { Judge0Service } from '../judge0/judge0.service';
 
 @Module({
   imports: [
@@ -39,12 +40,14 @@ import { TestCase } from './testcase/testcase.entity';
     ChapterService,
     DifficultyService,
     SubmissionService,
+    Judge0Service,
   ],
   exports: [
     QuestionService,
     ChapterService,
     DifficultyService,
     SubmissionService,
+    Judge0Service,
   ],
 })
 export class QuestionModule {}
