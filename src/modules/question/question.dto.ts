@@ -43,7 +43,7 @@ export class QueryQuestionDto extends PaginationDto {
 
 export class QueryChapterDto extends PaginationDto {
   @ApiPropertyOptional()
-  @IsNotEmpty()
+  @IsOptional()
   majorId: string;
 }
 
