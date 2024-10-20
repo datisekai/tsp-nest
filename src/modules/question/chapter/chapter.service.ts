@@ -34,7 +34,15 @@ export class ChapterService {
     return await this.chapterRepository.remove(chapter);
   }
 
-  async getAllChapters(): Promise<Chapter[]> {
-    return this.chapterRepository.find();
+  async getAllChapters(): Promise<{ data: Chapter[] }> {
+    const chapters = await this.chapterRepository.find();
+    return { data: chapters };
+  }
+
+  async getAllChaptersOfMajor(majorId: number): Promise<{ data: Chapter[] }> {
+    const chapters = await this.chapterRepository.find({
+      where: { major: { id: majorId } },
+    });
+    return { data: chapters };
   }
 }
