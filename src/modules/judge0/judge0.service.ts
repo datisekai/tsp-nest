@@ -46,8 +46,8 @@ export class Judge0Service {
       },
     });
 
-    const languages = response.data.filter(
-      (language) => !whileListLanguage.includes(language.id),
+    const languages = response.data.filter((language) =>
+      whileListLanguage.includes(language.id),
     );
     return languages;
   }
