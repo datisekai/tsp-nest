@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Chapter } from './chapter.entity';
 import { Repository } from 'typeorm';
-import { CreateChapterDto } from '../question.dto';
+import { CreateChapterDto, QueryChapterDto } from '../question.dto';
 import { User } from 'src/modules/user/user.entity';
 import { checkUserPermission } from 'src/common/helpers/checkPermission';
 
@@ -23,6 +23,7 @@ export class ChapterService {
       major: { id: majorId },
       user,
     });
+    delete chapter['user'];
     return await this.chapterRepository.save(chapter);
   }
 
@@ -34,15 +35,22 @@ export class ChapterService {
     return await this.chapterRepository.remove(chapter);
   }
 
-  async getAllChapters(): Promise<{ data: Chapter[] }> {
-    const chapters = await this.chapterRepository.find();
-    return { data: chapters };
-  }
+  async getAll(
+    dto: QueryChapterDto,
+  ): Promise<{ data: Chapter[]; total: number }> {
+    const { majorId, page = 1, limit = 10, pagination = true } = dto;
+    const query = this.chapterRepository.createQueryBuilder('chapter');
 
-  async getAllChaptersOfMajor(majorId: number): Promise<{ data: Chapter[] }> {
-    const chapters = await this.chapterRepository.find({
-      where: { major: { id: majorId } },
-    });
-    return { data: chapters };
+    if (majorId) {
+      query.andWhere('chapter.major.id LIKE :majorId', { majorId });
+    }
+
+    if (pagination) {
+      query.skip((page - 1) * limit).take(limit);
+    }
+
+    const [data, total] = await query.getManyAndCount();
+
+    return { data, total };
   }
 }
