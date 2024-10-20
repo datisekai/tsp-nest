@@ -42,8 +42,9 @@ export class QuestionController {
   @ApiPermissions(AppPermission.QUESTION_CREATE)
   async createQuestion(
     @Body() createQuestionDto: CreateUpdateQuestionDto,
+    @User() user: UserEntity,
   ): Promise<Question> {
-    return this.questionService.createQuestion(createQuestionDto);
+    return this.questionService.createQuestion(createQuestionDto, user);
   }
 
   @Get(':id')

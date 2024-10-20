@@ -16,6 +16,7 @@ import { TestCase } from './testcase/testcase.entity';
 import { Submission } from './submission/submission.entity';
 import { Exam } from '../exam/exam.entity';
 import { BaseEntity } from 'src/common/entities/base.entity';
+import { Major } from '../major/major.entity';
 
 @Entity()
 export class Question extends BaseEntity {
@@ -37,6 +38,9 @@ export class Question extends BaseEntity {
 
   @Column({ type: 'boolean', default: false })
   isPublic: boolean; // Trạng thái public
+
+  @ManyToOne(() => Major, (major) => major.id)
+  major: Major;
 
   @ManyToOne(() => Difficulty, (difficulty) => difficulty.id)
   difficulty: Difficulty;

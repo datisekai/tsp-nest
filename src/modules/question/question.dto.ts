@@ -86,13 +86,21 @@ export class CreateUpdateQuestionDto {
 
   @IsNotEmpty()
   @ApiProperty()
+  @Type(() => Number)
   @IsNumber()
   difficultyId: number; // ID độ khó
 
   @IsNotEmpty()
   @ApiProperty()
+  @Type(() => Number)
   @IsNumber()
   chapterId: number; // ID chương
+
+  @IsNotEmpty()
+  @ApiProperty()
+  @Type(() => Number)
+  @IsNumber()
+  majorId: number; // ID chương
 
   @ApiPropertyOptional()
   @IsOptional()
