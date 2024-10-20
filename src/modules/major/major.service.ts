@@ -153,7 +153,7 @@ export class MajorService {
     // Tìm major theo majorId
     const major = await this.majorRepository.findOne({
       where: { id: majorId },
-      relations: ['teachers'],
+      relations: ['teachers', 'faculty'],
     });
     if (!major) {
       throw new NotFoundException(`Major with ID ${majorId} not found`);
