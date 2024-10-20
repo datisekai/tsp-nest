@@ -89,6 +89,8 @@ export class PermissionService {
     return this.permissionRepository.save(permission);
   }
 
+  /*************  ✨ Codeium Command ⭐  *************/
+  /******  eb771b26-ce8f-4a2f-9893-92074a6327ca  *******/
   async delete(id: number): Promise<Permission> {
     const permission = await this.findOne(id);
     return this.permissionRepository.remove(permission);
