@@ -144,6 +144,17 @@ export class MajorService {
     return await this.majorRepository.remove(major);
   }
 
+  async deleteTeacherToMajor(
+    majorId: number,
+    teacherCode: string,
+  ): Promise<Major> {
+    const major = await this.findOne(majorId);
+    major.teachers = major.teachers.filter(
+      (teacher) => teacher.code !== teacherCode,
+    );
+    return await this.majorRepository.save(major);
+  }
+
   async assignTeacherToMajor(
     majorId: number,
     assignTeachersDto: AssignTeachersDto,

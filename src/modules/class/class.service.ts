@@ -14,6 +14,7 @@ import {
 } from './class.dto';
 import { User } from '../user/user.entity';
 import { UserType } from '../user/user.dto';
+import { checkUserPermission } from 'src/common/helpers/checkPermission';
 
 @Injectable()
 export class ClassService {
@@ -57,7 +58,8 @@ export class ClassService {
       teacherIds,
       page = 1,
       limit = 10,
-      pagination,
+      pagination = true,
+      duration,
     } = queryClassDto;
 
     const queryBuilder = this.classRepository
@@ -71,6 +73,12 @@ export class ClassService {
 
     if (name) {
       queryBuilder.andWhere('class.name LIKE :name', { name: `%${name}%` });
+    }
+
+    if (duration) {
+      queryBuilder.andWhere('class.duration LIKE :duration', {
+        duration: `%${duration}%`,
+      });
     }
 
     if (majorId) {
@@ -92,11 +100,12 @@ export class ClassService {
     return { data, total };
   }
 
-  async findOne(id: number): Promise<Class> {
+  async findOne(id: number, user?: User): Promise<Class> {
     const classEntity = await this.classRepository.findOne({
       where: { id },
       relations: ['major', 'teachers', 'users'],
     });
+
     if (!classEntity) {
       throw new NotFoundException(`Class with ID ${id} not found`);
     }
@@ -245,6 +254,17 @@ export class ClassService {
     classEntity.teachers = [...classEntity.teachers, ...teachers];
 
     return this.classRepository.save(classEntity);
+  }
+
+  async deleteTeacherToClass(
+    classId: number,
+    teacherCode: string,
+  ): Promise<Class> {
+    const classEntity = await this.findOne(classId);
+    classEntity.teachers = classEntity.teachers.filter(
+      (teacher) => teacher.code !== teacherCode,
+    );
+    return await this.classRepository.save(classEntity);
   }
 
   async checkExistedUser(classId: number, userId: number) {

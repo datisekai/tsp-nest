@@ -5,6 +5,7 @@ import {
   ManyToOne,
   ManyToMany,
   OneToMany,
+  Unique,
 } from 'typeorm';
 import { Major } from '../major/major.entity';
 import { User } from '../user/user.entity';
@@ -21,6 +22,9 @@ export class Class extends BaseEntity {
 
   @Column({ type: 'varchar', length: 255 })
   name: string; // Tên của Class
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  duration: string;
 
   @ManyToMany(() => User, (teacher) => teacher.teacherClasses)
   teachers: User[];

@@ -22,6 +22,11 @@ export class CreateClassDto {
   majorId: number; // ID của Major liên quan
 
   @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  duration: string; // ID của Major liên quan
+
+  @ApiProperty()
   @IsArray()
   @IsArray()
   @ArrayNotEmpty()
@@ -51,6 +56,11 @@ export class QueryClassDto extends PaginationDto {
   @IsString()
   @IsOptional()
   name?: string;
+
+  @ApiPropertyOptional({ description: 'Duration to search for' })
+  @IsString()
+  @IsOptional()
+  duration?: string;
 
   @ApiPropertyOptional({ description: 'Major ID to filter classes' })
   @IsInt()
