@@ -5,6 +5,8 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Class } from '../class/class.entity';
 import { User } from '../user/user.entity';
@@ -25,8 +27,9 @@ export class Notification extends BaseEntity {
   content: string; // Nội dung thông báo
 
   // Mối quan hệ với Class (1 Class có nhiều Notification)
-  @ManyToOne(() => Class, (classEntity) => classEntity.notifications)
-  class: Class;
+  @ManyToMany(() => Class, (classEntity) => classEntity.notifications)
+  @JoinTable() // Thêm JoinTable để tạo bảng trung gian
+  classes: Class[]; // Danh sách lớp liên quan đến thông báo
 
   // Mối quan hệ với User (1 User tạo nhiều Notification)
   @ManyToOne(() => User, { nullable: false })

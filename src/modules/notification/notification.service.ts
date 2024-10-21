@@ -27,12 +27,12 @@ export class NotificationService {
     createNotificationDto: CreateNotificationDto,
     creatorId: number,
   ): Promise<Notification> {
-    const { name, image, content, classId } = createNotificationDto;
+    const { name, image, content, classIds } = createNotificationDto;
 
-    // Tìm lớp học liên quan
-    const classEntity = await this.classService.findOne(classId);
-    if (!classEntity) {
-      throw new NotFoundException(`Class with ID ${classId} not found`);
+    // Tìm các lớp học liên quan
+    const classes = await this.classService.findByIds(classIds);
+    if (!classes || classes.length === 0) {
+      throw new NotFoundException(`Classes with IDs ${classIds} not found`);
     }
 
     // Tìm người tạo thông báo dựa trên ID từ req.user
@@ -41,12 +41,12 @@ export class NotificationService {
       throw new NotFoundException(`User with ID ${creatorId} not found`);
     }
 
-    // Tạo thông báo mới với thông tin người tạo
+    // Tạo thông báo mới với thông tin người tạo và các lớp liên quan
     const notification = this.notificationRepository.create({
       name,
       image,
       content,
-      class: classEntity,
+      classes, // Gán danh sách các lớp vào thông báo
       creator, // Lưu người tạo vào thông báo
     });
 
@@ -58,25 +58,29 @@ export class NotificationService {
     id: number,
     updateNotificationDto: UpdateNotificationDto,
   ): Promise<Notification> {
-    const { name, image, content, classId } = updateNotificationDto;
+    const { name, image, content, classIds } = updateNotificationDto;
 
+    // Tìm thông báo cần cập nhật
     const notification = await this.findOne(id);
     if (!notification) {
       throw new NotFoundException(`Notification with ID ${id} not found`);
     }
 
+    // Cập nhật các thuộc tính của thông báo
     if (name) notification.name = name;
     if (image) notification.image = image;
     if (content) notification.content = content;
 
-    if (classId) {
-      const classEntity = await this.classService.findOne(classId);
-      if (!classEntity) {
-        throw new NotFoundException(`Class with ID ${classId} not found`);
+    // Cập nhật quan hệ với các lớp (Class)
+    if (classIds && classIds.length > 0) {
+      const classes = await this.classService.findByIds(classIds);
+      if (!classes || classes.length === 0) {
+        throw new NotFoundException(`Classes with IDs ${classIds} not found`);
       }
-      notification.class = classEntity;
+      notification.classes = classes; // Gán danh sách các lớp cho thông báo
     }
 
+    // Lưu thông báo đã cập nhật
     return this.notificationRepository.save(notification);
   }
 
@@ -87,7 +91,7 @@ export class NotificationService {
   ): Promise<{ data: Notification[]; total: number }> {
     const {
       name,
-      classId,
+      classIds,
       page = 1,
       limit = 10,
       pagination,
@@ -95,7 +99,7 @@ export class NotificationService {
 
     const queryBuilder = this.notificationRepository
       .createQueryBuilder('notification')
-      .leftJoinAndSelect('notification.class', 'class');
+      .innerJoin('notification.classes', 'class'); // Tham gia bảng trung gian với bảng Class
 
     // Tìm kiếm theo name nếu có
     if (name) {
@@ -110,8 +114,8 @@ export class NotificationService {
     }
 
     // Tìm kiếm theo classId nếu có
-    if (classId) {
-      queryBuilder.andWhere('notification.class.id = :classId', { classId });
+    if (classIds && classIds.length > 0) {
+      queryBuilder.andWhere('class.id IN (:...classIds)', { classIds }); // Lọc theo các classIds
     }
 
     if (pagination) {

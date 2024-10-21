@@ -1,19 +1,18 @@
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
+  Entity,
   ManyToMany,
+  ManyToOne,
   OneToMany,
-  Unique,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Major } from '../major/major.entity';
-import { User } from '../user/user.entity';
-import { Notification } from '../notification/notification.entity';
 import { BaseEntity } from '../../common/entities/base.entity';
-import { Letter } from '../letter/letter.entity';
 import { Attendance } from '../attendance/attendance.entity';
 import { Exam } from '../exam/exam.entity';
+import { Letter } from '../letter/letter.entity';
+import { Major } from '../major/major.entity';
+import { Notification } from '../notification/notification.entity';
+import { User } from '../user/user.entity';
 
 @Entity()
 export class Class extends BaseEntity {
@@ -41,11 +40,8 @@ export class Class extends BaseEntity {
   @OneToMany(() => Attendance, (attendance) => attendance.class)
   attendances: Attendance[];
 
-  @OneToMany(
-    () => Notification,
-    (notificationEntity) => notificationEntity.class,
-  )
-  notifications: Notification[];
+  @ManyToMany(() => Notification, (notification) => notification.classes)
+  notifications: Notification[]; // Danh sách thông báo liên quan đến lớp
 
   @OneToMany(() => Exam, (exam) => exam.class) // Liên kết với bài thi
   exams: Exam[];
