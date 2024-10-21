@@ -22,6 +22,7 @@ import { RoleModule } from './modules/role/role.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { UserModule } from './modules/user/user.module';
 import { LanguageModule } from './modules/language/language.module';
+import { ScoreManagementModule } from './modules/score-management/score-management.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { LanguageModule } from './modules/language/language.module';
     QuestionModule,
     GoogleAIModule,
     LanguageModule,
+    ScoreManagementModule,
   ],
   controllers: [AppController],
   providers: [AppService],

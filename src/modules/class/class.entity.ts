@@ -13,6 +13,7 @@ import { Letter } from '../letter/letter.entity';
 import { Major } from '../major/major.entity';
 import { Notification } from '../notification/notification.entity';
 import { User } from '../user/user.entity';
+import { ScoreColumn } from '../score-management/score-column/score-column.entity';
 
 @Entity()
 export class Class extends BaseEntity {
@@ -39,6 +40,9 @@ export class Class extends BaseEntity {
 
   @OneToMany(() => Attendance, (attendance) => attendance.class)
   attendances: Attendance[];
+
+  @OneToMany(() => ScoreColumn, (scoreColumn) => scoreColumn.class)
+  scoreColumns: ScoreColumn[];
 
   @ManyToMany(() => Notification, (notification) => notification.classes)
   notifications: Notification[]; // Danh sách thông báo liên quan đến lớp

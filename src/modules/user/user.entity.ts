@@ -19,6 +19,7 @@ import { Letter } from '../letter/letter.entity';
 import { Major } from '../major/major.entity';
 import { Role } from '../role/role.entity';
 import { UserType } from './user.dto';
+import { StudentScore } from '../score-management/student-score/student-score.entity';
 @Entity()
 @Unique(['code', 'deviceUid'])
 export class User extends BaseEntity {
@@ -119,6 +120,9 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Attendee, (entity) => entity.user)
   attendees: Attendee[];
+
+  @OneToMany(() => StudentScore, (entity) => entity.student)
+  studentScores: StudentScore[];
 
   @BeforeInsert()
   @BeforeUpdate()

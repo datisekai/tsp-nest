@@ -2,19 +2,18 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MajorService } from '../major/major.service';
+import { UserType } from '../user/user.dto';
+import { User } from '../user/user.entity';
 import { UserService } from '../user/user.service';
-import { Class } from './class.entity';
 import {
   AssignTeachersDto,
   AssignUsersDto,
   CreateClassDto,
-  UpdateClassDto,
-  QueryClassDto,
   ImportUsersDto,
+  QueryClassDto,
+  UpdateClassDto,
 } from './class.dto';
-import { User } from '../user/user.entity';
-import { UserType } from '../user/user.dto';
-import { checkUserPermission } from 'src/common/helpers/checkPermission';
+import { Class } from './class.entity';
 
 @Injectable()
 export class ClassService {
@@ -101,10 +100,14 @@ export class ClassService {
     return { data, total };
   }
 
-  async findOne(id: number, user?: User): Promise<Class> {
+  async findOne(
+    id: number,
+    user?: User,
+    relations = ['major', 'teachers', 'users'],
+  ): Promise<Class> {
     const classEntity = await this.classRepository.findOne({
       where: { id },
-      relations: ['major', 'teachers', 'users'],
+      relations,
     });
 
     if (!classEntity) {
