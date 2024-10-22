@@ -87,7 +87,13 @@ export class UserService {
       queryBuilder.andWhere('user.name LIKE :name', { name: `%${name}%` });
     }
 
-    queryBuilder.andWhere('user.type != :type', { type: UserType.MASTER });
+    queryBuilder.andWhere(
+      '(user.type = :teacherType OR user.type = :unknownType)',
+      {
+        teacherType: UserType.TEACHER,
+        unknownType: UserType.UNKNOWN,
+      },
+    );
     queryBuilder.andWhere('user.type != :type', { type: UserType.STUDENT });
     queryBuilder.select([
       'user.id',
