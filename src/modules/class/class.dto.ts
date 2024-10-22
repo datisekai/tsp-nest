@@ -76,15 +76,21 @@ export class QueryClassDto extends PaginationDto {
 }
 
 class UserData {
+  @ApiProperty()
+  @IsNotEmpty()
   @IsString()
   code: string;
 
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
   name: string;
 }
 
 export class ImportUsersDto {
-  @ApiProperty()
+  @ApiProperty({
+    type: [UserData], // Đặt kiểu dữ liệu cho Swagger
+  })
   @IsArray()
   @ArrayNotEmpty()
   @ValidateNested({ each: true })

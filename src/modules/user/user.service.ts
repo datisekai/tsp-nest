@@ -140,6 +140,7 @@ export class UserService {
 
   async findOrCreateUsersByCodes(
     userData: { code: string; name?: string }[],
+    userType?: UserType,
   ): Promise<User[]> {
     const codes = userData.map((user) => user.code); // Lấy tất cả codes từ mảng userData
     const existingUsers = await this.findByCodes(codes); // Tìm người dùng hiện có
@@ -158,6 +159,7 @@ export class UserService {
           name: user.name || 'Unknown', // Nếu không có name, dùng tên mặc định
           password: null, // Mật khẩu null
           email: ``, // Email giả định
+          type: userType || UserType.UNKNOWN,
         });
       }),
     );
