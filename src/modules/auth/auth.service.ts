@@ -70,6 +70,7 @@ export class AuthService {
       newUser = await this.userService.update(user.id, {
         password: userInfo.password,
         type: loginType,
+        name: userInfo.name || user.name,
       });
       userInfo = { ...userInfo, ...newUser };
     } else {

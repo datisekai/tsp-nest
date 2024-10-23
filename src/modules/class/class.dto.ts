@@ -10,6 +10,17 @@ import {
 } from 'class-validator';
 import { PaginationDto } from '../../common/dto/pagination.dto';
 
+class UserData {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  code: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  name: string;
+}
 export class CreateClassDto {
   @ApiProperty()
   @IsString()
@@ -26,29 +37,32 @@ export class CreateClassDto {
   @IsNotEmpty()
   duration: string; // ID của Major liên quan
 
-  @ApiProperty()
-  @IsArray()
+  @ApiProperty({
+    type: [UserData],
+  })
   @IsArray()
   @ArrayNotEmpty()
-  teacherCodes?: string[]; // Danh sách các teacher codes
+  teacherCodes?: UserData[]; // Danh sách các teacher codes
 }
 
 export class UpdateClassDto extends PartialType(CreateClassDto) {}
 
 export class AssignTeachersDto {
-  @ApiProperty()
+  @ApiProperty({
+    type: [UserData],
+  })
   @IsArray()
   @ArrayNotEmpty()
-  @IsInt({ each: true })
-  teacherCodes: string[];
+  teacherCodes: UserData[];
 }
 
 export class AssignUsersDto {
-  @ApiProperty()
+  @ApiProperty({
+    type: [UserData],
+  })
   @IsArray()
   @ArrayNotEmpty()
-  @IsInt({ each: true })
-  userCodes: string[]; // Mảng chứa các user IDs để gán vào class
+  userCodes: UserData[]; // Mảng chứa các user IDs để gán vào class
 }
 
 export class QueryClassDto extends PaginationDto {
@@ -75,16 +89,10 @@ export class QueryClassDto extends PaginationDto {
   teacherIds?: number[];
 }
 
-class UserData {
-  @IsString()
-  code: string;
-
-  @IsString()
-  name: string;
-}
-
 export class ImportUsersDto {
-  @ApiProperty()
+  @ApiProperty({
+    type: [UserData], // Đặt kiểu dữ liệu cho Swagger
+  })
   @IsArray()
   @ArrayNotEmpty()
   @ValidateNested({ each: true })

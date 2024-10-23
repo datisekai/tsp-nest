@@ -34,7 +34,8 @@ export class ClassService {
 
     const teachers = teacherCodes
       ? await this.userService.findOrCreateUsersByCodes(
-          teacherCodes.map((item) => ({ code: item })),
+          teacherCodes,
+          UserType.TEACHER,
         )
       : [];
 
@@ -147,7 +148,8 @@ export class ClassService {
 
     if (teacherCodes) {
       const teachers = await this.userService.findOrCreateUsersByCodes(
-        teacherCodes.map((item) => ({ code: item })),
+        teacherCodes,
+        UserType.TEACHER,
       );
       classEntity.teachers = teachers;
     }
@@ -175,7 +177,8 @@ export class ClassService {
     }
 
     const teachers = await this.userService.findOrCreateUsersByCodes(
-      teacherCodes.map((item) => ({ code: item })),
+      teacherCodes,
+      UserType.TEACHER,
     );
 
     const teacherSet = new Set(
@@ -207,7 +210,8 @@ export class ClassService {
     }
 
     const users = await this.userService.findOrCreateUsersByCodes(
-      userCodes.map((item) => ({ code: item })),
+      userCodes,
+      UserType.STUDENT,
     );
 
     const userSet = new Set(classEntity.users.map((user) => user.id));
@@ -224,20 +228,32 @@ export class ClassService {
     classId: number,
     importUsersDto: ImportUsersDto,
   ): Promise<Class> {
+    // Tìm class theo ID, bao gồm cả mối quan hệ với 'users'
     const classEntity = await this.classRepository.findOne({
       where: { id: classId },
       relations: ['users'],
     });
+
     if (!classEntity) {
       throw new NotFoundException(`Class with ID ${classId} not found`);
     }
 
+    // Tìm hoặc tạo người dùng theo danh sách mã (codes)
     const users = await this.userService.findOrCreateUsersByCodes(
       importUsersDto.users,
+      UserType.STUDENT,
     );
 
-    classEntity.users = [...classEntity.users, ...users];
+    // Lọc ra những người dùng chưa có trong classEntity.users
+    const newUsers = users.filter(
+      (user) =>
+        !classEntity.users.some((existingUser) => existingUser.id === user.id),
+    );
 
+    // Thêm những người dùng mới vào classEntity.users
+    classEntity.users = [...classEntity.users, ...newUsers];
+
+    // Lưu lại thay đổi
     return this.classRepository.save(classEntity);
   }
 
@@ -255,6 +271,7 @@ export class ClassService {
 
     const teachers = await this.userService.findOrCreateUsersByCodes(
       importTeachersDto.users,
+      UserType.TEACHER,
     );
 
     classEntity.teachers = [...classEntity.teachers, ...teachers];

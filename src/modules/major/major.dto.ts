@@ -10,6 +10,17 @@ import {
 } from 'class-validator';
 import { PaginationDto } from '../../common/dto/pagination.dto';
 
+class UserData {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  code: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  name: string;
+}
 export class CreateMajorDto {
   @ApiProperty()
   @IsString()
@@ -25,10 +36,10 @@ export class CreateMajorDto {
   @IsNumber()
   facultyId: number; // ID của Faculty mà Major thuộc về
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: [UserData] })
   @IsArray()
   @IsOptional()
-  teacherIds?: number[]; // Các ID của Teacher liên quan (tùy chọn)
+  teachers?: UserData[]; // Các ID của Teacher liên quan (tùy chọn)
 }
 
 export class UpdateMajorDto extends PartialType(CreateMajorDto) {}
@@ -48,15 +59,18 @@ export class QueryMajorDto extends PaginationDto {
   @IsOptional()
   code?: string;
 
-  @ApiPropertyOptional({ description: 'Array of teacher IDs to filter majors' })
+  @ApiPropertyOptional({
+    description: 'Array of teacher Codes to filter majors',
+    type: [UserData],
+  })
   @IsArray()
   @IsOptional()
-  teacherIds?: number[];
+  teacherCodes: string[];
 }
 
 export class AssignTeachersDto {
-  @ApiProperty()
+  @ApiProperty({ type: [UserData] })
   @IsArray()
   @ArrayNotEmpty()
-  teacherCodes: string[];
+  teacherCodes: UserData[];
 }

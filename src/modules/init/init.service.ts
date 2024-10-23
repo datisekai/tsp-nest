@@ -52,18 +52,49 @@ export class InitService {
     password: string,
   ): Promise<UserInfo | null> {
     const URL = 'https://nhapdiem.sgu.edu.vn/public/Apihelper.php';
+    const URLWelcome = 'https://nhapdiem.sgu.edu.vn/public/welcome';
+    const URLCheckLogin = 'https://nhapdiem.sgu.edu.vn/public/check-login';
     try {
       const payload = `username=${username}&password=${password}`;
       const response = await axios.post(URL, payload, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
+        withCredentials: true,
       });
+
+      const checkLogin = await axios.post(
+        URLCheckLogin,
+        `username=${username}`,
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          withCredentials: true,
+        },
+      );
+
+      const cookies = checkLogin.headers['set-cookie'];
+      console.log('🚀 ~ InitService ~ cookies:', cookies);
+
+      const welcome = await axios.post(
+        URLWelcome,
+        {},
+        {
+          headers: {
+            Cookie: cookies,
+            Referer: 'https://nhapdiem.sgu.edu.vn',
+            Origin: 'https://nhapdiem.sgu.edu.vn',
+          },
+          withCredentials: true,
+        },
+      );
+      console.log('🚀 ~ InitService ~ welcome:', welcome);
       const success = !!response.data;
       if (success) {
         const userInfo: UserInfo = {
           code: username,
-          name: `Giảng viên ${username}`,
+          name: '',
           password,
         };
         return userInfo;

@@ -87,7 +87,13 @@ export class UserService {
       queryBuilder.andWhere('user.name LIKE :name', { name: `%${name}%` });
     }
 
-    queryBuilder.andWhere('user.type != :type', { type: UserType.MASTER });
+    queryBuilder.andWhere(
+      '(user.type = :teacherType OR user.type = :unknownType)',
+      {
+        teacherType: UserType.TEACHER,
+        unknownType: UserType.UNKNOWN,
+      },
+    );
     queryBuilder.andWhere('user.type != :type', { type: UserType.STUDENT });
     queryBuilder.select([
       'user.id',
@@ -134,6 +140,7 @@ export class UserService {
 
   async findOrCreateUsersByCodes(
     userData: { code: string; name?: string }[],
+    userType?: UserType,
   ): Promise<User[]> {
     const codes = userData.map((user) => user.code); // Lấy tất cả codes từ mảng userData
     const existingUsers = await this.findByCodes(codes); // Tìm người dùng hiện có
@@ -152,6 +159,7 @@ export class UserService {
           name: user.name || 'Unknown', // Nếu không có name, dùng tên mặc định
           password: null, // Mật khẩu null
           email: ``, // Email giả định
+          type: userType || UserType.UNKNOWN,
         });
       }),
     );
