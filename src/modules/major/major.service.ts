@@ -23,16 +23,12 @@ export class MajorService {
   ) {}
 
   async create(createMajorDto: CreateMajorDto): Promise<Major> {
-    const { name, facultyId, teacherIds, code } = createMajorDto;
+    const { name, facultyId, teachers, code } = createMajorDto;
 
     const faculty = await this.facultyService.findOne(facultyId);
     if (!faculty) {
       throw new NotFoundException(`Faculty with ID ${facultyId} not found`);
     }
-
-    const teachers = teacherIds
-      ? await this.userService.findByIds(teacherIds)
-      : [];
 
     const major = this.majorRepository.create({
       name,
@@ -40,6 +36,11 @@ export class MajorService {
       teachers,
       code,
     });
+
+    major.teachers = await this.userService.findOrCreateUsersByCodes(
+      teachers,
+      UserType.TEACHER,
+    );
 
     return this.majorRepository.save(major);
   }
@@ -51,7 +52,7 @@ export class MajorService {
     const {
       name,
       facultyId,
-      teacherIds,
+      teacherCodes,
       page = 1,
       limit = 10,
       code,
@@ -83,8 +84,10 @@ export class MajorService {
     }
 
     // Tìm kiếm theo danh sách teacherIds nếu có
-    if (teacherIds && teacherIds.length > 0) {
-      queryBuilder.andWhere('teacher.id IN (:...teacherIds)', { teacherIds });
+    if (teacherCodes && teacherCodes.length > 0) {
+      queryBuilder.andWhere('teacher.code IN (:...teacherCodes)', {
+        teacherCodes,
+      });
     }
 
     if (pagination) {
@@ -114,7 +117,7 @@ export class MajorService {
   }
 
   async update(id: number, updateMajorDto: UpdateMajorDto): Promise<Major> {
-    const { name, facultyId, teacherIds, code } = updateMajorDto;
+    const { name, facultyId, teachers, code } = updateMajorDto;
 
     const major = await this.majorRepository.findOne({ where: { id } });
     if (!major) {
@@ -131,9 +134,11 @@ export class MajorService {
       major.faculty = faculty;
     }
 
-    if (teacherIds) {
-      const teachers = await this.userService.findByIds(teacherIds);
-      major.teachers = teachers;
+    if (teachers) {
+      major.teachers = await this.userService.findOrCreateUsersByCodes(
+        teachers,
+        UserType.TEACHER,
+      );
     }
 
     return this.majorRepository.save(major);
@@ -178,7 +183,7 @@ export class MajorService {
 
     // Tìm giáo viên dựa trên teacherCodes
     const teachers = await this.userService.findOrCreateUsersByCodes(
-      teacherCodes.map((code) => ({ code })),
+      teacherCodes,
       UserType.TEACHER,
     );
     if (teachers.length === 0) {
