@@ -2,19 +2,18 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MajorService } from '../major/major.service';
+import { UserType } from '../user/user.dto';
+import { User } from '../user/user.entity';
 import { UserService } from '../user/user.service';
-import { Class } from './class.entity';
 import {
   AssignTeachersDto,
   AssignUsersDto,
   CreateClassDto,
-  UpdateClassDto,
-  QueryClassDto,
   ImportUsersDto,
+  QueryClassDto,
+  UpdateClassDto,
 } from './class.dto';
-import { User } from '../user/user.entity';
-import { UserType } from '../user/user.dto';
-import { checkUserPermission } from 'src/common/helpers/checkPermission';
+import { Class } from './class.entity';
 
 @Injectable()
 export class ClassService {
@@ -26,7 +25,7 @@ export class ClassService {
   ) {}
 
   async create(createClassDto: CreateClassDto): Promise<Class> {
-    const { name, majorId, teacherCodes } = createClassDto;
+    const { name, majorId, teacherCodes, duration } = createClassDto;
 
     const major = await this.majorService.findOne(majorId);
     if (!major) {
@@ -43,6 +42,7 @@ export class ClassService {
       name,
       major,
       teachers,
+      duration,
     });
 
     return this.classRepository.save(classEntity);
@@ -100,10 +100,14 @@ export class ClassService {
     return { data, total };
   }
 
-  async findOne(id: number, user?: User): Promise<Class> {
+  async findOne(
+    id: number,
+    user?: User,
+    relations = ['major', 'teachers', 'users'],
+  ): Promise<Class> {
     const classEntity = await this.classRepository.findOne({
       where: { id },
-      relations: ['major', 'teachers', 'users'],
+      relations,
     });
 
     if (!classEntity) {
@@ -111,6 +115,7 @@ export class ClassService {
     }
     return classEntity;
   }
+
   async findByIds(ids: number[]): Promise<Class[]> {
     const classes = await this.classRepository.findByIds(ids);
     if (!classes || classes.length === 0) {
@@ -122,7 +127,7 @@ export class ClassService {
   }
 
   async update(id: number, updateClassDto: UpdateClassDto): Promise<Class> {
-    const { name, majorId, teacherCodes } = updateClassDto;
+    const { name, majorId, teacherCodes, duration } = updateClassDto;
 
     const classEntity = await this.findOne(id);
     if (!classEntity) {
@@ -130,6 +135,7 @@ export class ClassService {
     }
 
     if (name) classEntity.name = name;
+    if (duration) classEntity.duration = duration;
 
     if (majorId) {
       const major = await this.majorService.findOne(majorId);
@@ -261,6 +267,12 @@ export class ClassService {
     teacherCode: string,
   ): Promise<Class> {
     const classEntity = await this.findOne(classId);
+    const teacherCodes = classEntity.teachers.map((teacher) => teacher.code);
+    if (!teacherCodes.includes(teacherCode)) {
+      throw new NotFoundException(
+        `Teacher with code ${teacherCode} not found in class with ID ${classId}`,
+      );
+    }
     classEntity.teachers = classEntity.teachers.filter(
       (teacher) => teacher.code !== teacherCode,
     );

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { IsString, IsOptional, IsNotEmpty, IsInt } from 'class-validator';
+import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 export class CreateNotificationDto {
@@ -19,9 +19,8 @@ export class CreateNotificationDto {
   content: string; // Nội dung thông báo
 
   @ApiProperty()
-  @IsInt()
-  @IsNotEmpty()
-  classId: number; // ID của Class liên quan
+  @IsArray()
+  classIds: number[]; // ID của Class liên quan
 }
 
 export class UpdateNotificationDto extends PartialType(CreateNotificationDto) {}
@@ -34,6 +33,6 @@ export class QueryNotificationDto extends PaginationDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsInt()
-  classId?: number;
+  @IsArray()
+  classIds?: number[];
 }

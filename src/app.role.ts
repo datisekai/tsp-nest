@@ -18,6 +18,8 @@ export enum AppResource {
   GOOGLEAI = 'GOOGLEAI',
   EXAM = 'EXAM',
   LANGUAGE = 'LANGUAGE',
+  SCORE_COLUMN = 'SCORE_COLUMN',
+  STUDENT_CORE = 'STUDENT_CORE',
 }
 
 export enum AppPermission {

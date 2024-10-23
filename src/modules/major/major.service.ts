@@ -149,6 +149,12 @@ export class MajorService {
     teacherCode: string,
   ): Promise<Major> {
     const major = await this.findOne(majorId);
+    const teacherCodes = major.teachers.map((teacher) => teacher.code);
+    if (!teacherCodes.includes(teacherCode)) {
+      throw new NotFoundException(
+        `Teacher with code ${teacherCode} not found in major with ID ${majorId}`,
+      );
+    }
     major.teachers = major.teachers.filter(
       (teacher) => teacher.code !== teacherCode,
     );
