@@ -35,6 +35,7 @@ export class ClassService {
     const teachers = teacherCodes
       ? await this.userService.findOrCreateUsersByCodes(
           teacherCodes.map((item) => ({ code: item })),
+          UserType.TEACHER,
         )
       : [];
 
@@ -148,6 +149,7 @@ export class ClassService {
     if (teacherCodes) {
       const teachers = await this.userService.findOrCreateUsersByCodes(
         teacherCodes.map((item) => ({ code: item })),
+        UserType.TEACHER,
       );
       classEntity.teachers = teachers;
     }
@@ -176,6 +178,7 @@ export class ClassService {
 
     const teachers = await this.userService.findOrCreateUsersByCodes(
       teacherCodes.map((item) => ({ code: item })),
+      UserType.TEACHER,
     );
 
     const teacherSet = new Set(
@@ -208,6 +211,7 @@ export class ClassService {
 
     const users = await this.userService.findOrCreateUsersByCodes(
       userCodes.map((item) => ({ code: item })),
+      UserType.STUDENT,
     );
 
     const userSet = new Set(classEntity.users.map((user) => user.id));

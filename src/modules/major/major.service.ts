@@ -179,6 +179,7 @@ export class MajorService {
     // Tìm giáo viên dựa trên teacherCodes
     const teachers = await this.userService.findOrCreateUsersByCodes(
       teacherCodes.map((code) => ({ code })),
+      UserType.TEACHER,
     );
     if (teachers.length === 0) {
       throw new NotFoundException('No teachers found with the given codes');
