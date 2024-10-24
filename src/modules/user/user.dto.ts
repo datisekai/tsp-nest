@@ -67,7 +67,7 @@ export class CreateUserDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  device_uid?: string;
+  deviceUid?: string;
 
   @ApiPropertyOptional({
     enum: UserType,
