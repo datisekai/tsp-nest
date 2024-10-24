@@ -137,7 +137,7 @@ export class NotificationService {
   async findOne(id: number): Promise<Notification> {
     const notification = await this.notificationRepository.findOne({
       where: { id },
-      relations: ['class'],
+      relations: ['classes'],
     });
 
     if (!notification) {
