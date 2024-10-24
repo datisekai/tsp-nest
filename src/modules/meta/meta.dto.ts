@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsJSON } from 'class-validator';
+import { IsString, IsNotEmpty, IsJSON, IsObject } from 'class-validator';
 
 export enum META_KEY {
   SETTING = 'setting',
@@ -7,7 +7,7 @@ export enum META_KEY {
 }
 export class UpdateMetaDto {
   @ApiProperty()
-  @IsJSON()
+  @IsObject()
   value: any; // Giá trị JSON
 }
 

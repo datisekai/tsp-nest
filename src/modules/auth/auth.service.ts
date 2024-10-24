@@ -26,6 +26,12 @@ export class AuthService {
       const { password, ...rest } = user;
       const payload = { sub: user.id };
 
+      // if (dto.deviceUid && user.deviceUid && user.deviceUid != dto.deviceUid) {
+      //   throw new ForbiddenException(
+      //     'You do not have permission to perform this action',
+      //   );
+      // }
+
       if (user.type != UserType.MASTER && user.type != loginType) {
         throw new ForbiddenException(
           'You do not have permission to perform this action',
@@ -34,6 +40,11 @@ export class AuthService {
       if (!user.active) {
         throw new NotFoundException('Your account is not active');
       }
+
+      // if (dto.deviceUid && !user.deviceUid) {
+      //   user.deviceUid = dto.deviceUid;
+      //   this.userService.update(user.id, { deviceUid: dto.deviceUid });
+      // }
 
       return {
         message: 'Login successfully',
