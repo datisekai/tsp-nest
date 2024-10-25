@@ -39,6 +39,11 @@ export class QueryQuestionDto extends PaginationDto {
   @IsOptional()
   @IsBoolean()
   isPublic?: boolean; // Lọc theo trạng thái công khai
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  type?: string;
 }
 
 export class QueryChapterDto extends PaginationDto {

@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Question } from './question.entity';
 import { CreateUpdateQuestionDto, QueryQuestionDto } from './question.dto';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { User } from '../user/user.entity';
 import { UserType } from '../user/user.dto';
 import { TestCase } from './testcase/testcase.entity';
@@ -23,23 +23,28 @@ export class QuestionService {
     dto: QueryQuestionDto,
     user: User,
   ): Promise<{ data: Question[]; total: number }> {
-    const { title, isPublic, page = 1, limit = 10, pagination } = dto;
+    const { title, page = 1, limit = 10, pagination, type = 'all' } = dto;
     const query = this.questionRepository.createQueryBuilder('question');
 
     if (title) {
       query.andWhere('question.title LIKE :title', { title: `%${title}%` });
     }
-
-    if (typeof isPublic === 'boolean') {
-      query.andWhere('question.isPublic = :isPublic', { isPublic });
-    }
-
     if (pagination) {
       query.skip((page - 1) * limit).take(limit);
     }
 
-    if (user.type !== UserType.MASTER) {
+    if (type === 'me') {
       query.andWhere('question.user.id = :userId', { userId: user.id });
+    }
+
+    if (user.type !== UserType.MASTER && type === 'all') {
+      query.andWhere(
+        new Brackets((qb) => {
+          qb.where('question.user.id = :userId', { userId: user.id }).orWhere(
+            'question.isPublic = true',
+          );
+        }),
+      );
     }
 
     const [data, total] = await query.getManyAndCount();
