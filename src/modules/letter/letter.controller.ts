@@ -38,6 +38,15 @@ export class LetterController {
     return this.letterService.create(createLetterDto, user.id);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async delete(
+    @Param('id') id: number,
+    @User() user: UserEntity,
+  ): Promise<Letter> {
+    return this.letterService.delete(id, user);
+  }
+
   @Get()
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.LETTER_VIEW)

@@ -161,7 +161,7 @@ export class NotificationService {
 
     const queryBuilder = this.notificationRepository
       .createQueryBuilder('notification')
-      .leftJoinAndSelect('notification.class', 'class')
+      .leftJoinAndSelect('notification.classes', 'class')
       .leftJoinAndSelect('class.major', 'major')
       .leftJoin('class.users', 'user')
       .where('user.id = :userId', { userId })
@@ -169,6 +169,7 @@ export class NotificationService {
         'notification.id',
         'notification.name',
         'notification.content',
+        'notification.image',
         'notification.createdAt',
         'class.id',
         'class.name',

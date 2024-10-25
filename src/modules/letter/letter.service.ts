@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Letter } from './letter.entity';
@@ -27,7 +31,7 @@ export class LetterService {
     createLetterDto: CreateLetterDto,
     userId: number,
   ): Promise<Letter> {
-    const { type, reason, classId } = createLetterDto;
+    const { type, reason, classId, image } = createLetterDto;
     const classEntity = await this.classService.findOne(classId);
     if (!classEntity) {
       throw new NotFoundException(`Class with ID ${classId} not found`);
@@ -40,6 +44,7 @@ export class LetterService {
       status: LetterStatus.PENDING,
       user,
       class: classEntity,
+      image,
     });
 
     return this.letterRepository.save(letter);
@@ -181,6 +186,18 @@ export class LetterService {
     }
 
     return letter;
+  }
+
+  async delete(id: number, user: User): Promise<Letter> {
+    const letter = await this.findOne(id);
+
+    if (letter.user.id !== user.id) {
+      throw new ForbiddenException(
+        "You don't have permission to delete this letter",
+      );
+    }
+
+    return await this.letterRepository.remove(letter);
   }
 
   async findMyLetters(

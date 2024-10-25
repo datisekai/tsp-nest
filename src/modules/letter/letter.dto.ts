@@ -25,6 +25,11 @@ export class CreateLetterDto {
   @IsNotEmpty()
   reason: string; // Lý do đơn
 
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  image?: string;
+
   @ApiProperty()
   @IsInt()
   @IsNotEmpty()

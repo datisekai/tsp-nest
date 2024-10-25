@@ -19,6 +19,9 @@ export class Letter extends BaseEntity {
   @Column({ type: 'varchar', length: 255 })
   type: string; // Loại đơn
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  image: string; // Loại đơn
+
   @Column({ type: 'text' })
   reason: string; // Lý do của đơn
 
