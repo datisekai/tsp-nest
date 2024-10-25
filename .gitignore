@@ -35,3 +35,6 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 .vercel
+
+yarn.lock
+package-lock.json
