@@ -47,6 +47,12 @@ export class UserController {
     return this.userService.findTeachers(queryDto);
   }
 
+  @Get('/public/class/me')
+  @UseGuards(JwtAuthGuard)
+  async findClass(@User() user: UserEntity) {
+    return this.userService.findClass(user.id);
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.USER_VIEW)

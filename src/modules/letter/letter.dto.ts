@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsString,
   IsNotEmpty,
@@ -31,8 +32,9 @@ export class CreateLetterDto {
   image?: string;
 
   @ApiProperty()
-  @IsInt()
   @IsNotEmpty()
+  @IsInt()
+  @Type(() => Number)
   classId: number; // ID của lớp học liên quan
 }
 
@@ -51,6 +53,7 @@ export class QueryLetterDto extends PaginationDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsInt()
+  @Type(() => Number)
   classId?: number; // Lọc theo lớp học
 
   @ApiPropertyOptional()

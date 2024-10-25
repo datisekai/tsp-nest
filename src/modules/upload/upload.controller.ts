@@ -23,7 +23,7 @@ export class UploadController {
     summary: 'Upload Image',
   })
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(AppPermission.UPLOAD_IMAGE)
+  // @Permissions(AppPermission.UPLOAD_IMAGE)
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file) {
     try {

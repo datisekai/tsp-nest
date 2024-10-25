@@ -216,6 +216,7 @@ export class LetterService {
     const queryBuilder = this.letterRepository
       .createQueryBuilder('letter')
       .leftJoinAndSelect('letter.class', 'class')
+      .leftJoinAndSelect('class.major', 'major')
       .where('letter.user.id = :userId', { userId });
 
     if (status) {

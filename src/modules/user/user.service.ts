@@ -110,10 +110,10 @@ export class UserService {
     return { data };
   }
 
-  async findOne(id: number, hasPermission = false): Promise<User> {
+  async findOne(id: number, relations = []): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },
-      relations: hasPermission ? ['role', 'role.permissions'] : [],
+      relations: relations,
     });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
@@ -217,5 +217,10 @@ export class UserService {
     const user = await this.findOne(id);
     user.deviceUid = null;
     return this.userRepository.save(user);
+  }
+
+  async findClass(id: number) {
+    const user = await this.findOne(id, ['classes', 'classes.major']);
+    return { data: user.classes };
   }
 }
