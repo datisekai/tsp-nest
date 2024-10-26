@@ -18,7 +18,7 @@ export class Submission extends BaseEntity {
   @ManyToOne(() => Exam)
   exam: Exam; // Câu hỏi mà sinh viên nộp
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable: true })
   languageId: number; // Ngôn ngữ lập trình (nếu là bài tập lập trình)
 
   @Column({ type: 'text', nullable: true })

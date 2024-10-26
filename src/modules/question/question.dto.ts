@@ -68,6 +68,29 @@ export class InitCodeDto {
   [key: string]: string; // cho phép khóa là string và giá trị là string
 }
 
+export class Choice {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  text: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsBoolean()
+  isCorrect: boolean;
+}
+
+export class Input {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  input: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  expectedOutput: string;
+}
 export class CreateUpdateQuestionDto {
   @ApiProperty()
   @IsNotEmpty()
@@ -107,23 +130,23 @@ export class CreateUpdateQuestionDto {
   @IsNumber()
   majorId: number; // ID chương
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: [Choice] })
   @IsOptional()
   @IsArray()
-  choices: { text: string; isCorrect: boolean }[]; // Đáp án cho câu hỏi trắc nghiệm
+  choices: Choice[]; // Đáp án cho câu hỏi trắc nghiệm
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: [Input] })
   @IsOptional()
   @IsArray()
-  testCases?: { input: string; expectedOutput: string }[]; // Test case cho câu hỏi viết code
+  testCases?: Input[]; // Test case cho câu hỏi viết code
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: [Number] })
   @IsOptional() // Nếu bạn không cần bắt buộc
   @IsArray()
   @IsInt({ each: true }) // Kiểm tra từng phần tử trong mảng là số nguyên
   acceptedLanguages: number[];
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: InitCodeDto })
   @IsOptional() // Nếu bạn không cần bắt buộc
   @ValidateNested() // Để xác thực các thuộc tính bên trong
   @Type(() => InitCodeDto) // Chuyển đổi kiểu

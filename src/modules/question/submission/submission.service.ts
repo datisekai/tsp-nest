@@ -26,7 +26,7 @@ export class SubmissionService {
     questionId: number,
     answer: string,
     examId: number,
-  ): Promise<Submission> {
+  ): Promise<{ data: boolean }> {
     const question = await this.questionRepository.findOne({
       where: { id: questionId },
     });
@@ -47,11 +47,10 @@ export class SubmissionService {
     });
 
     await this.submissionRepository.save(submission);
-    delete submission['grade'];
-    return submission;
+    return { data: true };
   }
 
-  async submitCode(dto: SubmitCodeDto, user: User): Promise<Submission> {
+  async submitCode(dto: SubmitCodeDto, user: User): Promise<{ data: true }> {
     const { code, examId, languageId, questionId } = dto;
     const question = await this.questionRepository.findOne({
       where: { id: questionId },
@@ -90,9 +89,6 @@ export class SubmissionService {
 
     await this.submissionRepository.save(submission);
 
-    delete submission['resultJudge0'];
-    delete submission['grade'];
-
-    return submission;
+    return { data: true };
   }
 }

@@ -18,9 +18,9 @@ export class CreateExamDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   description: string;
 
   @ApiPropertyOptional()

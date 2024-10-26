@@ -29,8 +29,20 @@ export class ExamController {
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.EXAM_CREATE)
   @ApiPermissions(AppPermission.EXAM_CREATE)
-  async create(@Body() createExamDto: CreateExamDto): Promise<Exam> {
-    return this.examService.create(createExamDto);
+  async create(
+    @Body() createExamDto: CreateExamDto,
+    @User() user: UserEntity,
+  ): Promise<Exam> {
+    return this.examService.create(createExamDto, user);
+  }
+
+  @Get('/public/me')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  async findAllMe(
+    @Query() dto: ExamQueryDto,
+    @User() user: UserEntity,
+  ): Promise<{ data: Exam[]; total: number }> {
+    return this.examService.findAllMe(dto, user);
   }
 
   @Get('public/:id')
