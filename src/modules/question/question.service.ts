@@ -23,7 +23,13 @@ export class QuestionService {
     dto: QueryQuestionDto,
     user: User,
   ): Promise<{ data: Question[]; total: number }> {
-    const { title, page = 1, limit = 10, pagination, type = 'all' } = dto;
+    const {
+      title,
+      page = 1,
+      limit = 10,
+      pagination = true,
+      type = 'all',
+    } = dto;
     const query = this.questionRepository.createQueryBuilder('question');
 
     if (title) {
