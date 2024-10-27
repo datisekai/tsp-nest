@@ -50,8 +50,9 @@ export class ExamController {
   async findOnePublic(
     @Param('id') id: number,
     @User() user: UserEntity,
-  ): Promise<Exam> {
-    return this.examService.joinExam(id, user);
+  ): Promise<{ data: Exam }> {
+    const exam: Exam = await this.examService.joinExam(id, user);
+    return { data: exam };
   }
 
   @Get()

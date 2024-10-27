@@ -52,6 +52,7 @@ export class QuestionService {
         }),
       );
     }
+    query.addOrderBy('createdAt', 'DESC');
 
     const [data, total] = await query.getManyAndCount();
 

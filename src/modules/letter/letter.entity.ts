@@ -22,6 +22,9 @@ export class Letter extends BaseEntity {
   @Column({ type: 'varchar', length: 255, nullable: true })
   image: string; // Loại đơn
 
+  @Column({ type: 'timestamp', nullable: true, default: null })
+  time: Date | null;
+
   @Column({ type: 'text' })
   reason: string; // Lý do của đơn
 

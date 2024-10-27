@@ -73,8 +73,6 @@ export class UserController {
 
   @Put('me')
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(AppPermission.USER_UPDATE_OWN)
-  @ApiPermissions(AppPermission.USER_UPDATE_OWN)
   @UsePipes(new ValidationPipe({ transform: true }))
   async updateMe(
     @Body() updateUserDto: UpdateUserDto,

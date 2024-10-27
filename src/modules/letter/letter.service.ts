@@ -31,7 +31,7 @@ export class LetterService {
     createLetterDto: CreateLetterDto,
     userId: number,
   ): Promise<Letter> {
-    const { type, reason, classId, image } = createLetterDto;
+    const { type, reason, classId, image, time } = createLetterDto;
     const classEntity = await this.classService.findOne(classId);
     if (!classEntity) {
       throw new NotFoundException(`Class with ID ${classId} not found`);
@@ -45,6 +45,7 @@ export class LetterService {
       user,
       class: classEntity,
       image,
+      time,
     });
 
     return this.letterRepository.save(letter);

@@ -26,6 +26,10 @@ export class CreateLetterDto {
   @IsNotEmpty()
   reason: string; // Lý do đơn
 
+  @ApiProperty()
+  @IsString()
+  time: string; // Lý do đơn
+
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
