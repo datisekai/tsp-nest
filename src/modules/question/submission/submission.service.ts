@@ -38,13 +38,25 @@ export class SubmissionService {
       (choice) => choice.text === answer && choice.isCorrect,
     );
 
-    const submission = this.submissionRepository.create({
-      user: { id: userId },
-      question,
-      answer,
-      grade: isCorrect ? 10 : 0,
-      exam: { id: examId },
+    // Tìm submission có cùng userId, questionId và examId
+    let submission = await this.submissionRepository.findOne({
+      where: { user: { id: userId }, question: { id: questionId }, exam: { id: examId } },
     });
+
+    if (submission) {
+      // Nếu đã có submission, cập nhật thông tin
+      submission.answer = answer;
+      submission.grade = isCorrect ? 10 : 0;
+    } else {
+      // Nếu chưa có submission, tạo mới
+      submission = this.submissionRepository.create({
+        user: { id: userId },
+        question,
+        answer,
+        grade: isCorrect ? 10 : 0,
+        exam: { id: examId },
+      });
+    }
 
     await this.submissionRepository.save(submission);
     return { data: true };
@@ -60,12 +72,9 @@ export class SubmissionService {
       throw new NotFoundException('Coding question not found');
     }
 
-    const submission = this.submissionRepository.create({
-      user: { id: user.id },
-      question,
-      languageId,
-      code,
-      exam: { id: examId },
+    // Tìm submission có cùng userId, questionId và examId
+    let submission = await this.submissionRepository.findOne({
+      where: { user: { id: user.id }, question: { id: questionId }, exam: { id: examId } },
     });
 
     const testResults = [];
@@ -84,8 +93,25 @@ export class SubmissionService {
         grade += testCase.grade;
       }
     }
-    submission.resultJudge0 = testResults;
-    submission.grade = grade;
+
+    if (submission) {
+      // Nếu đã có submission, cập nhật thông tin
+      submission.code = code;
+      submission.languageId = languageId;
+      submission.resultJudge0 = testResults;
+      submission.grade = grade;
+    } else {
+      // Nếu chưa có submission, tạo mới
+      submission = this.submissionRepository.create({
+        user: { id: user.id },
+        question,
+        languageId,
+        code,
+        exam: { id: examId },
+        resultJudge0: testResults,
+        grade,
+      });
+    }
 
     await this.submissionRepository.save(submission);
 
