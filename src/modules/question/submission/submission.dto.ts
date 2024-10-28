@@ -5,7 +5,7 @@ export class SubmitMultipleChoiceDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
-  questionId: number;
+  examQuestionId: number;
   @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
@@ -21,7 +21,7 @@ export class SubmitCodeDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
-  questionId: number;
+  examQuestionId: number;
 
   @ApiProperty()
   @IsNotEmpty()

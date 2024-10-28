@@ -12,6 +12,16 @@ import {
 } from 'class-validator';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
+class QuestionDto{
+  @ApiProperty()
+  @IsInt()
+  @IsNotEmpty()
+  questionId: number
+
+  @ApiProperty()
+  @IsNotEmpty()
+  score: number
+}
 export class CreateExamDto {
   @ApiProperty()
   @IsString()
@@ -38,9 +48,9 @@ export class CreateExamDto {
   @IsNotEmpty()
   classId: number;
 
-  @ApiProperty()
+  @ApiProperty({type: [QuestionDto]})
   @IsArray()
-  questions?: number[]; // Mảng ID câu hỏi
+  questions?: QuestionDto[];
 }
 
 export class UpdateExamDto {
@@ -66,13 +76,13 @@ export class UpdateExamDto {
 
   @IsOptional()
   @IsInt()
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({type: [Number]})
   classId?: number[]; // Mảng ID lớp
 
   @IsOptional()
   @IsArray()
-  @ApiPropertyOptional()
-  questions?: number[]; // Mảng ID câu hỏi
+  @ApiPropertyOptional({type: [QuestionDto]})
+  questions?: QuestionDto[]; // Mảng ID câu hỏi
 }
 
 export class ExamQueryDto extends PaginationDto {

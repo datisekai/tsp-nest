@@ -8,6 +8,8 @@ import { User } from '../user/user.entity';
 import { UserType } from '../user/user.dto';
 import { checkUserPermission } from 'src/common/helpers/checkPermission';
 import { ClassService } from '../class/class.service';
+import {ExamQuestion} from "./exam-question/exam-question.entity";
+import {ExamLog} from "./exam-log/exam-log.entity";
 
 @Injectable()
 export class ExamService {
@@ -16,29 +18,44 @@ export class ExamService {
     private readonly classService: ClassService,
     @InjectRepository(Exam)
     private readonly examRepository: Repository<Exam>,
+    @InjectRepository(ExamQuestion)
+    private readonly examQuestionRepository: Repository<ExamQuestion>,
+    @InjectRepository(ExamLog)
+    private readonly examLogRepository: Repository<ExamLog>,
   ) {}
 
   async create(createExamDto: CreateExamDto, user: User): Promise<Exam> {
-    const { classId, description, endTime, startTime, title, questions } =
-      createExamDto;
+    const { classId, description, endTime, startTime, title, questions } = createExamDto;
+
+    // Tạo exam mới
     const exam = this.examRepository.create({
       title,
       description,
       endTime,
       startTime,
-      questions: [],
       class: { id: classId },
       user: { id: user.id },
     });
 
-    for (const questionId of questions) {
+    // Lưu exam vào database để lấy id
+    await this.examRepository.save(exam);
+
+    // Tạo ExamQuestion cho từng câu hỏi với điểm số tương ứng
+    for (const { questionId, score } of questions) {
       const question = await this.questionService.getQuestionById(questionId);
       if (question) {
-        exam.questions.push(question);
+        const examQuestion = this.examQuestionRepository.create({
+          exam,
+          question,
+          score,
+        });
+        await this.examQuestionRepository.save(examQuestion);
       }
     }
-    return await this.examRepository.save(exam);
+
+    return exam;
   }
+
 
   async findAll(
     query: ExamQueryDto,
@@ -171,7 +188,7 @@ export class ExamService {
   async findOne(id: number, user?: User): Promise<Exam> {
     const examEntity = await this.examRepository.findOne({
       where: { id },
-      relations: ['questions', 'class'],
+      relations: ['examQuestions', 'class','user'],
     });
     if (user) {
       checkUserPermission(examEntity.user.id, user);
@@ -183,42 +200,133 @@ export class ExamService {
   }
 
   async joinExam(id: number, user: User): Promise<Exam> {
-    const exam = await this.findOne(id);
+    const query = this.examRepository.createQueryBuilder('exam')
+        .select(['exam','submissions','examQuestions','question.id','question.title','question.content','question.type','question.choices', 'question.initCode','question.acceptedLanguages','testCases'])
+        .leftJoin('exam.class', 'class')
+        .leftJoin('class.users', 'users','users.id = :userId', {userId: user.id})
+        .leftJoin('exam.examQuestions', 'examQuestions')
+        .leftJoin('examQuestions.question', 'question')
+        .leftJoin('question.testCases','testCases','testCases.isHidden = false')
+        .leftJoin('exam.submissions', 'submissions','submissions.user.id = :userId', {userId: user.id})
+        .where('users.id = :userId', { userId: user.id })
+        .andWhere('exam.id = :id', { id }).andWhere('exam.startTime <= :now', { now: new Date() })
+        .andWhere('exam.endTime >= :now', { now: new Date() });
 
-    const isExisted = await this.classService.checkExistedUser(
-      exam.class.id,
-      user.id,
-    );
-    if (!isExisted) {
-      throw new NotFoundException(`Class with ID ${exam.class.id} not found`);
-    }
+    const exam = await query.getOne();
 
-    if (new Date() < exam.startTime) {
-      throw new NotFoundException(`Exam with ID ${id} not found`);
-    }
-    if (new Date() > exam.endTime) {
-      throw new NotFoundException(`Exam with ID ${id} not found`);
-    }
+    if(!exam) throw new NotFoundException(`Exam with ID ${id} not found`);
 
-    exam.questions = await this.questionService.getQuestionByExamId(id);
+    exam.examQuestions.forEach(eq => {
+      eq.question.choices = eq.question.choices.map(c => {
+          return {text: c.text}
+      }) as any
+    })
+
+    // exam.examQuestions = await this.examQuestionRepository.find({where:{exam: {id}}});
+    this.updateStartTimeLog(id, user.id);
 
     return exam;
   }
 
   async update(
-    id: number,
-    updateExamDto: UpdateExamDto,
-    user: User,
+      id: number,
+      updateExamDto: UpdateExamDto,
+      user: User,
   ): Promise<Exam> {
     const exam = await this.findOne(id, user);
 
-    Object.assign(exam, updateExamDto);
+    // Cập nhật các thuộc tính của Exam (nếu có trong DTO)
+    Object.assign(exam, {
+      title: updateExamDto.title ?? exam.title,
+      description: updateExamDto.description ?? exam.description,
+      startTime: updateExamDto.startTime ?? exam.startTime,
+      endTime: updateExamDto.endTime ?? exam.endTime,
+    });
 
-    return await this.examRepository.save(exam);
+    // Lưu thay đổi của Exam
+    await this.examRepository.save(exam);
+
+    // Nếu có danh sách câu hỏi cần cập nhật
+    if (updateExamDto.questions) {
+      for (const { questionId, score } of updateExamDto.questions) {
+        const examQuestion = await this.examQuestionRepository.findOne({
+          where: { exam: { id }, question: { id: questionId } },
+        });
+
+        if (examQuestion) {
+          // Cập nhật điểm số nếu ExamQuestion đã tồn tại
+          examQuestion.score = score;
+          await this.examQuestionRepository.save(examQuestion);
+        } else {
+          // Nếu ExamQuestion chưa tồn tại, tạo mới
+          const question = await this.questionService.getQuestionById(questionId);
+          if (question) {
+            const newExamQuestion = this.examQuestionRepository.create({
+              exam,
+              question,
+              score,
+            });
+            await this.examQuestionRepository.save(newExamQuestion);
+          }
+        }
+      }
+    }
+
+    return exam;
   }
 
   async remove(id: number, user: User): Promise<Exam> {
     const exam = await this.findOne(id, user);
     return this.examRepository.remove(exam);
+  }
+
+  async updateStartTimeLog(examId: number, studentId: number){
+    const examLog = await this.examLogRepository.findOne({where:{
+      exam:{id: examId},
+      student:{id: studentId}
+      }})
+    if(!examLog){
+      await this.examLogRepository.create({
+        exam: {id: examId},
+        student: {id: studentId},
+        startTime: new Date()
+      })
+    }
+  }
+
+  async updateEndTimeLog(examId: number, studentId: number){
+    const examLog = await this.examLogRepository.findOne({where:{
+        exam:{id: examId},
+        student:{id: studentId}
+      }})
+    if(examLog){
+      examLog.endTime = new Date();
+      await this.examLogRepository.save(examLog);
+    }else{
+      await this.examLogRepository.create({
+        exam: {id: examId},
+        student: {id: studentId},
+        endTime: new Date()
+      })
+    }
+  }
+
+  async hasSubmission(examId: number, studentId: number){
+    const examLog = await this.examLogRepository.findOne({where:{
+        exam:{id: examId},
+        student:{id: studentId}
+      }})
+    return examLog;
+  }
+
+  async getExamQuestion(id: number): Promise<ExamQuestion> {
+    const examQuestion = await this.examQuestionRepository.findOne({
+      where: { id },
+      relations: ['question'],
+    });
+    if (!examQuestion) {
+      throw new NotFoundException(`Exam with ID ${id} not found`);
+    }
+    return examQuestion;
   }
 }

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import {forwardRef, Module} from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PermissionModule } from '../permission/permission.module';
 import { UserModule } from '../user/user.module';
@@ -16,6 +16,7 @@ import { Submission } from './submission/submission.entity';
 import { SubmissionService } from './submission/submission.service';
 import { TestCase } from './testcase/testcase.entity';
 import { Judge0Service } from '../judge0/judge0.service';
+import {ExamModule} from "../exam/exam.module";
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { Judge0Service } from '../judge0/judge0.service';
     ]),
     UserModule,
     PermissionModule,
+      forwardRef(() => ExamModule),
   ],
   controllers: [
     QuestionController,

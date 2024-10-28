@@ -21,7 +21,7 @@ export class SubmissionController {
   ) {
     return this.submissionService.submitMultipleChoice(
       user.id,
-      submitMultipleChoiceDto.questionId,
+      submitMultipleChoiceDto.examQuestionId,
       submitMultipleChoiceDto.answer,
       submitMultipleChoiceDto.examId,
     );

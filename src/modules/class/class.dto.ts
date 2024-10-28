@@ -45,6 +45,18 @@ export class CreateClassDto {
   teacherCodes?: UserData[]; // Danh sách các teacher codes
 }
 
+export class AddStudentDto{
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  code: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  name?:string
+}
+
 export class UpdateClassDto extends PartialType(CreateClassDto) {}
 
 export class AssignTeachersDto {

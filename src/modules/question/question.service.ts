@@ -121,20 +121,6 @@ export class QuestionService {
     return question;
   }
 
-  async getQuestionByExamId(examId: number, user?: User): Promise<Question[]> {
-    const questions = await this.questionRepository.find({
-      where: { exams: { id: examId } },
-    });
-
-    questions.forEach((item) => {
-      item.choices = item.choices.map((choice) => ({
-        text: choice.text,
-        isCorrect: undefined,
-      }));
-    });
-
-    return questions;
-  }
 
   async updateQuestion(
     id: number,

@@ -17,6 +17,7 @@ import { Submission } from './submission/submission.entity';
 import { Exam } from '../exam/exam.entity';
 import { BaseEntity } from 'src/common/entities/base.entity';
 import { Major } from '../major/major.entity';
+import {ExamQuestion} from "../exam/exam-question/exam-question.entity";
 
 @Entity()
 export class Question extends BaseEntity {
@@ -57,8 +58,6 @@ export class Question extends BaseEntity {
   @OneToMany(() => TestCase, (testCase) => testCase.question, { cascade: true })
   testCases: TestCase[]; // Các test case của bài tập
 
-  @OneToMany(() => Submission, (submission) => submission.question)
-  submissions: Submission[];
 
   @Column({ type: 'simple-array', nullable: true })
   acceptedLanguages: number[];
@@ -66,7 +65,7 @@ export class Question extends BaseEntity {
   @Column({ type: 'simple-json', nullable: true })
   initCode: { [key: string | number]: string };
 
-  @ManyToMany(() => Exam, (exam) => exam.questions)
-  @JoinTable() // Tạo bảng liên kết giữa Question và Exam
-  exams: Exam[];
+  @OneToMany(() => ExamQuestion
+      , (examQuestion) => examQuestion.question)
+  examQuestions: ExamQuestion[]; // Thêm mối quan hệ với ExamQuestion
 }

@@ -16,7 +16,7 @@ import {
   AssignTeachersDto,
   AssignUsersDto,
   ImportUsersDto,
-  QueryClassDto,
+  QueryClassDto, AddStudentDto,
 } from './class.dto';
 import { Class } from './class.entity';
 import { ApiTags } from '@nestjs/swagger';
@@ -68,6 +68,30 @@ export class ClassController {
     @Body() updateClassDto: UpdateClassDto,
   ): Promise<Class> {
     return this.classService.update(classId, updateClassDto);
+  }
+
+  @Post('/student/:classId')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.CLASS_UPDATE)
+  @ApiPermissions(AppPermission.CLASS_UPDATE)
+  async addStudentToClass(
+      @Body() addStudentDto: AddStudentDto,
+      @Param('classId') classId: number,
+      @User() user: UserEntity
+  ): Promise<Class> {
+    return this.classService.addStudentToClass(addStudentDto, classId, user);
+  }
+
+  @Delete('/:classId/student/:studentCode')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.CLASS_UPDATE)
+  @ApiPermissions(AppPermission.CLASS_UPDATE)
+  async deleteStudentFromClass(
+      @Param('classId') classId: number,
+      @Param('studentCode') studentCode: string,
+      @User() user: UserEntity
+  ): Promise<Class> {
+    return this.classService.deleteStudentFromClass(classId, studentCode, user);
   }
 
   @Delete(':id')

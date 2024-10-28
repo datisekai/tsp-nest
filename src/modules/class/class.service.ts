@@ -6,6 +6,7 @@ import { UserType } from '../user/user.dto';
 import { User } from '../user/user.entity';
 import { UserService } from '../user/user.service';
 import {
+  AddStudentDto,
   AssignTeachersDto,
   AssignUsersDto,
   CreateClassDto,
@@ -296,6 +297,23 @@ export class ClassService {
     return await this.classRepository.save(classEntity);
   }
 
+  async addStudentToClass(dto: AddStudentDto, classId: number, user: User): Promise<Class> {
+       await this.checkExistedTeacher(classId, user.id);
+
+      const classEntity = await this.findOne(classId);
+      const users = await this.userService.findOrCreateUsersByCodes(
+          [dto], UserType.STUDENT);
+      classEntity.users.push(users[0]);
+      return await this.classRepository.save(classEntity);
+  }
+
+  async deleteStudentFromClass(classId: number, studentCode: string, user:User){
+    await this.checkExistedTeacher(classId, user.id);
+    const classEntity = await this.findOne(classId);
+    classEntity.users = classEntity.users.filter(item => item.code !== studentCode);
+    return await this.classRepository.save(classEntity);
+  }
+
   async checkExistedUser(classId: number, userId: number) {
     const classExist = await this.findOne(classId);
 
@@ -303,5 +321,20 @@ export class ClassService {
     const userExists = classExist.users.some((user) => user.id === userId);
 
     return userExists; // Trả về true nếu người dùng tồn tại, ngược lại false
+  }
+
+  async checkExistedTeacher(classId: number, userId: number) {
+    const classExist = await this.findOne(classId);
+
+    // Kiểm tra xem userId có nằm trong danh sách người dùng của lớp không
+    const userExists = classExist.teachers.some((user) => user.id === userId);
+
+    if (!userExists) {
+      throw new NotFoundException(
+          `User with ID ${userId} not found in class with ID ${classId}`
+      );
+    }
+
+    return userExists; // Trả về true nếu người dùng tồn tại, ngở false
   }
 }

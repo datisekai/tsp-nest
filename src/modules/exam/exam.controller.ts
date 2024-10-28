@@ -99,4 +99,12 @@ export class ExamController {
   ): Promise<Exam> {
     return this.examService.remove(id, user);
   }
+
+  @Post('/submit/:examId')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  async submit(
+    @Param('examId') examId: number,
+    @User() user: UserEntity){
+    return this.examService.updateEndTimeLog(examId, user.id);
+  }
 }
