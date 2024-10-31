@@ -45,6 +45,12 @@ export class ExamController {
     return this.examService.findAllMe(dto, user);
   }
 
+  @Get('/public/history/:id')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  async findMeByExamId(@Param('id') id: number, @User() user: UserEntity) {
+    return this.examService.findMeByExamId(id, user);
+  }
+
   @Get('public/:id')
   @UseGuards(JwtAuthGuard)
   async findOnePublic(
@@ -102,9 +108,7 @@ export class ExamController {
 
   @Post('/submit/:examId')
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  async submit(
-    @Param('examId') examId: number,
-    @User() user: UserEntity){
+  async submit(@Param('examId') examId: number, @User() user: UserEntity) {
     return this.examService.updateEndTimeLog(examId, user.id);
   }
 }

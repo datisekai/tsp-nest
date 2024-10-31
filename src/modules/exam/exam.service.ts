@@ -8,8 +8,8 @@ import { User } from '../user/user.entity';
 import { UserType } from '../user/user.dto';
 import { checkUserPermission } from 'src/common/helpers/checkPermission';
 import { ClassService } from '../class/class.service';
-import {ExamQuestion} from "./exam-question/exam-question.entity";
-import {ExamLog} from "./exam-log/exam-log.entity";
+import { ExamQuestion } from './exam-question/exam-question.entity';
+import { ExamLog } from './exam-log/exam-log.entity';
 
 @Injectable()
 export class ExamService {
@@ -25,7 +25,15 @@ export class ExamService {
   ) {}
 
   async create(createExamDto: CreateExamDto, user: User): Promise<Exam> {
-    const { classId, description, endTime, startTime, title, questions } = createExamDto;
+    const {
+      classId,
+      description,
+      endTime,
+      startTime,
+      title,
+      questions,
+      showResult = false,
+    } = createExamDto;
 
     // Tạo exam mới
     const exam = this.examRepository.create({
@@ -35,6 +43,7 @@ export class ExamService {
       startTime,
       class: { id: classId },
       user: { id: user.id },
+      showResult,
     });
 
     // Lưu exam vào database để lấy id
@@ -55,7 +64,6 @@ export class ExamService {
 
     return exam;
   }
-
 
   async findAll(
     query: ExamQueryDto,
@@ -111,6 +119,48 @@ export class ExamService {
     return { data, total }; // Trả về dữ liệu và tổng số lượng
   }
 
+  async findMeByExamId(examId: number, user: User) {
+    const queryBuilder = this.examRepository
+      .createQueryBuilder('exam')
+      .select([
+        'exam.id',
+        'exam.title',
+        'exam.startTime',
+        'exam.endTime',
+        'exam.showResult',
+        'submissions.createdAt',
+        'submissions.id',
+        'examLogs.startTime',
+        'examLogs.endTime',
+        'examQuestions',
+        'question.id',
+        'question.title',
+        'question.content',
+        'question.type',
+        'question.choices',
+        'question.initCode',
+        'question.acceptedLanguages',
+      ])
+      .leftJoin('exam.examQuestions', 'examQuestions')
+      .leftJoin('examQuestions.question', 'question')
+      .leftJoin(
+        'exam.submissions',
+        'submissions',
+        'submissions.user.id = :userId',
+        { userId: user.id },
+      )
+      .leftJoin('exam.examLogs', 'examLogs', 'examLogs.student.id = :userId', {
+        userId: user.id,
+      })
+      .andWhere('exam.id = :id', { id: examId });
+    const exam = await queryBuilder.getOne();
+
+    if (!exam) {
+      throw new NotFoundException(`Exam with ID ${examId} not found`);
+    }
+    return { data: exam };
+  }
+
   async findAllMe(
     query: ExamQueryDto,
     user: User,
@@ -134,6 +184,7 @@ export class ExamService {
         'exam.title',
         'exam.startTime',
         'exam.endTime',
+        'exam.showResult',
         'class.id',
         'class.name',
         'major.id',
@@ -144,6 +195,8 @@ export class ExamService {
         'submission_user.id',
         'teachers.name',
         'teachers.id',
+        'examLog.startTime',
+        'examLog.endTime',
       ])
       .leftJoin('exam.class', 'class')
       .leftJoin('class.major', 'major')
@@ -151,6 +204,9 @@ export class ExamService {
       .leftJoin('class.users', 'user')
       .leftJoin('exam.submissions', 'submissions')
       .leftJoin('submissions.user', 'submission_user')
+      .leftJoin('exam.examLogs', 'examLog', 'examLog.student.id = :userId', {
+        userId: user.id,
+      })
       .where('user.id = :userId', { userId: user.id });
 
     // Áp dụng các điều kiện tìm kiếm
@@ -188,7 +244,7 @@ export class ExamService {
   async findOne(id: number, user?: User): Promise<Exam> {
     const examEntity = await this.examRepository.findOne({
       where: { id },
-      relations: ['examQuestions', 'class','user'],
+      relations: ['examQuestions', 'class', 'user'],
     });
     if (user) {
       checkUserPermission(examEntity.user.id, user);
@@ -200,38 +256,73 @@ export class ExamService {
   }
 
   async joinExam(id: number, user: User): Promise<Exam> {
-    const query = this.examRepository.createQueryBuilder('exam')
-        .select(['exam','submissions','examQuestions','question.id','question.title','question.content','question.type','question.choices', 'question.initCode','question.acceptedLanguages','testCases'])
-        .leftJoin('exam.class', 'class')
-        .leftJoin('class.users', 'users','users.id = :userId', {userId: user.id})
-        .leftJoin('exam.examQuestions', 'examQuestions')
-        .leftJoin('examQuestions.question', 'question')
-        .leftJoin('question.testCases','testCases','testCases.isHidden = false')
-        .leftJoin('exam.submissions', 'submissions','submissions.user.id = :userId', {userId: user.id})
-        .where('users.id = :userId', { userId: user.id })
-        .andWhere('exam.id = :id', { id }).andWhere('exam.startTime <= :now', { now: new Date() })
-        .andWhere('exam.endTime >= :now', { now: new Date() });
+    const query = this.examRepository
+      .createQueryBuilder('exam')
+      .select([
+        'exam',
+        'submissions',
+        'examQuestions',
+        'question.id',
+        'question.title',
+        'question.content',
+        'question.type',
+        'question.choices',
+        'question.initCode',
+        'question.acceptedLanguages',
+        'testCases',
+        'submissionExamQuestion.id',
+      ])
+      .leftJoin('exam.class', 'class')
+      .leftJoin('class.users', 'users', 'users.id = :userId', {
+        userId: user.id,
+      })
+      .leftJoin('exam.examQuestions', 'examQuestions')
+      .leftJoin('examQuestions.question', 'question')
+      .leftJoin('question.testCases', 'testCases', 'testCases.isHidden = false')
+      .leftJoin(
+        'exam.submissions',
+        'submissions',
+        'submissions.user.id = :userId',
+        { userId: user.id },
+      )
+      .leftJoin('submissions.examQuestion', 'submissionExamQuestion')
+      .where('users.id = :userId', { userId: user.id })
+      .andWhere('exam.id = :id', { id })
+      .andWhere('exam.startTime <= :now', { now: new Date() })
+      .andWhere('exam.endTime >= :now', { now: new Date() });
 
     const exam = await query.getOne();
 
-    if(!exam) throw new NotFoundException(`Exam with ID ${id} not found`);
+    if (!exam) throw new NotFoundException(`Exam with ID ${id} not found`);
 
-    exam.examQuestions.forEach(eq => {
-      eq.question.choices = eq.question.choices.map(c => {
-          return {text: c.text}
-      }) as any
-    })
+    const examLog = await this.examLogRepository.findOne({
+      where: {
+        student: {
+          id: user.id,
+        },
+      },
+    });
+
+    if (examLog && examLog.endTime) {
+      throw new NotFoundException(`You have submitted.`);
+    }
+
+    exam.examQuestions.forEach((eq) => {
+      eq.question.choices = eq.question.choices.map((c) => {
+        return { text: c.text };
+      }) as any;
+    });
 
     // exam.examQuestions = await this.examQuestionRepository.find({where:{exam: {id}}});
-    this.updateStartTimeLog(id, user.id);
+    await this.updateStartTimeLog(id, user.id);
 
     return exam;
   }
 
   async update(
-      id: number,
-      updateExamDto: UpdateExamDto,
-      user: User,
+    id: number,
+    updateExamDto: UpdateExamDto,
+    user: User,
   ): Promise<Exam> {
     const exam = await this.findOne(id, user);
 
@@ -259,7 +350,8 @@ export class ExamService {
           await this.examQuestionRepository.save(examQuestion);
         } else {
           // Nếu ExamQuestion chưa tồn tại, tạo mới
-          const question = await this.questionService.getQuestionById(questionId);
+          const question =
+            await this.questionService.getQuestionById(questionId);
           if (question) {
             const newExamQuestion = this.examQuestionRepository.create({
               exam,
@@ -280,42 +372,51 @@ export class ExamService {
     return this.examRepository.remove(exam);
   }
 
-  async updateStartTimeLog(examId: number, studentId: number){
-    const examLog = await this.examLogRepository.findOne({where:{
-      exam:{id: examId},
-      student:{id: studentId}
-      }})
-    if(!examLog){
-      await this.examLogRepository.create({
-        exam: {id: examId},
-        student: {id: studentId},
-        startTime: new Date()
-      })
+  async updateStartTimeLog(examId: number, studentId: number) {
+    const examLog = await this.examLogRepository.findOne({
+      where: {
+        exam: { id: examId },
+        student: { id: studentId },
+      },
+    });
+    if (!examLog) {
+      const newExamLog = this.examLogRepository.create({
+        exam: { id: examId },
+        student: { id: studentId },
+        startTime: new Date(),
+      });
+      await this.examLogRepository.save(newExamLog);
     }
   }
 
-  async updateEndTimeLog(examId: number, studentId: number){
-    const examLog = await this.examLogRepository.findOne({where:{
-        exam:{id: examId},
-        student:{id: studentId}
-      }})
-    if(examLog){
+  async updateEndTimeLog(examId: number, studentId: number) {
+    const examLog = await this.examLogRepository.findOne({
+      where: {
+        exam: { id: examId },
+        student: { id: studentId },
+      },
+    });
+    if (examLog) {
       examLog.endTime = new Date();
       await this.examLogRepository.save(examLog);
-    }else{
+    } else {
       await this.examLogRepository.create({
-        exam: {id: examId},
-        student: {id: studentId},
-        endTime: new Date()
-      })
+        exam: { id: examId },
+        student: { id: studentId },
+        endTime: new Date(),
+      });
     }
+
+    return { data: true };
   }
 
-  async hasSubmission(examId: number, studentId: number){
-    const examLog = await this.examLogRepository.findOne({where:{
-        exam:{id: examId},
-        student:{id: studentId}
-      }})
+  async hasSubmission(examId: number, studentId: number) {
+    const examLog = await this.examLogRepository.findOne({
+      where: {
+        exam: { id: examId },
+        student: { id: studentId },
+      },
+    });
     return examLog;
   }
 

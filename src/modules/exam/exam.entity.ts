@@ -13,7 +13,8 @@ import { Class } from '../class/class.entity';
 import { BaseEntity } from 'src/common/entities/base.entity';
 import { Submission } from '../question/submission/submission.entity';
 import { User } from '../user/user.entity';
-import {ExamQuestion} from "./exam-question/exam-question.entity";
+import { ExamQuestion } from './exam-question/exam-question.entity';
+import { ExamLog } from './exam-log/exam-log.entity';
 
 @Entity()
 export class Exam extends BaseEntity {
@@ -25,6 +26,9 @@ export class Exam extends BaseEntity {
 
   @Column({ type: 'text', nullable: true })
   description: string;
+
+  @Column({ type: 'boolean', default: false })
+  showResult: boolean;
 
   @Column({ type: 'timestamp', nullable: true })
   startTime: Date;
@@ -45,4 +49,7 @@ export class Exam extends BaseEntity {
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: 'userId' })
   user: User;
+
+  @OneToMany(() => ExamLog, (examLog) => examLog.exam)
+  examLogs: ExamLog[];
 }

@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsArray,
+  IsBoolean,
   IsDateString,
   IsIn,
   IsInt,
@@ -12,15 +13,15 @@ import {
 } from 'class-validator';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
-class QuestionDto{
+class QuestionDto {
   @ApiProperty()
   @IsInt()
   @IsNotEmpty()
-  questionId: number
+  questionId: number;
 
   @ApiProperty()
   @IsNotEmpty()
-  score: number
+  score: number;
 }
 export class CreateExamDto {
   @ApiProperty()
@@ -48,9 +49,14 @@ export class CreateExamDto {
   @IsNotEmpty()
   classId: number;
 
-  @ApiProperty({type: [QuestionDto]})
+  @ApiProperty({ type: [QuestionDto] })
   @IsArray()
   questions?: QuestionDto[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  showResult: boolean;
 }
 
 export class UpdateExamDto {
@@ -76,12 +82,12 @@ export class UpdateExamDto {
 
   @IsOptional()
   @IsInt()
-  @ApiPropertyOptional({type: [Number]})
+  @ApiPropertyOptional({ type: [Number] })
   classId?: number[]; // Mảng ID lớp
 
   @IsOptional()
   @IsArray()
-  @ApiPropertyOptional({type: [QuestionDto]})
+  @ApiPropertyOptional({ type: [QuestionDto] })
   questions?: QuestionDto[]; // Mảng ID câu hỏi
 }
 
