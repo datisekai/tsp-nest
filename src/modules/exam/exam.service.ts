@@ -293,13 +293,17 @@ export class ExamService {
 
     const exam = await query.getOne();
 
-    if (!exam) throw new NotFoundException(`Exam with ID ${id} not found`);
+    if (!exam)
+      throw new NotFoundException(
+        `You have submitted or exam with ID ${id} not found`,
+      );
 
     const examLog = await this.examLogRepository.findOne({
       where: {
         student: {
           id: user.id,
         },
+        exam: { id },
       },
     });
 
@@ -308,7 +312,7 @@ export class ExamService {
     }
 
     exam.examQuestions.forEach((eq) => {
-      eq.question.choices = eq.question.choices.map((c) => {
+      eq.question.choices = eq.question.choices?.map((c) => {
         return { text: c.text };
       }) as any;
     });

@@ -4,10 +4,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Question } from '../question.entity';
 import { QuestionType } from '../question.dto';
-import { SubmitCodeDto } from './submission.dto';
+import { RunTestCodeDto, SubmitCodeDto } from './submission.dto';
 import { User } from 'src/modules/user/user.entity';
 import { Judge0Service } from 'src/modules/judge0/judge0.service';
-import {ExamService} from "../../exam/exam.service";
+import { ExamService } from '../../exam/exam.service';
 
 const JUDGE0_SUCCESS_STATUS = 3;
 @Injectable()
@@ -20,8 +20,7 @@ export class SubmissionService {
     private questionRepository: Repository<Question>,
 
     private readonly judge0Service: Judge0Service,
-    private readonly  examService: ExamService
-
+    private readonly examService: ExamService,
   ) {}
 
   async submitMultipleChoice(
@@ -31,9 +30,13 @@ export class SubmissionService {
     examId: number,
   ): Promise<{ data: boolean }> {
     const hasSubmission = await this.examService.hasSubmission(examId, userId);
-    if(hasSubmission) throw new NotFoundException(`Exam with ID ${examId} has been submitted`);
+    if (hasSubmission)
+      throw new NotFoundException(`Exam with ID ${examId} has been submitted`);
     const examQuestion = await this.examService.getExamQuestion(examQuestionId);
-    if (!examQuestion || examQuestion.question.type !== QuestionType.MULTIPLE_CHOICE) {
+    if (
+      !examQuestion ||
+      examQuestion.question.type !== QuestionType.MULTIPLE_CHOICE
+    ) {
       throw new NotFoundException('Multiple choice question not found');
     }
 
@@ -43,7 +46,11 @@ export class SubmissionService {
 
     // Tìm submission có cùng userId, examQuestionId và examId
     let submission = await this.submissionRepository.findOne({
-      where: { user: { id: userId }, examQuestion: { id: examQuestionId }, exam: { id: examId } },
+      where: {
+        user: { id: userId },
+        examQuestion: { id: examQuestionId },
+        exam: { id: examId },
+      },
     });
 
     if (submission) {
@@ -54,7 +61,7 @@ export class SubmissionService {
       // Nếu chưa có submission, tạo mới
       submission = this.submissionRepository.create({
         user: { id: userId },
-        examQuestion:{ id: examQuestionId },
+        examQuestion: { id: examQuestionId },
         answer,
         grade: isCorrect ? examQuestion.score : 0,
         exam: { id: examId },
@@ -65,9 +72,27 @@ export class SubmissionService {
     return { data: true };
   }
 
+  async runTestCode(dto: RunTestCodeDto): Promise<any> {
+    const { expected_output, language_id, source_code, stdin } = dto;
+    const result = await this.judge0Service.testCode({
+      language_id: language_id,
+      expected_output: expected_output,
+      source_code: source_code,
+      stdin: stdin,
+    });
+
+    return result;
+  }
+
   async submitCode(dto: SubmitCodeDto, user: User): Promise<{ data: true }> {
-    const hasSubmission = await this.examService.hasSubmission(dto.examId, user.id);
-    if(hasSubmission) throw new NotFoundException(`Exam with ID ${dto.examId} has been submitted`);
+    const hasSubmission = await this.examService.hasSubmission(
+      dto.examId,
+      user.id,
+    );
+    if (hasSubmission)
+      throw new NotFoundException(
+        `Exam with ID ${dto.examId} has been submitted`,
+      );
     const { code, examId, languageId, examQuestionId } = dto;
     const examQuestion = await this.examService.getExamQuestion(examQuestionId);
 
@@ -77,7 +102,11 @@ export class SubmissionService {
 
     // Tìm submission có cùng userId, examQuestionId và examId
     let submission = await this.submissionRepository.findOne({
-      where: { user: { id: user.id }, examQuestion: { id: examQuestionId }, exam: { id: examId } },
+      where: {
+        user: { id: user.id },
+        examQuestion: { id: examQuestionId },
+        exam: { id: examId },
+      },
     });
 
     const testResults = [];
