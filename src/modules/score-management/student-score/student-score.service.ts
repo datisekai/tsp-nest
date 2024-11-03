@@ -61,10 +61,6 @@ export class StudentScoreService {
       .where('scoreColumn.classId = :classId', { classId }) // Điều kiện cho classId
       .getMany();
 
-    if (!scores.length) {
-      throw new NotFoundException(`No scores found for class ID ${classId}`);
-    }
-
     return {
       data: scores.map((score) => ({
         studentId: score.student.id,
