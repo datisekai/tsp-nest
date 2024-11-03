@@ -10,7 +10,7 @@ import {
 } from 'class-validator';
 import { PaginationDto } from '../../common/dto/pagination.dto';
 
-class UserData {
+export class UserData {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()

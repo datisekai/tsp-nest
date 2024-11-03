@@ -59,6 +59,14 @@ export class ClassController {
     return this.classService.findOne(classId);
   }
 
+  @Get(':id/student')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.CLASS_VIEW)
+  @ApiPermissions(AppPermission.CLASS_VIEW)
+  async findStudentFromClass(@Param('id') classId: number, @User() user: UserEntity) {
+    return this.classService.getStudentFromClass(classId, user);
+  }
+
   @Patch(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.CLASS_UPDATE)
