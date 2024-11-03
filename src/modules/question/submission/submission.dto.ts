@@ -38,3 +38,25 @@ export class SubmitCodeDto {
   @IsString()
   code: string;
 }
+
+export class RunTestCodeDto {
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  language_id: number;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  expected_output: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  source_code: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  stdin: string;
+}

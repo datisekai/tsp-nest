@@ -1,6 +1,10 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { SubmissionService } from './submission.service';
-import { SubmitCodeDto, SubmitMultipleChoiceDto } from './submission.dto';
+import {
+  RunTestCodeDto,
+  SubmitCodeDto,
+  SubmitMultipleChoiceDto,
+} from './submission.dto';
 import { User } from 'src/common/decorators';
 
 import { User as UserEntity } from '../../user/user.entity';
@@ -34,5 +38,11 @@ export class SubmissionController {
     @User() user: UserEntity,
   ) {
     return this.submissionService.submitCode(submitCodeDto, user);
+  }
+
+  @Post('run-test-code')
+  @UseGuards(JwtAuthGuard)
+  async runTestCode(@Body() dto: RunTestCodeDto, @User() user: UserEntity) {
+    return this.submissionService.runTestCode(dto);
   }
 }

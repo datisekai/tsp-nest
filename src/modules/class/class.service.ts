@@ -297,20 +297,32 @@ export class ClassService {
     return await this.classRepository.save(classEntity);
   }
 
-  async addStudentToClass(dto: AddStudentDto, classId: number, user: User): Promise<Class> {
-       await this.checkExistedTeacher(classId, user.id);
+  async addStudentToClass(
+    dto: AddStudentDto,
+    classId: number,
+    user: User,
+  ): Promise<Class> {
+    await this.checkExistedTeacher(classId, user.id);
 
-      const classEntity = await this.findOne(classId);
-      const users = await this.userService.findOrCreateUsersByCodes(
-          [dto], UserType.STUDENT);
-      classEntity.users.push(users[0]);
-      return await this.classRepository.save(classEntity);
+    const classEntity = await this.findOne(classId);
+    const users = await this.userService.findOrCreateUsersByCodes(
+      [dto],
+      UserType.STUDENT,
+    );
+    classEntity.users.push(users[0]);
+    return await this.classRepository.save(classEntity);
   }
 
-  async deleteStudentFromClass(classId: number, studentCode: string, user:User){
+  async deleteStudentFromClass(
+    classId: number,
+    studentCode: string,
+    user: User,
+  ) {
     await this.checkExistedTeacher(classId, user.id);
     const classEntity = await this.findOne(classId);
-    classEntity.users = classEntity.users.filter(item => item.code !== studentCode);
+    classEntity.users = classEntity.users.filter(
+      (item) => item.code !== studentCode,
+    );
     return await this.classRepository.save(classEntity);
   }
 
@@ -331,10 +343,15 @@ export class ClassService {
 
     if (!userExists) {
       throw new NotFoundException(
-          `User with ID ${userId} not found in class with ID ${classId}`
+        `User with ID ${userId} not found in class with ID ${classId}`,
       );
     }
 
     return userExists; // Trả về true nếu người dùng tồn tại, ngở false
+  }
+
+  async getStudentFromClass(classId: number, user: User){
+    const classEntity = await this.findOne(classId, user);
+    return {data: classEntity.users};
   }
 }

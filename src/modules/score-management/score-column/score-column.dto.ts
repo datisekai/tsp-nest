@@ -50,3 +50,12 @@ export class CreateMultipleScoreColumnsDto {
   @Type(() => CreateScoreColumnDto)
   scoreColumns: CreateScoreColumnDto[];
 }
+
+export class CreateScoreColumnMajorDto {
+  @ApiProperty({
+    type: [CreateMultipleScoreColumnsDto],
+  })
+  @ValidateNested({ each: true })
+  @Type(() => CreateMultipleScoreColumnsDto)
+  scoreColumns: CreateMultipleScoreColumnsDto[];
+}

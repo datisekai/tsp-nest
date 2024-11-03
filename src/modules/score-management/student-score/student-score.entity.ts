@@ -10,7 +10,9 @@ export class StudentScore {
   @ManyToOne(() => User, (user) => user.studentScores)
   student: User; // Sinh viên
 
-  @ManyToOne(() => ScoreColumn, (scoreColumn) => scoreColumn.scores)
+  @ManyToOne(() => ScoreColumn, (scoreColumn) => scoreColumn.scores, {
+    onDelete: 'CASCADE',
+  })
   scoreColumn: ScoreColumn; // Cột điểm
 
   @Column({ type: 'float' })

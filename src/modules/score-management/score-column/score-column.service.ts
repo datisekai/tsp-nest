@@ -3,7 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ClassService } from 'src/modules/class/class.service';
 import { MajorService } from 'src/modules/major/major.service';
 import { In, Repository } from 'typeorm';
-import { CreateMultipleScoreColumnsDto } from './score-column.dto';
+import {
+  CreateMultipleScoreColumnsDto,
+  CreateScoreColumnMajorDto,
+} from './score-column.dto';
 import { ScoreColumn } from './score-column.entity';
 
 @Injectable()
@@ -23,6 +26,19 @@ export class ScoreColumnService {
     });
 
     return { data: { major, columns } };
+  }
+
+  async findByClassId(classId: number) {
+    const columns = await this.scoreColumnRepository.find({
+      where: { class: { id: classId } },
+    });
+
+    return { data: columns };
+  }
+
+  async updateMultiple(dto: CreateScoreColumnMajorDto) {
+    await Promise.allSettled(dto.scoreColumns.map((item) => this.update(item)));
+    return true;
   }
 
   async update(
@@ -76,5 +92,10 @@ export class ScoreColumnService {
       throw new NotFoundException(`Class with ID ${id} not found`);
     }
     return classEntity;
+  }
+
+  async deleteScoreColumn(id: number) {
+    const scoreColumn = await this.findOne(id);
+    return await this.scoreColumnRepository.remove(scoreColumn);
   }
 }
