@@ -40,7 +40,7 @@ export class Judge0Service {
       throw new NotFoundException('Judge0 URL or API key not found');
     const { source_code, language_id, stdin, expected_output } = dto;
     const response = await axios.post(
-      `${this.judgeUrl}/submissions?wait=true`,
+      `${this.judgeUrl}/submissions?wait=true&base64_encoded=true`,
       {
         source_code,
         language_id,
