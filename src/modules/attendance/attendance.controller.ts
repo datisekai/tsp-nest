@@ -118,9 +118,9 @@ export class AttendanceController {
   }
 
   @Get('/class/:classId/statistic')
-  // @UseGuards(JwtAuthGuard, PermissionGuard)
-  // @Permissions(AppPermission.ATTENDANCE_VIEW)
-  // @ApiPermissions(AppPermission.ATTENDANCE_VIEW)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.ATTENDANCE_VIEW)
+  @ApiPermissions(AppPermission.ATTENDANCE_VIEW)
   async statistic(
     @Param('classId') classId: number,
     @Query() dto: QueryStatisticDto,
