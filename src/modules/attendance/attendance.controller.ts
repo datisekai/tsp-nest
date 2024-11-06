@@ -20,7 +20,7 @@ import { User as UserEntity } from '../user/user.entity';
 import {
   CreateAttendanceDto,
   QueryAttendanceDto,
-  QueryAttendeeDto,
+  QueryAttendeeDto, QueryStatisticDto,
   UpdateAttendanceDto,
 } from './attendance.dto';
 import { Attendance } from './attendance.entity';
@@ -115,5 +115,16 @@ export class AttendanceController {
     @User() user: UserEntity,
   ): Promise<Attendance> {
     return await this.attendanceService.remove(id, user);
+  }
+
+  @Get('/class/:classId/statistic')
+  // @UseGuards(JwtAuthGuard, PermissionGuard)
+  // @Permissions(AppPermission.ATTENDANCE_VIEW)
+  // @ApiPermissions(AppPermission.ATTENDANCE_VIEW)
+  async statistic(
+    @Param('classId') classId: number,
+    @Query() dto: QueryStatisticDto,
+  ){
+    return this.attendanceService.statisticClass(classId,dto?.date);
   }
 }

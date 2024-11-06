@@ -7,12 +7,14 @@ import { AttendanceService } from './attendance.service';
 import { Attendee } from './attendee.entity';
 import { AttendanceController } from './attendance.controller';
 import { AttendanceGateway } from './attendance.gateway';
+import {ClassModule} from "../class/class.module";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Attendance, Attendee]),
     UserModule,
     PermissionModule,
+      ClassModule,
   ],
   controllers: [AttendanceController],
   providers: [AttendanceService, AttendanceGateway],

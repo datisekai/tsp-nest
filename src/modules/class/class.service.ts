@@ -354,4 +354,6 @@ export class ClassService {
     const classEntity = await this.findOne(classId, user);
     return {data: classEntity.users};
   }
+
+
 }

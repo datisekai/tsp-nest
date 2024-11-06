@@ -14,6 +14,7 @@ import { removeVietnameseDiacritics } from 'src/common/helpers';
 import { User } from '../user/user.entity';
 import { UserType } from '../user/user.dto';
 import { checkUserPermission } from 'src/common/helpers/checkPermission';
+import {ClassService} from "../class/class.service";
 
 @Injectable()
 export class AttendanceService {
@@ -22,6 +23,8 @@ export class AttendanceService {
     private readonly attendanceRepository: Repository<Attendance>,
     @InjectRepository(Attendee)
     private readonly attendeeRepository: Repository<Attendee>,
+
+    private readonly classService: ClassService
   ) {}
 
   async create(
@@ -212,4 +215,42 @@ export class AttendanceService {
     const attendance = await this.findOne(id, user);
     return await this.attendanceRepository.remove(attendance);
   }
+
+    async statisticClass(classId: number, date?:string){
+        const classEntity = await this.classService.findOne(classId, null, ['users']);
+        const queryBuilder = this.attendanceRepository.createQueryBuilder('attendance').select(['attendance.id','attendance.createdAt','attendance.updatedAt', 'attendees', 'user.code','user.name'])
+        .andWhere('attendance.class.id = :classId', { classId }).leftJoin('attendance.attendees', 'attendees')
+            .leftJoin('attendees.user', 'user');
+
+        if(date){
+            queryBuilder.andWhere("DATE_FORMAT(attendance.updatedAt, '%d/%m/%Y') = :date", { date })
+        }
+
+        const data = await queryBuilder.getMany();
+
+
+        let checkedInCount = 0;
+        let notCheckedInCount = 0;
+
+
+
+        data.forEach(item => {
+            checkedInCount += item.attendees.length;
+            notCheckedInCount += classEntity.users.length - item.attendees.length
+        })
+
+        const countAttendance = data.length || 1
+        const attendanceRate = (checkedInCount / classEntity.users.length) / countAttendance;
+        const absenceRate = (notCheckedInCount / classEntity.users.length) / countAttendance;
+
+
+        return {
+            checkedInCount,
+            notCheckedInCount,
+            attendanceRate:`${attendanceRate * 100}%`,
+            absenceRate:`${absenceRate * 100}%`,
+            data: data
+        }
+
+    }
 }

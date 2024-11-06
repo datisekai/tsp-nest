@@ -125,3 +125,10 @@ export class CreateAttendeeDto {
   @IsNumber()
   userId: number;
 }
+
+export class QueryStatisticDto{
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  date:string
+}
