@@ -7,6 +7,7 @@ import { UserService } from '../user/user.service';
 import {
   AssignTeachersDto,
   CreateMajorDto,
+  CreateMultipleMajorDto,
   QueryMajorDto,
   UpdateMajorDto,
 } from './major.dto';
@@ -21,6 +22,28 @@ export class MajorService {
     private readonly facultyService: FacultyService,
     private readonly userService: UserService,
   ) {}
+
+  async findByCode(code: string): Promise<Major> {
+    return await this.majorRepository.findOne({ where: { code } });
+  }
+
+  async createMultiple(dto: CreateMultipleMajorDto) {
+    const newMajors = [];
+    for (const major of dto.majors) {
+      const falcuty = await this.facultyService.findByCode(major.facultyCode);
+      if (falcuty) {
+        const newMajor = this.majorRepository.create(major);
+        newMajor.faculty = falcuty;
+        newMajor.teachers = await this.userService.findOrCreateUsersByCodes(
+          major.teachers,
+          UserType.TEACHER,
+        );
+        newMajors.push(newMajor);
+      }
+    }
+
+    return await this.majorRepository.save(newMajors);
+  }
 
   async create(createMajorDto: CreateMajorDto): Promise<Major> {
     const { name, facultyId, teachers, code } = createMajorDto;

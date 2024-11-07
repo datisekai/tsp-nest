@@ -31,7 +31,10 @@ export class StudentScoreService {
       }
 
       let studentScore = await this.studentScoreRepository.findOne({
-        where: { student: student, scoreColumn: scoreColumn },
+        where: {
+          student: { id: dto.studentId },
+          scoreColumn: { id: dto.scoreColumnId },
+        },
       });
 
       if (studentScore) {

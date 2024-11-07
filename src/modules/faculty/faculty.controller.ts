@@ -16,6 +16,7 @@ import {
   CreateFacultyDto,
   UpdateFacultyDto,
   QueryFacultyDto,
+  CreateFacultyMultipleDto,
 } from './faculty.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { AppPermission, AppResource } from '../../app.role';
@@ -54,6 +55,15 @@ export class FacultyController {
   @UsePipes(new ValidationPipe({ transform: true }))
   async create(@Body() createFacultyDto: CreateFacultyDto) {
     return this.facultyService.create(createFacultyDto);
+  }
+
+  @Post('multiple')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.FACULTY_CREATE)
+  @ApiPermissions(AppPermission.FACULTY_CREATE)
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async createMultiple(@Body() dto: CreateFacultyMultipleDto) {
+    return this.facultyService.createMultipleFaculty(dto);
   }
 
   @Put(':id')

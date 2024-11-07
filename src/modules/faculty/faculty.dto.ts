@@ -1,6 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { PaginationDto } from '../../common/dto/pagination.dto';
+import { Type } from 'class-transformer';
 
 export class CreateFacultyDto {
   @ApiProperty({ description: 'Name of the faculty' })
@@ -8,10 +15,23 @@ export class CreateFacultyDto {
   @IsNotEmpty()
   name: string;
 
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  code: string;
+
   @ApiPropertyOptional({ description: 'Description of the faculty' })
   @IsString()
   @IsOptional()
   description?: string;
+}
+
+export class CreateFacultyMultipleDto {
+  @ApiProperty({ type: [CreateFacultyDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateFacultyDto)
+  faculties: CreateFacultyDto[];
 }
 
 export class UpdateFacultyDto extends CreateFacultyDto {}

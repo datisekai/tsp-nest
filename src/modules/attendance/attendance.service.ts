@@ -14,7 +14,7 @@ import { removeVietnameseDiacritics } from 'src/common/helpers';
 import { User } from '../user/user.entity';
 import { UserType } from '../user/user.dto';
 import { checkUserPermission } from 'src/common/helpers/checkPermission';
-import {ClassService} from "../class/class.service";
+import { ClassService } from '../class/class.service';
 
 @Injectable()
 export class AttendanceService {
@@ -23,8 +23,7 @@ export class AttendanceService {
     private readonly attendanceRepository: Repository<Attendance>,
     @InjectRepository(Attendee)
     private readonly attendeeRepository: Repository<Attendee>,
-
-    private readonly classService: ClassService
+    private readonly classService: ClassService,
   ) {}
 
   async create(
@@ -91,6 +90,7 @@ export class AttendanceService {
     const [data, total] = await query.getManyAndCount();
     return { data, total };
   }
+
   // Lấy danh sách Attendance với phân trang và lọc theo createdAt
   async findAll(
     dto: QueryAttendanceDto,
@@ -156,6 +156,7 @@ export class AttendanceService {
 
     return { data, total };
   }
+
   async findOne(id: number, user?: User): Promise<Attendance> {
     const attendance = await this.attendanceRepository.findOne({
       where: { id },
@@ -199,6 +200,7 @@ export class AttendanceService {
 
     return await this.attendeeRepository.save(newAttendee);
   }
+
   // Cập nhật Attendance theo ID
   async update(
     id: number,
@@ -216,41 +218,52 @@ export class AttendanceService {
     return await this.attendanceRepository.remove(attendance);
   }
 
-    async statisticClass(classId: number, date?:string){
-        const classEntity = await this.classService.findOne(classId, null, ['users']);
-        const queryBuilder = this.attendanceRepository.createQueryBuilder('attendance').select(['attendance.id','attendance.createdAt','attendance.updatedAt', 'attendees', 'user.code','user.name'])
-        .andWhere('attendance.class.id = :classId', { classId }).leftJoin('attendance.attendees', 'attendees')
-            .leftJoin('attendees.user', 'user');
+  async statisticClass(classId: number, date?: string) {
+    const classEntity = await this.classService.findOne(classId, null, [
+      'users',
+    ]);
+    const queryBuilder = this.attendanceRepository
+      .createQueryBuilder('attendance')
+      .select([
+        'attendance.id',
+        'attendance.createdAt',
+        'attendance.updatedAt',
+        'attendees',
+        'user.code',
+        'user.name',
+      ])
+      .andWhere('attendance.class.id = :classId', { classId })
+      .leftJoin('attendance.attendees', 'attendees')
+      .leftJoin('attendees.user', 'user');
 
-        if(date){
-            queryBuilder.andWhere("DATE_FORMAT(attendance.updatedAt, '%d/%m/%Y') = :date", { date })
-        }
-
-        const data = await queryBuilder.getMany();
-
-
-        let checkedInCount = 0;
-        let notCheckedInCount = 0;
-
-
-
-        data.forEach(item => {
-            checkedInCount += item.attendees.length;
-            notCheckedInCount += classEntity.users.length - item.attendees.length
-        })
-
-        const countAttendance = data.length || 1
-        const attendanceRate = (checkedInCount / classEntity.users.length) / countAttendance;
-        const absenceRate = (notCheckedInCount / classEntity.users.length) / countAttendance;
-
-
-        return {
-            checkedInCount,
-            notCheckedInCount,
-            attendanceRate:`${attendanceRate * 100}%`,
-            absenceRate:`${absenceRate * 100}%`,
-            data: data
-        }
-
+    if (date) {
+      queryBuilder.andWhere(
+        "DATE_FORMAT(attendance.updatedAt, '%d/%m/%Y') = :date",
+        { date },
+      );
     }
+
+    const data = await queryBuilder.getMany();
+
+    let checkedInCount = 0;
+    let notCheckedInCount = 0;
+
+    data.forEach((item) => {
+      checkedInCount += item.attendees.length;
+      notCheckedInCount += classEntity.users.length - item.attendees.length;
+    });
+
+    const countAttendance = data.length || 1;
+    const classUserLength = classEntity.users.length || 1;
+    const attendanceRate = checkedInCount / classUserLength / countAttendance;
+    const absenceRate = notCheckedInCount / classUserLength / countAttendance;
+
+    return {
+      checkedInCount,
+      notCheckedInCount,
+      attendanceRate: `${attendanceRate * 100}%`,
+      absenceRate: `${absenceRate * 100}%`,
+      data: data,
+    };
+  }
 }

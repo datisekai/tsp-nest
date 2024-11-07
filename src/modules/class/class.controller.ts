@@ -16,7 +16,9 @@ import {
   AssignTeachersDto,
   AssignUsersDto,
   ImportUsersDto,
-  QueryClassDto, AddStudentDto,
+  QueryClassDto,
+  AddStudentDto,
+  CreateClassMultipleDto,
 } from './class.dto';
 import { Class } from './class.entity';
 import { ApiTags } from '@nestjs/swagger';
@@ -38,6 +40,14 @@ export class ClassController {
   @Post()
   async createClass(@Body() createClassDto: CreateClassDto): Promise<Class> {
     return this.classService.create(createClassDto);
+  }
+
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.CLASS_CREATE)
+  @ApiPermissions(AppPermission.CLASS_CREATE)
+  @Post('multiple')
+  async createClassMultiple(@Body() dto: CreateClassMultipleDto) {
+    return this.classService.createMultiple(dto);
   }
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -63,7 +73,10 @@ export class ClassController {
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.CLASS_VIEW)
   @ApiPermissions(AppPermission.CLASS_VIEW)
-  async findStudentFromClass(@Param('id') classId: number, @User() user: UserEntity) {
+  async findStudentFromClass(
+    @Param('id') classId: number,
+    @User() user: UserEntity,
+  ) {
     return this.classService.getStudentFromClass(classId, user);
   }
 
@@ -83,9 +96,9 @@ export class ClassController {
   @Permissions(AppPermission.CLASS_UPDATE)
   @ApiPermissions(AppPermission.CLASS_UPDATE)
   async addStudentToClass(
-      @Body() addStudentDto: AddStudentDto,
-      @Param('classId') classId: number,
-      @User() user: UserEntity
+    @Body() addStudentDto: AddStudentDto,
+    @Param('classId') classId: number,
+    @User() user: UserEntity,
   ): Promise<Class> {
     return this.classService.addStudentToClass(addStudentDto, classId, user);
   }
@@ -95,9 +108,9 @@ export class ClassController {
   @Permissions(AppPermission.CLASS_UPDATE)
   @ApiPermissions(AppPermission.CLASS_UPDATE)
   async deleteStudentFromClass(
-      @Param('classId') classId: number,
-      @Param('studentCode') studentCode: string,
-      @User() user: UserEntity
+    @Param('classId') classId: number,
+    @Param('studentCode') studentCode: string,
+    @User() user: UserEntity,
   ): Promise<Class> {
     return this.classService.deleteStudentFromClass(classId, studentCode, user);
   }

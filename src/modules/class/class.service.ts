@@ -10,6 +10,7 @@ import {
   AssignTeachersDto,
   AssignUsersDto,
   CreateClassDto,
+  CreateClassMultipleDto,
   ImportUsersDto,
   QueryClassDto,
   UpdateClassDto,
@@ -24,6 +25,24 @@ export class ClassService {
     private readonly majorService: MajorService,
     private readonly userService: UserService,
   ) {}
+
+  async createMultiple(dto: CreateClassMultipleDto): Promise<Class[]> {
+    const newClasses = [];
+    for (const item of dto.classes) {
+      const major = await this.majorService.findByCode(item.majorCode);
+      if (major) {
+        const newClass = this.classRepository.create(item);
+        newClass.major = major;
+        newClass.teachers = await this.userService.findOrCreateUsersByCodes(
+          item.teacherCodes,
+          UserType.TEACHER,
+        );
+        newClasses.push(newClass);
+      }
+    }
+
+    return await this.classRepository.save(newClasses);
+  }
 
   async create(createClassDto: CreateClassDto): Promise<Class> {
     const { name, majorId, teacherCodes, duration } = createClassDto;
@@ -350,10 +369,8 @@ export class ClassService {
     return userExists; // Trả về true nếu người dùng tồn tại, ngở false
   }
 
-  async getStudentFromClass(classId: number, user: User){
+  async getStudentFromClass(classId: number, user: User) {
     const classEntity = await this.findOne(classId, user);
-    return {data: classEntity.users};
+    return { data: classEntity.users };
   }
-
-
 }

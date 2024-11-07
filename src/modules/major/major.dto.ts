@@ -42,6 +42,34 @@ export class CreateMajorDto {
   teachers?: UserData[]; // Các ID của Teacher liên quan (tùy chọn)
 }
 
+class CreateMultipleMajor {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  name: string; // Tên của Major
+
+  @ApiProperty()
+  @IsNotEmpty()
+  code: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  facultyCode: string; // ID của Faculty mà Major thuộc về
+
+  @ApiPropertyOptional({ type: [UserData] })
+  @IsArray()
+  @IsOptional()
+  teachers?: UserData[]; // Các ID của Teacher liên quan (tùy chọn)
+}
+
+export class CreateMultipleMajorDto {
+  @ApiProperty({ type: [CreateMultipleMajor] })
+  @IsArray()
+  @ArrayNotEmpty()
+  majors: CreateMultipleMajor[];
+}
+
 export class UpdateMajorDto extends PartialType(CreateMajorDto) {}
 
 export class QueryMajorDto extends PaginationDto {

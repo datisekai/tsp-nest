@@ -17,6 +17,9 @@ export class Faculty extends BaseEntity {
   @Column('varchar')
   name: string;
 
+  @Column({ type: 'varchar', length: 255, unique: true, nullable: true })
+  code: string;
+
   @Column('varchar')
   description: string;
 

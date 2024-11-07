@@ -15,6 +15,7 @@ import {
   QueryMajorDto,
   UpdateMajorDto,
   AssignTeachersDto,
+  CreateMultipleMajorDto,
 } from './major.dto';
 import { Major } from './major.entity';
 import { AppPermission, AppResource } from '../..//app.role';
@@ -36,6 +37,14 @@ export class MajorController {
   @Post()
   async create(@Body() createMajorDto: CreateMajorDto): Promise<Major> {
     return this.majorService.create(createMajorDto);
+  }
+
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.MAJOR_CREATE)
+  @ApiPermissions(AppPermission.MAJOR_CREATE)
+  @Post('multiple')
+  async createMultiple(@Body() dto: CreateMultipleMajorDto) {
+    return this.majorService.createMultiple(dto);
   }
 
   @Get()

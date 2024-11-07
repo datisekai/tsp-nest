@@ -45,7 +45,39 @@ export class CreateClassDto {
   teacherCodes?: UserData[]; // Danh sách các teacher codes
 }
 
-export class AddStudentDto{
+class CreateClassMultiple {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  name: string; // Tên của Class
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  majorCode: string; // ID của Major liên quan
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  duration: string; // ID của Major liên quan
+
+  @ApiProperty({
+    type: [UserData],
+  })
+  @IsArray()
+  @ArrayNotEmpty()
+  teacherCodes?: UserData[];
+}
+
+export class CreateClassMultipleDto {
+  @ApiProperty({ type: [CreateClassMultiple] })
+  @IsArray()
+  @ArrayNotEmpty()
+  @ValidateNested({ each: true })
+  classes: CreateClassMultiple[];
+}
+
+export class AddStudentDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
@@ -54,7 +86,7 @@ export class AddStudentDto{
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  name?:string
+  name?: string;
 }
 
 export class UpdateClassDto extends PartialType(CreateClassDto) {}

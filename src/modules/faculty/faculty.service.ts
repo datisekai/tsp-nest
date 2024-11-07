@@ -5,6 +5,7 @@ import {
   CreateFacultyDto,
   UpdateFacultyDto,
   QueryFacultyDto,
+  CreateFacultyMultipleDto,
 } from './faculty.dto';
 import { Faculty } from './faculty.entity';
 
@@ -64,5 +65,22 @@ export class FacultyService {
   async delete(id: number): Promise<Faculty> {
     const faculty = await this.findOne(id);
     return await this.facultyRepository.remove(faculty);
+  }
+
+  async findByCode(code: string): Promise<Faculty> {
+    return await this.facultyRepository.findOne({ where: { code } });
+  }
+
+  async createMultipleFaculty(
+    dto: CreateFacultyMultipleDto,
+  ): Promise<Faculty[]> {
+    const { faculties } = dto;
+    const newFaculties = [];
+    faculties.forEach((item) => {
+      const newFaculty = this.facultyRepository.create(item);
+      newFaculties.push(newFaculty);
+    });
+
+    return await this.facultyRepository.save(newFaculties);
   }
 }
