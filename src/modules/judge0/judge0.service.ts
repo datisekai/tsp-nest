@@ -2,6 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Judge0Submit, SubmitJudge0Dto } from './judge0.dto';
 import axios from 'axios';
+import { encode } from 'js-base64';
 
 @Injectable()
 export class Judge0Service {
@@ -17,12 +18,12 @@ export class Judge0Service {
       throw new NotFoundException('Judge0 URL or API key not found');
     const { source_code, language_id, stdin, expected_output } = dto;
     const response = await axios.post(
-      `${this.judgeUrl}/submissions?base64_encoded=true&wait=true`,
+      `${this.judgeUrl}/submissions?base64_encoded=true&wait=true&base64_encoded=true`,
       {
-        source_code,
+        source_code: encode(source_code),
         language_id,
-        stdin,
-        expected_output,
+        stdin: encode(stdin),
+        expected_output: encode(expected_output),
       },
       {
         headers: {

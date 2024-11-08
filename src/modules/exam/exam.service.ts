@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { Exam } from './exam.entity';
 import { CreateExamDto, ExamQueryDto, UpdateExamDto } from './exam.dto';
 import { QuestionService } from '../question/question.service';
@@ -419,8 +419,10 @@ export class ExamService {
       where: {
         exam: { id: examId },
         student: { id: studentId },
+        endTime: Not(IsNull()),
       },
     });
+    console.log('hasSubmission', examLog);
     return examLog;
   }
 
