@@ -61,6 +61,12 @@ export class ClassController {
     return this.classService.findAll(queryClassDto, user);
   }
 
+  @Get('/me')
+  @UseGuards(JwtAuthGuard)
+  async fubdNe(@User() user: UserEntity) {
+    return this.classService.findMe(user);
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.CLASS_VIEW)

@@ -225,4 +225,13 @@ export class MajorService {
 
     return this.majorRepository.save(major);
   }
+
+  async findMe(user:User) {
+    const queryBuilder = await this.majorRepository.createQueryBuilder('major');
+    queryBuilder.leftJoin('major.classes', 'classes');
+    queryBuilder.leftJoin('classes.users', 'users');
+    queryBuilder.where('users.id = :userId', { userId: user.id });
+    const data = await queryBuilder.getMany();
+    return {data}
+  }
 }

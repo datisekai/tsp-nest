@@ -373,4 +373,12 @@ export class ClassService {
     const classEntity = await this.findOne(classId, user);
     return { data: classEntity.users };
   }
+
+  async findMe(user: User){
+    const queryBuilder = await this.classRepository.createQueryBuilder('class');
+    queryBuilder.leftJoin('class.users', 'users');
+    queryBuilder.where('users.id = :userId', { userId: user.id });
+    const data = await queryBuilder.getMany();
+    return {data}
+  }
 }

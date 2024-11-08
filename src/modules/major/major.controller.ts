@@ -58,6 +58,12 @@ export class MajorController {
     return this.majorService.findAll(queryMajorDto, user);
   }
 
+  @Get('/me')
+  @UseGuards(JwtAuthGuard)
+  async findMe(@User() user: UserEntity){
+    return this.majorService.findMe(user);
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.MAJOR_VIEW)
@@ -106,4 +112,6 @@ export class MajorController {
   ): Promise<Major> {
     return this.majorService.assignTeacherToMajor(majorId, assignTeachersDto);
   }
+
+
 }
