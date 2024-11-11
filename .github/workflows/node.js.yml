@@ -22,4 +22,5 @@ jobs:
             git pull
             yarn
             yarn build
-            pm2 reload tsp-nest
+            pm2 delete tsp-nest
+            pm2 start dist/main.js --name tsp-nest
