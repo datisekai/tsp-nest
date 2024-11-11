@@ -112,6 +112,8 @@ export class SubmissionService {
     const testResults = [];
     let grade = 0;
 
+    console.log('examQuestion', examQuestion);
+
     // Chạy từng test case với Judge0
     for (const testCase of examQuestion.question.testCases) {
       const result = await this.judge0Service.submitCode({

@@ -196,6 +196,7 @@ export class ExamService {
         'submissions.createdAt',
         'submissions.id',
         'submission_user.id',
+        'submissions.languageId',
         'teachers.name',
         'teachers.id',
         'examLog.startTime',
@@ -433,7 +434,11 @@ export class ExamService {
   async getExamQuestion(id: number): Promise<ExamQuestion> {
     const examQuestion = await this.examQuestionRepository.findOne({
       where: { id },
-      relations: ['question'],
+      relations: {
+        question: {
+          testCases: true,
+        },
+      },
     });
     if (!examQuestion) {
       throw new NotFoundException(`Exam with ID ${id} not found`);
