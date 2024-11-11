@@ -10,6 +10,7 @@ import { checkUserPermission } from 'src/common/helpers/checkPermission';
 import { ClassService } from '../class/class.service';
 import { ExamQuestion } from './exam-question/exam-question.entity';
 import { ExamLog } from './exam-log/exam-log.entity';
+import { SubmissionService } from '../question/submission/submission.service';
 
 @Injectable()
 export class ExamService {
@@ -113,7 +114,7 @@ export class ExamService {
       queryBuilder.skip((page - 1) * limit).take(limit);
     }
 
-    queryBuilder.addOrderBy('createdAt', 'DESC')
+    queryBuilder.addOrderBy('createdAt', 'DESC');
     // Tính toán phân trang
     const [data, total] = await queryBuilder.getManyAndCount();
 
@@ -237,7 +238,7 @@ export class ExamService {
       queryBuilder.skip((page - 1) * limit).take(limit);
     }
 
-    queryBuilder.addOrderBy('createdAt', 'DESC')
+    queryBuilder.addOrderBy('createdAt', 'DESC');
     // Tính toán phân trang
     const [data, total] = await queryBuilder.getManyAndCount();
 

@@ -1,4 +1,4 @@
-import {forwardRef, Module} from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PermissionModule } from '../permission/permission.module';
 import { FacultyModule } from '../faculty/faculty.module';
@@ -8,8 +8,9 @@ import { ExamController } from './exam.controller';
 import { ExamService } from './exam.service';
 import { QuestionModule } from '../question/question.module';
 import { ClassModule } from '../class/class.module';
-import {ExamQuestion} from "./exam-question/exam-question.entity";
-import {ExamLog} from "./exam-log/exam-log.entity";
+import { ExamQuestion } from './exam-question/exam-question.entity';
+import { ExamLog } from './exam-log/exam-log.entity';
+import { SubmissionService } from '../question/submission/submission.service';
 
 @Module({
   imports: [

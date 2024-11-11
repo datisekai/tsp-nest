@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { SubmissionService } from './submission.service';
 import {
   RunTestCodeDto,
@@ -29,6 +29,13 @@ export class SubmissionController {
       submitMultipleChoiceDto.answer,
       submitMultipleChoiceDto.examId,
     );
+  }
+
+  @Get('/score/:examId')
+  @UseGuards(JwtAuthGuard)
+  async getStudentGradesByExam(@Param('examId') examId: number) {
+    const data = await this.submissionService.getStudentGradesByExam(examId);
+    return { data };
   }
 
   @Post('submit-code')

@@ -149,4 +149,20 @@ export class SubmissionService {
 
     return { data: true };
   }
+
+  async getStudentGradesByExam(examId: number) {
+    const studentGrades = await this.submissionRepository
+      .createQueryBuilder('submission')
+      .select('submission.userId', 'userId')
+      .addSelect('SUM(submission.grade)', 'grade')
+      .where('submission.examId = :examId', { examId })
+      .groupBy('submission.userId')
+      .leftJoin('submission.user', 'user')
+      .addSelect(['user.id', 'user.name', 'user.code'])
+      .leftJoin('submission.exam', 'exam')
+      .addSelect(['exam.id', 'exam.title', 'exam.classId'])
+      .getRawMany();
+
+    return studentGrades;
+  }
 }
