@@ -114,7 +114,7 @@ export class ExamService {
       queryBuilder.skip((page - 1) * limit).take(limit);
     }
 
-    queryBuilder.addOrderBy('createdAt', 'DESC');
+    queryBuilder.addOrderBy('exam.createdAt', 'DESC');
     // Tính toán phân trang
     const [data, total] = await queryBuilder.getManyAndCount();
 
@@ -187,6 +187,7 @@ export class ExamService {
         'exam.startTime',
         'exam.endTime',
         'exam.showResult',
+        'exam.createdAt',
         'class.id',
         'class.name',
         'major.id',
@@ -238,7 +239,7 @@ export class ExamService {
       queryBuilder.skip((page - 1) * limit).take(limit);
     }
 
-    queryBuilder.addOrderBy('createdAt', 'DESC');
+    queryBuilder.addOrderBy('exam.createdAt', 'DESC');
     // Tính toán phân trang
     const [data, total] = await queryBuilder.getManyAndCount();
 
