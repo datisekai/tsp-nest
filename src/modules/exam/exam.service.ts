@@ -113,6 +113,7 @@ export class ExamService {
       queryBuilder.skip((page - 1) * limit).take(limit);
     }
 
+    queryBuilder.addOrderBy('createdAt', 'DESC')
     // Tính toán phân trang
     const [data, total] = await queryBuilder.getManyAndCount();
 
@@ -236,6 +237,7 @@ export class ExamService {
       queryBuilder.skip((page - 1) * limit).take(limit);
     }
 
+    queryBuilder.addOrderBy('createdAt', 'DESC')
     // Tính toán phân trang
     const [data, total] = await queryBuilder.getManyAndCount();
 

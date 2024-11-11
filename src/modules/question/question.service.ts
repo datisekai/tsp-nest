@@ -29,8 +29,32 @@ export class QuestionService {
       limit = 10,
       pagination = true,
       type = 'all',
+        difficultyId,chapterId,questionType,majorId, isPublic
     } = dto;
     const query = this.questionRepository.createQueryBuilder('question');
+
+
+    if(difficultyId){
+      query.leftJoinAndSelect('question.difficulty','difficulty').andWhere('difficulty.id = :id',{id: difficultyId})
+    }
+
+    if(chapterId){
+      query.leftJoinAndSelect('question.chapter','chapter').andWhere('chapter.id = :id',{id: chapterId})
+    }
+
+
+    if(chapterId){
+      query.leftJoin('question.major','major').andWhere('major.id = :id',{id: majorId})
+    }
+
+    if(questionType){
+      query.andWhere('question.type like :questionType',{questionType:`%${questionType}%`})
+    }
+
+    if(isPublic != null){
+      query.andWhere('question.isPublic = :isPublic',{isPublic})
+    }
+
 
     if (title) {
       query.andWhere('question.title LIKE :title', { title: `%${title}%` });

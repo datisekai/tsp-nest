@@ -44,6 +44,26 @@ export class QueryQuestionDto extends PaginationDto {
   @IsOptional()
   @IsString()
   type?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  chapterId: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  difficultyId: string
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  majorId: string
+
+  @ApiPropertyOptional({description:'questionType is multiple_choice or code'})
+  @IsOptional()
+  @IsString()
+  questionType?: string
 }
 
 export class QueryChapterDto extends PaginationDto {
