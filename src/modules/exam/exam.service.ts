@@ -248,7 +248,13 @@ export class ExamService {
   async findOne(id: number, user?: User): Promise<Exam> {
     const examEntity = await this.examRepository.findOne({
       where: { id },
-      relations: ['examQuestions', 'class', 'user'],
+      relations: {
+        examQuestions: {
+          question: true,
+        },
+        class: true,
+        user: true,
+      },
     });
     if (user) {
       checkUserPermission(examEntity.user.id, user);
@@ -327,11 +333,14 @@ export class ExamService {
     return exam;
   }
 
-  async getTakeOrderQuestionOfExam(id: number, user: User){
+  async getTakeOrderQuestionOfExam(id: number, user: User) {
     console.log('getTakeOrderQuestionOfExam', id);
-    const qb = this.examQuestionRepository.createQueryBuilder('examQuestion').where('examQuestion.exam.id = :id', {id}).select(['examQuestion.id'])
+    const qb = this.examQuestionRepository
+      .createQueryBuilder('examQuestion')
+      .where('examQuestion.exam.id = :id', { id })
+      .select(['examQuestion.id']);
     const data = await qb.getMany();
-    return {data: data.map(item => item.id)}
+    return { data: data.map((item) => item.id) };
   }
 
   async update(
