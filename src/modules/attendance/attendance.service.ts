@@ -264,6 +264,7 @@ export class AttendanceService {
       attendanceRate: `${attendanceRate * 100}%`,
       absenceRate: `${absenceRate * 100}%`,
       data: data,
+      studentCount: classEntity.users.length
     };
   }
 }
