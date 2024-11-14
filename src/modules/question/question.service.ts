@@ -31,19 +31,20 @@ export class QuestionService {
       type = 'all',
         difficultyId,chapterId,questionType,majorId, isPublic
     } = dto;
-    const query = this.questionRepository.createQueryBuilder('question');
+    const query = this.questionRepository.createQueryBuilder('question').leftJoinAndSelect('question.difficulty','difficulty').leftJoinAndSelect('question.chapter','chapter');
 
+    console.log('dto', dto)
 
     if(difficultyId){
-      query.leftJoinAndSelect('question.difficulty','difficulty').andWhere('difficulty.id = :id',{id: difficultyId})
+      query.andWhere('difficulty.id = :id',{id: difficultyId})
     }
 
     if(chapterId){
-      query.leftJoinAndSelect('question.chapter','chapter').andWhere('chapter.id = :id',{id: chapterId})
+      query.andWhere('chapter.id = :id',{id: chapterId})
     }
 
 
-    if(chapterId){
+    if(majorId){
       query.leftJoin('question.major','major').andWhere('major.id = :id',{id: majorId})
     }
 
@@ -76,7 +77,7 @@ export class QuestionService {
         }),
       );
     }
-    query.addOrderBy('createdAt', 'DESC');
+    query.addOrderBy('question.createdAt', 'DESC');
 
     const [data, total] = await query.getManyAndCount();
 
