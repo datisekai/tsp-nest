@@ -51,6 +51,16 @@ export class ExamController {
     return this.examService.findMeByExamId(id, user);
   }
 
+  @Get('take-order/:id')
+  @UseGuards(JwtAuthGuard)
+  async findTakeOrderQuestion(
+    @Param('id') id: number,
+    @User() user: UserEntity,
+  ) {
+    return this.examService.getTakeOrderQuestionOfExam(id, user);
+  }
+
+
   @Get('public/:id')
   @UseGuards(JwtAuthGuard)
   async findOnePublic(
@@ -111,4 +121,6 @@ export class ExamController {
   async submit(@Param('examId') examId: number, @User() user: UserEntity) {
     return this.examService.updateEndTimeLog(examId, user.id);
   }
+
+
 }

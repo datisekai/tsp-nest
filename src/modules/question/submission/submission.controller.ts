@@ -52,4 +52,11 @@ export class SubmissionController {
   async runTestCode(@Body() dto: RunTestCodeDto, @User() user: UserEntity) {
     return this.submissionService.runTestCode(dto);
   }
+
+
+  @Get('/history/:examId')
+  @UseGuards(JwtAuthGuard)
+  async getHistory(@Param('examId') examId: number, @User() user: UserEntity) {
+    return await this.submissionService.getMySubmissionOfExam(examId, user);
+  }
 }

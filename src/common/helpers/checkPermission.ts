@@ -6,7 +6,7 @@ export function checkUserPermission(id: number, user: User): void {
   if (id !== user.id) {
     if (user.type !== UserType.MASTER) {
       throw new ForbiddenException(
-        `You do not have permission to modify this question`,
+        `You do not have permission to modify this entity`,
       );
     }
   }

@@ -31,6 +31,9 @@ export class Submission extends BaseEntity {
   @Column({ type: 'simple-json', nullable: true })
   resultJudge0: any;
 
+  @Column({ type: 'simple-json', nullable: true})
+  questionTemp: any;
+
   @Column({ type: 'float', default: 0 })
   grade?: number; // Kết quả từ Judge0 hoặc kiểm tra trắc nghiệm (bao gồm trạng thái, thời gian chạy, vv.)
 }

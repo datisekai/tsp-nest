@@ -179,7 +179,6 @@ export class ExamService {
     } = query;
 
     const queryBuilder = this.examRepository
-
       .createQueryBuilder('exam')
       .select([
         'exam.id',
@@ -326,6 +325,13 @@ export class ExamService {
     await this.updateStartTimeLog(id, user.id);
 
     return exam;
+  }
+
+  async getTakeOrderQuestionOfExam(id: number, user: User){
+    console.log('getTakeOrderQuestionOfExam', id);
+    const qb = this.examQuestionRepository.createQueryBuilder('examQuestion').where('examQuestion.exam.id = :id', {id}).select(['examQuestion.id'])
+    const data = await qb.getMany();
+    return {data: data.map(item => item.id)}
   }
 
   async update(

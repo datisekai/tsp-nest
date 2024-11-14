@@ -68,6 +68,7 @@ export class SubmissionService {
       });
     }
 
+    submission.questionTemp = examQuestion.question;
     await this.submissionRepository.save(submission);
     return { data: true };
   }
@@ -147,6 +148,8 @@ export class SubmissionService {
       });
     }
 
+    submission.questionTemp = examQuestion.question;
+
     await this.submissionRepository.save(submission);
 
     return { data: true };
@@ -166,5 +169,33 @@ export class SubmissionService {
       .getRawMany();
 
     return studentGrades;
+  }
+
+  async getMySubmissionOfExam(examId: number, user: User){
+    const exam = await this.examService.findOne(examId);
+
+    const qb = this.submissionRepository.createQueryBuilder('submission')
+    .where('submission.exam.id = :id',{id: examId})
+    .andWhere('submission.user.id = :userId', {userId: user.id}).leftJoin('submission.examQuestion','examQuestion')
+    .select(['submission.id','examQuestion.id','submission.languageId','submission.code','submission.answer','submission.questionTemp'])
+
+    if(exam.showResult){
+      qb.addSelect(['submission.resultJudge0','submission.grade'])
+    }
+
+    const submissions = await qb.getMany();
+
+    if(!exam.showResult){
+      submissions.forEach(sub => {
+        if(sub.questionTemp && sub.questionTemp.choices){
+          sub.questionTemp.choices = sub.questionTemp.choices?.map((c) => {
+            return { text: c.text };
+          }) as any;
+        }
+      })
+    }
+
+
+    return {data: {submissions, showResult: exam.showResult}}
   }
 }

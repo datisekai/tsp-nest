@@ -377,6 +377,7 @@ export class ClassService {
   async findMe(user: User){
     const queryBuilder = await this.classRepository.createQueryBuilder('class');
     queryBuilder.leftJoin('class.users', 'users');
+    queryBuilder.leftJoin('class.major', 'major').addSelect(['major.name','major.code'])
     queryBuilder.where('users.id = :userId', { userId: user.id });
     const data = await queryBuilder.getMany();
     return {data}
