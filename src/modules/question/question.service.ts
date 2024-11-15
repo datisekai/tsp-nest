@@ -31,9 +31,8 @@ export class QuestionService {
       type = 'all',
         difficultyId,chapterId,questionType,majorId, isPublic
     } = dto;
-    const query = this.questionRepository.createQueryBuilder('question').leftJoinAndSelect('question.difficulty','difficulty').leftJoinAndSelect('question.chapter','chapter');
+    const query = this.questionRepository.createQueryBuilder('question').leftJoinAndSelect('question.difficulty','difficulty').leftJoinAndSelect('question.chapter','chapter').where('question.isDeleted = false');
 
-    console.log('dto', dto)
 
     if(difficultyId){
       query.andWhere('difficulty.id = :id',{id: difficultyId})
@@ -134,7 +133,7 @@ export class QuestionService {
 
   async getQuestionById(id: number, user?: User): Promise<Question> {
     const question = await this.questionRepository.findOne({
-      where: { id },
+      where: { id, isDeleted:false },
       relations: ['difficulty', 'chapter', 'user', 'testCases', 'major'],
     });
     if (user) {
@@ -174,6 +173,7 @@ export class QuestionService {
 
   async deleteQuestion(id: number, user: User): Promise<Question> {
     const question = await this.getQuestionById(id, user);
-    return await this.questionRepository.remove(question);
+    question.isDeleted = true;
+    return await this.questionRepository.save(question);
   }
 }

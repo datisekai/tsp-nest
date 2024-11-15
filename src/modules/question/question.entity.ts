@@ -68,4 +68,7 @@ export class Question extends BaseEntity {
   @OneToMany(() => ExamQuestion
       , (examQuestion) => examQuestion.question)
   examQuestions: ExamQuestion[]; // Thêm mối quan hệ với ExamQuestion
+
+  @Column({type:'boolean', default: false})
+  isDeleted: boolean
 }
