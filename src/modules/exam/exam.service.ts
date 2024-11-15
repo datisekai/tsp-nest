@@ -37,6 +37,7 @@ export class ExamService {
       title,
       questions,
       showResult = false,
+      blockControlCVX,blockMouseRight,logOutTab
     } = createExamDto;
 
     // Tạo exam mới
@@ -48,6 +49,7 @@ export class ExamService {
       class: { id: classId },
       user: { id: user.id },
       showResult,
+      blockControlCVX, blockMouseRight, logOutTab
     });
 
     // Lưu exam vào database để lấy id
@@ -359,6 +361,10 @@ export class ExamService {
       description: updateExamDto.description ?? exam.description,
       startTime: updateExamDto.startTime ?? exam.startTime,
       endTime: updateExamDto.endTime ?? exam.endTime,
+      showResult: updateExamDto.showResult != null ? updateExamDto.showResult : exam.showResult,
+      logOutTab: updateExamDto.logOutTab != null ? updateExamDto.logOutTab : exam.logOutTab,
+      blockControlCVX: updateExamDto.blockControlCVX != null ? updateExamDto.blockControlCVX : exam.blockControlCVX,
+      blockMouseRight: updateExamDto.blockMouseRight != null ? updateExamDto.blockMouseRight : exam.blockMouseRight
     });
 
     // Lưu thay đổi của Exam

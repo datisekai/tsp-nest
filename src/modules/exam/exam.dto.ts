@@ -105,6 +105,25 @@ export class UpdateExamDto {
   @IsArray()
   @ApiPropertyOptional({ type: [QuestionDto] })
   questions?: QuestionDto[]; // Mảng ID câu hỏi
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  showResult: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  logOutTab: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  blockMouseRight: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  blockControlCVX: boolean;
 }
 
 export class ExamQueryDto extends PaginationDto {
