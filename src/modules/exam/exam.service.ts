@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Not, Repository } from 'typeorm';
 import { Exam } from './exam.entity';
-import { CreateExamDto, ExamQueryDto, UpdateExamDto } from './exam.dto';
+import { CreateExamDto, ExamQueryDto, ExamUserLogMultipleDto, UpdateExamDto } from './exam.dto';
 import { QuestionService } from '../question/question.service';
 import { User } from '../user/user.entity';
 import { UserType } from '../user/user.dto';
@@ -470,13 +470,27 @@ export class ExamService {
     return examQuestion;
   }
 
-  async createExamUserLog(examId: number, studentId: number, action:string) {
-    const newExamUserLog = this.examUserLogRepository.create({
-      exam: { id: examId },
-      student: { id: studentId },
-      action
-    });
-    await this.examUserLogRepository.save(newExamUserLog);
+  async createExamUserLog(examId: number, studentId: number, data:ExamUserLogMultipleDto) {
+    const newItems = []
+    data.data.forEach(item => {
+      const newItem = this.examUserLogRepository.create({
+        exam: { id: examId },
+        student: { id: studentId },
+        action: item.action,
+      })
+      newItems.push(newItem)
+    })
+   
+    await this.examUserLogRepository.save(newItems);
     return {data: true}
+  }
+
+  getExamUserLogs(examId: number, studentId: number) {
+    return this.examUserLogRepository.find({
+      where: {
+        exam: { id: examId },
+        student: { id: studentId },
+      },
+    });
   }
 }

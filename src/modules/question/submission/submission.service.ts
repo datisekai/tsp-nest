@@ -8,6 +8,7 @@ import { RunTestCodeDto, SubmitCodeDto } from './submission.dto';
 import { User } from 'src/modules/user/user.entity';
 import { Judge0Service } from 'src/modules/judge0/judge0.service';
 import { ExamService } from '../../exam/exam.service';
+import { CheatAction } from 'src/modules/exam/exam.dto';
 
 const JUDGE0_SUCCESS_STATUS = 3;
 @Injectable()
@@ -168,6 +169,13 @@ export class SubmissionService {
       .leftJoin('submission.exam', 'exam')
       .addSelect(['exam.id', 'exam.title', 'exam.classId'])
       .getRawMany();
+
+      for(const sd of studentGrades){
+        const logs = await this.examService.getExamUserLogs(examId, sd.user_id);
+        sd.outTabCount = logs.filter(l => l.action === CheatAction.OUT_TAB).length
+        sd.controlCVX = logs.filter(l => l.action === CheatAction.CTROL_CVX).length
+        sd.mouseRight = logs.filter(l => l.action === CheatAction.MOUSE_RIGHT).length
+      }
 
     return studentGrades;
   }

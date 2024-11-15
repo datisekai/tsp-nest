@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -11,6 +12,7 @@ import {
   IsOptional,
   IsString,
   Matches,
+  ValidateNested,
 } from 'class-validator';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
@@ -158,13 +160,7 @@ export enum CheatAction {
   MOUSE_RIGHT = 'mouse_right',
   CTROL_CVX = 'ctrol_cvx',
 }
-
 export class ExamUserLogDto {
-  @ApiProperty()
-  @IsInt()
-  @IsNotEmpty()
-  examId: number;
-
   @ApiProperty()
   @Matches(
     `^${Object.values(CheatAction)
@@ -173,4 +169,12 @@ export class ExamUserLogDto {
     'i',
   )
   action: string;
+}
+
+export class ExamUserLogMultipleDto {
+  @ApiProperty({ type: [ExamUserLogDto] })
+  @IsArray()
+  @ValidateNested({ each: true }) // Kiểm tra từng phần tử trong mảng
+  @Type(() => ExamUserLogDto) // Hỗ trợ chuyển đổi kiểu dữ liệu
+  data: ExamUserLogDto[];
 }

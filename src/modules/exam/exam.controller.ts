@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ExamService } from './exam.service';
-import { CreateExamDto, ExamQueryDto, ExamUserLogDto, UpdateExamDto } from './exam.dto';
+import { CreateExamDto, ExamQueryDto, ExamUserLogDto, ExamUserLogMultipleDto, UpdateExamDto } from './exam.dto';
 import { Exam } from './exam.entity';
 import { ApiTags } from '@nestjs/swagger';
 import { AppPermission, AppResource } from 'src/app.role';
@@ -126,8 +126,8 @@ export class ExamController {
   @UseGuards(JwtAuthGuard)
   async saveAction(
     @Param('examId') examId: number,
-    @Body() dto: ExamUserLogDto,
+    @Body() dto: ExamUserLogMultipleDto,
     @User() user: UserEntity,){
-      return this.examService.createExamUserLog(examId, user.id, dto.action);
+      return this.examService.createExamUserLog(examId, user.id, dto);
     }
 }
