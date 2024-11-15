@@ -11,10 +11,11 @@ import { ClassModule } from '../class/class.module';
 import { ExamQuestion } from './exam-question/exam-question.entity';
 import { ExamLog } from './exam-log/exam-log.entity';
 import { SubmissionService } from '../question/submission/submission.service';
+import { ExamUserLog } from './exam-user-log/exam-user-log.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Exam, ExamQuestion, ExamLog]),
+    TypeOrmModule.forFeature([Exam, ExamQuestion, ExamLog, ExamUserLog]),
     ClassModule,
     PermissionModule,
     forwardRef(() => QuestionModule),

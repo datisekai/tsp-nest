@@ -110,7 +110,7 @@ export class SubmissionService {
       },
     });
 
-    const testResults = [];
+    const testResults = {};
     let grade = 0;
 
     console.log('examQuestion', examQuestion);
@@ -123,11 +123,12 @@ export class SubmissionService {
         source_code: code,
         stdin: testCase.input,
       });
-      testResults.push(result);
+      testResults[testCase.id] = result;
       if (result.status.id == JUDGE0_SUCCESS_STATUS) {
         grade += testCase.grade;
       }
     }
+
 
     if (submission) {
       // Nếu đã có submission, cập nhật thông tin

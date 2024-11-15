@@ -11,6 +11,7 @@ import { ClassService } from '../class/class.service';
 import { ExamQuestion } from './exam-question/exam-question.entity';
 import { ExamLog } from './exam-log/exam-log.entity';
 import { SubmissionService } from '../question/submission/submission.service';
+import { ExamUserLog } from './exam-user-log/exam-user-log.entity';
 
 @Injectable()
 export class ExamService {
@@ -23,6 +24,8 @@ export class ExamService {
     private readonly examQuestionRepository: Repository<ExamQuestion>,
     @InjectRepository(ExamLog)
     private readonly examLogRepository: Repository<ExamLog>,
+    @InjectRepository(ExamUserLog)
+    private readonly examUserLogRepository: Repository<ExamUserLog>,
   ) {}
 
   async create(createExamDto: CreateExamDto, user: User): Promise<Exam> {
@@ -459,5 +462,15 @@ export class ExamService {
       throw new NotFoundException(`Exam with ID ${id} not found`);
     }
     return examQuestion;
+  }
+
+  async createExamUserLog(examId: number, studentId: number, action:string) {
+    const newExamUserLog = this.examUserLogRepository.create({
+      exam: { id: examId },
+      student: { id: studentId },
+      action
+    });
+    await this.examUserLogRepository.save(newExamUserLog);
+    return {data: true}
   }
 }

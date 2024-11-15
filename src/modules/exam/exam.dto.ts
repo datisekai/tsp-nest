@@ -10,6 +10,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Matches,
 } from 'class-validator';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
@@ -57,6 +58,21 @@ export class CreateExamDto {
   @IsOptional()
   @IsBoolean()
   showResult: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  logOutTab: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  blockMouseRight: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  blockControlCVX: boolean;
 }
 
 export class UpdateExamDto {
@@ -116,4 +132,26 @@ export class ExamQueryDto extends PaginationDto {
   @IsOptional()
   @IsNumber()
   classId?: number;
+}
+
+export enum CheatAction {
+  OUT_TAB = 'out_tab',
+  MOUSE_RIGHT = 'mouse_right',
+  CTROL_CVX = 'ctrol_cvx',
+}
+
+export class ExamUserLogDto {
+  @ApiProperty()
+  @IsInt()
+  @IsNotEmpty()
+  examId: number;
+
+  @ApiProperty()
+  @Matches(
+    `^${Object.values(CheatAction)
+      .filter((v) => typeof v !== 'number')
+      .join('|')}$`,
+    'i',
+  )
+  action: string;
 }

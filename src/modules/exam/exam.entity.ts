@@ -15,6 +15,7 @@ import { Submission } from '../question/submission/submission.entity';
 import { User } from '../user/user.entity';
 import { ExamQuestion } from './exam-question/exam-question.entity';
 import { ExamLog } from './exam-log/exam-log.entity';
+import { ExamUserLog } from './exam-user-log/exam-user-log.entity';
 
 @Entity()
 export class Exam extends BaseEntity {
@@ -29,6 +30,18 @@ export class Exam extends BaseEntity {
 
   @Column({ type: 'boolean', default: false })
   showResult: boolean;
+
+
+  @Column({ type: 'boolean', default: false })
+  logOutTab: boolean;
+
+
+  @Column({ type: 'boolean', default: false })
+  blockMouseRight: boolean;
+
+
+  @Column({ type: 'boolean', default: false })
+  blockControlCVX: boolean;
 
   @Column({ type: 'timestamp', nullable: true })
   startTime: Date;
@@ -52,4 +65,7 @@ export class Exam extends BaseEntity {
 
   @OneToMany(() => ExamLog, (examLog) => examLog.exam)
   examLogs: ExamLog[];
+
+  @OneToMany(() => ExamUserLog, exam => exam.exam)
+  examUserLogs: ExamUserLog[]
 }
