@@ -182,6 +182,7 @@ export class AttendanceService {
         'user.name',
         'user.email',
         'user.phone',
+        'user.id',
       ])
       .where('attendee.attendanceId = :id', { id })
       .leftJoin('attendee.user', 'user');
@@ -264,7 +265,7 @@ export class AttendanceService {
       attendanceRate: `${attendanceRate * 100}%`,
       absenceRate: `${absenceRate * 100}%`,
       data: data,
-      studentCount: classEntity.users.length
+      studentCount: classEntity.users.length,
     };
   }
 }

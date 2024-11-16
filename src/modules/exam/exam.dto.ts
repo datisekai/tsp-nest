@@ -151,7 +151,6 @@ export class ExamQueryDto extends PaginationDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsNumber()
   classId?: number;
 }
 
