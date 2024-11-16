@@ -21,7 +21,7 @@ import { Role } from '../role/role.entity';
 import { UserType } from './user.dto';
 import { StudentScore } from '../score-management/student-score/student-score.entity';
 @Entity()
-@Unique(['code', 'deviceUid'])
+// @Unique(['code'])
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -29,7 +29,7 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', unique: true })
   code: string;
 
-  @Column({ type: 'varchar', unique: true, nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   email: string;
 
   @Column({ type: 'varchar', select: false, nullable: true })

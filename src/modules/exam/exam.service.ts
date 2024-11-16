@@ -2,7 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Not, Repository } from 'typeorm';
 import { Exam } from './exam.entity';
-import { CreateExamDto, ExamQueryDto, ExamUserLogMultipleDto, UpdateExamDto } from './exam.dto';
+import {
+  CreateExamDto,
+  ExamQueryDto,
+  ExamUserLogMultipleDto,
+  UpdateExamDto,
+} from './exam.dto';
 import { QuestionService } from '../question/question.service';
 import { User } from '../user/user.entity';
 import { UserType } from '../user/user.dto';
@@ -37,7 +42,9 @@ export class ExamService {
       title,
       questions,
       showResult = false,
-      blockControlCVX,blockMouseRight,logOutTab
+      blockControlCVX,
+      blockMouseRight,
+      logOutTab,
     } = createExamDto;
 
     // Tạo exam mới
@@ -49,7 +56,9 @@ export class ExamService {
       class: { id: classId },
       user: { id: user.id },
       showResult,
-      blockControlCVX, blockMouseRight, logOutTab
+      blockControlCVX,
+      blockMouseRight,
+      logOutTab,
     });
 
     // Lưu exam vào database để lấy id
@@ -120,6 +129,10 @@ export class ExamService {
     }
 
     queryBuilder.addOrderBy('exam.createdAt', 'DESC');
+    queryBuilder.leftJoin('exam.class', 'class');
+    queryBuilder
+      .leftJoin('class.major', 'major')
+      .addSelect(['class.name', 'major.name', 'major.code']);
     // Tính toán phân trang
     const [data, total] = await queryBuilder.getManyAndCount();
 
@@ -361,10 +374,22 @@ export class ExamService {
       description: updateExamDto.description ?? exam.description,
       startTime: updateExamDto.startTime ?? exam.startTime,
       endTime: updateExamDto.endTime ?? exam.endTime,
-      showResult: updateExamDto.showResult != null ? updateExamDto.showResult : exam.showResult,
-      logOutTab: updateExamDto.logOutTab != null ? updateExamDto.logOutTab : exam.logOutTab,
-      blockControlCVX: updateExamDto.blockControlCVX != null ? updateExamDto.blockControlCVX : exam.blockControlCVX,
-      blockMouseRight: updateExamDto.blockMouseRight != null ? updateExamDto.blockMouseRight : exam.blockMouseRight
+      showResult:
+        updateExamDto.showResult != null
+          ? updateExamDto.showResult
+          : exam.showResult,
+      logOutTab:
+        updateExamDto.logOutTab != null
+          ? updateExamDto.logOutTab
+          : exam.logOutTab,
+      blockControlCVX:
+        updateExamDto.blockControlCVX != null
+          ? updateExamDto.blockControlCVX
+          : exam.blockControlCVX,
+      blockMouseRight:
+        updateExamDto.blockMouseRight != null
+          ? updateExamDto.blockMouseRight
+          : exam.blockMouseRight,
     });
 
     // Lưu thay đổi của Exam
@@ -470,19 +495,23 @@ export class ExamService {
     return examQuestion;
   }
 
-  async createExamUserLog(examId: number, studentId: number, data:ExamUserLogMultipleDto) {
-    const newItems = []
-    data.data.forEach(item => {
+  async createExamUserLog(
+    examId: number,
+    studentId: number,
+    data: ExamUserLogMultipleDto,
+  ) {
+    const newItems = [];
+    data.data.forEach((item) => {
       const newItem = this.examUserLogRepository.create({
         exam: { id: examId },
         student: { id: studentId },
         action: item.action,
-      })
-      newItems.push(newItem)
-    })
-   
+      });
+      newItems.push(newItem);
+    });
+
     await this.examUserLogRepository.save(newItems);
-    return {data: true}
+    return { data: true };
   }
 
   getExamUserLogs(examId: number, studentId: number) {
