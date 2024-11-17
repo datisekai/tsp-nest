@@ -59,7 +59,7 @@ export class UserController {
   @ApiPermissions(AppPermission.USER_VIEW)
   @UsePipes(new ValidationPipe({ transform: true }))
   async findOne(@Param('id') id: number) {
-    return this.userService.findOne(id);
+    return this.userService.findOne(id, ['role']);
   }
 
   @Post()

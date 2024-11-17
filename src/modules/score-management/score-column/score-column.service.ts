@@ -37,7 +37,9 @@ export class ScoreColumnService {
   }
 
   async updateMultiple(dto: CreateScoreColumnMajorDto) {
-    await Promise.allSettled(dto.scoreColumns.map((item) => this.update(item)));
+    await Promise.allSettled(
+      dto.scoreColumns.map((item) => this.update(item)),
+    ).then((result) => {});
     return true;
   }
 

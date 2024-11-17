@@ -46,7 +46,7 @@ export class MajorService {
   }
 
   async create(createMajorDto: CreateMajorDto): Promise<Major> {
-    const { name, facultyId, teachers, code } = createMajorDto;
+    const { name, facultyId, teachers = [], code } = createMajorDto;
 
     const faculty = await this.facultyService.findOne(facultyId);
     if (!faculty) {
@@ -57,13 +57,17 @@ export class MajorService {
       name,
       faculty,
       teachers,
-      code,
+      code: code.toString(),
     });
+    console.log('teachers', teachers, major);
 
-    major.teachers = await this.userService.findOrCreateUsersByCodes(
-      teachers,
-      UserType.TEACHER,
-    );
+    major.teachers =
+      teachers.length > 0
+        ? await this.userService.findOrCreateUsersByCodes(
+            teachers,
+            UserType.TEACHER,
+          )
+        : [];
 
     return this.majorRepository.save(major);
   }
@@ -89,7 +93,11 @@ export class MajorService {
       .leftJoinAndSelect('major.teachers', 'teacher');
 
     if (user.type !== UserType.MASTER) {
-      queryBuilder.andWhere('teacher.id = :userId', { userId: user.id });
+      queryBuilder
+        .leftJoin('major.classes', 'class')
+        .leftJoin('class.teachers', 'classTeacher')
+        .where('teacher.id = :userId', { userId: user.id })
+        .orWhere('classTeacher.id = :userId', { userId: user.id });
     }
 
     // Tìm kiếm theo tên nếu có
@@ -226,12 +234,12 @@ export class MajorService {
     return this.majorRepository.save(major);
   }
 
-  async findMe(user:User) {
+  async findMe(user: User) {
     const queryBuilder = await this.majorRepository.createQueryBuilder('major');
     queryBuilder.leftJoin('major.classes', 'classes');
     queryBuilder.leftJoin('classes.users', 'users');
     queryBuilder.where('users.id = :userId', { userId: user.id });
     const data = await queryBuilder.getMany();
-    return {data}
+    return { data };
   }
 }

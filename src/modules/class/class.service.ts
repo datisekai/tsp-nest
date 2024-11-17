@@ -321,7 +321,7 @@ export class ClassService {
     classId: number,
     user: User,
   ): Promise<Class> {
-    await this.checkExistedTeacher(classId, user.id);
+    await this.checkExistedUser(classId, user.id);
 
     const classEntity = await this.findOne(classId);
     const users = await this.userService.findOrCreateUsersByCodes(
@@ -374,12 +374,14 @@ export class ClassService {
     return { data: classEntity.users };
   }
 
-  async findMe(user: User){
+  async findMe(user: User) {
     const queryBuilder = await this.classRepository.createQueryBuilder('class');
     queryBuilder.leftJoin('class.users', 'users');
-    queryBuilder.leftJoin('class.major', 'major').addSelect(['major.name','major.code'])
+    queryBuilder
+      .leftJoin('class.major', 'major')
+      .addSelect(['major.name', 'major.code']);
     queryBuilder.where('users.id = :userId', { userId: user.id });
     const data = await queryBuilder.getMany();
-    return {data}
+    return { data };
   }
 }

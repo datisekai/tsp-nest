@@ -29,32 +29,43 @@ export class QuestionService {
       limit = 10,
       pagination = true,
       type = 'all',
-        difficultyId,chapterId,questionType,majorId, isPublic
+      difficultyId,
+      chapterId,
+      questionType,
+      majorId,
+      isPublic,
     } = dto;
-    const query = this.questionRepository.createQueryBuilder('question').leftJoinAndSelect('question.difficulty','difficulty').leftJoinAndSelect('question.chapter','chapter').where('question.isDeleted = false');
+    const query = this.questionRepository
+      .createQueryBuilder('question')
+      .leftJoinAndSelect('question.difficulty', 'difficulty')
+      .leftJoinAndSelect('question.chapter', 'chapter')
+      .where('question.isDeleted = false')
+      .leftJoin('question.user', 'user')
+      .addSelect(['user.id']);
 
-
-    if(difficultyId){
-      query.andWhere('difficulty.id = :id',{id: difficultyId})
+    if (difficultyId) {
+      query.andWhere('difficulty.id = :id', { id: difficultyId });
     }
 
-    if(chapterId){
-      query.andWhere('chapter.id = :id',{id: chapterId})
+    if (chapterId) {
+      query.andWhere('chapter.id = :id', { id: chapterId });
     }
 
-
-    if(majorId){
-      query.leftJoin('question.major','major').andWhere('major.id = :id',{id: majorId})
+    if (majorId) {
+      query
+        .leftJoin('question.major', 'major')
+        .andWhere('major.id = :id', { id: majorId });
     }
 
-    if(questionType){
-      query.andWhere('question.type like :questionType',{questionType:`%${questionType}%`})
+    if (questionType) {
+      query.andWhere('question.type like :questionType', {
+        questionType: `%${questionType}%`,
+      });
     }
 
-    if(isPublic != null){
-      query.andWhere('question.isPublic = :isPublic',{isPublic})
+    if (isPublic != null) {
+      query.andWhere('question.isPublic = :isPublic', { isPublic });
     }
-
 
     if (title) {
       query.andWhere('question.title LIKE :title', { title: `%${title}%` });
@@ -133,7 +144,7 @@ export class QuestionService {
 
   async getQuestionById(id: number, user?: User): Promise<Question> {
     const question = await this.questionRepository.findOne({
-      where: { id, isDeleted:false },
+      where: { id, isDeleted: false },
       relations: ['difficulty', 'chapter', 'user', 'testCases', 'major'],
     });
     if (user) {
@@ -144,7 +155,6 @@ export class QuestionService {
     }
     return question;
   }
-
 
   async updateQuestion(
     id: number,
