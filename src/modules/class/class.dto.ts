@@ -121,7 +121,7 @@ export class QueryClassDto extends PaginationDto {
   duration?: string;
 
   @ApiPropertyOptional({ description: 'Major ID to filter classes' })
-  @IsInt()
+  // @IsInt()
   @IsOptional()
   majorId?: number;
 
