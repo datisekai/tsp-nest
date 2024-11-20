@@ -29,7 +29,7 @@ export class FacultyService {
     }
 
     // Apply pagination
-    if (pagination) {
+    if (JSON.parse(pagination || 'true')) {
       queryBuilder.skip((page - 1) * limit).take(limit);
     }
     queryBuilder.orderBy('faculty.createdAt', 'DESC');

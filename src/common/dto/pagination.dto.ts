@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsInt, IsOptional, Max, Min } from 'class-validator';
 
 export class PaginationDto {
@@ -23,7 +23,5 @@ export class PaginationDto {
     default: true,
   })
   @IsOptional()
-  @IsBoolean()
-  @Type(() => Boolean) // Chuyển đổi query param thành kiểu boolean
-  pagination?: boolean = true;
+  pagination?: string;
 }

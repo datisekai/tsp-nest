@@ -38,14 +38,14 @@ export class ChapterService {
   async getAll(
     dto: QueryChapterDto,
   ): Promise<{ data: Chapter[]; total: number }> {
-    const { majorId, page = 1, limit = 10, pagination = true } = dto;
+    const { majorId, page = 1, limit = 10, pagination } = dto;
     const query = this.chapterRepository.createQueryBuilder('chapter');
 
     if (majorId) {
       query.andWhere('chapter.major.id LIKE :majorId', { majorId });
     }
 
-    if (pagination) {
+    if (JSON.parse(pagination || 'true')) {
       query.skip((page - 1) * limit).take(limit);
     }
 

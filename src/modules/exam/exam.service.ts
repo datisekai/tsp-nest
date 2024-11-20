@@ -92,7 +92,7 @@ export class ExamService {
       classId,
       page = 1,
       limit = 10,
-      pagination = true,
+      pagination,
     } = query;
 
     const queryBuilder = this.examRepository.createQueryBuilder('exam');
@@ -124,7 +124,7 @@ export class ExamService {
       queryBuilder.andWhere('exam.user.id = :userId', { userId: user.id });
     }
 
-    if (pagination) {
+    if (JSON.parse(pagination || 'true')) {
       queryBuilder.skip((page - 1) * limit).take(limit);
     }
 
@@ -193,7 +193,7 @@ export class ExamService {
       classId,
       page = 1,
       limit = 10,
-      pagination = true,
+      pagination,
     } = query;
 
     const queryBuilder = this.examRepository
@@ -253,7 +253,7 @@ export class ExamService {
       queryBuilder.andWhere('exam.class.id = :classId', { classId });
     }
 
-    if (pagination) {
+    if (JSON.parse(pagination || 'true')) {
       queryBuilder.skip((page - 1) * limit).take(limit);
     }
 

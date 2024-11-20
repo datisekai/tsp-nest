@@ -79,7 +79,7 @@ export class ClassService {
       teacherIds,
       page = 1,
       limit = 10,
-      pagination = true,
+      pagination,
       duration,
     } = queryClassDto;
 
@@ -110,7 +110,7 @@ export class ClassService {
       queryBuilder.andWhere('teacher.id IN (:...teacherIds)', { teacherIds });
     }
 
-    if (pagination) {
+    if (JSON.parse(pagination || 'true')) {
       queryBuilder.skip((page - 1) * limit).take(limit);
     }
 

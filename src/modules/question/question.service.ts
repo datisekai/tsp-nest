@@ -27,7 +27,7 @@ export class QuestionService {
       title,
       page = 1,
       limit = 10,
-      pagination = true,
+      pagination,
       type = 'all',
       difficultyId,
       chapterId,
@@ -70,7 +70,7 @@ export class QuestionService {
     if (title) {
       query.andWhere('question.title LIKE :title', { title: `%${title}%` });
     }
-    if (pagination) {
+    if (JSON.parse(pagination || 'true')) {
       query.skip((page - 1) * limit).take(limit);
     }
 

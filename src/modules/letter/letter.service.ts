@@ -106,7 +106,7 @@ export class LetterService {
         },
       );
     }
-    if (pagination) {
+    if (JSON.parse(pagination || 'true')) {
       queryBuilder
         .skip((page - 1) * limit) // Phân trang
         .take(limit);

@@ -118,7 +118,7 @@ export class NotificationService {
       queryBuilder.andWhere('class.id IN (:...classIds)', { classIds }); // Lọc theo các classIds
     }
 
-    if (pagination) {
+    if (JSON.parse(pagination || 'true')) {
       queryBuilder
         .skip((page - 1) * limit) // Tính toán offset
         .take(limit); // Số bản ghi mỗi trang

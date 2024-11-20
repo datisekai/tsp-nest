@@ -67,7 +67,7 @@ export class UserService {
     }
 
     // Paginate results
-    if (pagination) {
+    if (JSON.parse(pagination || 'true')) {
       queryBuilder.skip((page - 1) * limit).take(limit);
     }
     queryBuilder.orderBy('user.createdAt', 'DESC');

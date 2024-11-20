@@ -30,7 +30,7 @@ export class RoleService {
       queryBuilder.where('role.name LIKE :name', { name: `%${name}%` });
     }
 
-    if (pagination) {
+    if (JSON.parse(pagination || 'true')) {
       queryBuilder
         .skip((page - 1) * limit) // Offset
         .take(limit);

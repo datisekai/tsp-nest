@@ -121,7 +121,7 @@ export class MajorService {
       });
     }
 
-    if (pagination) {
+    if (JSON.parse(pagination || 'true')) {
       queryBuilder
         .skip((page - 1) * limit) // Offset
         .take(limit); // Limit số bản ghi mỗi lần
