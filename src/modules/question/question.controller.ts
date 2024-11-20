@@ -12,7 +12,11 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { AppPermission, AppResource } from 'src/app.role';
 import { QuestionService } from './question.service';
-import { CreateUpdateQuestionDto, QueryQuestionDto } from './question.dto';
+import {
+  CreateUpdateQuestionDto,
+  QueryGenerateQuestionDto,
+  QueryQuestionDto,
+} from './question.dto';
 import { JwtAuthGuard } from '../auth/guards';
 import { PermissionGuard } from '../auth/guards/permission.guard';
 import { ApiPermissions } from 'src/common/decorators/api.decorator';
@@ -46,6 +50,18 @@ export class QuestionController {
   ): Promise<Question> {
     return this.questionService.createQuestion(createQuestionDto, user);
   }
+
+  @Get('generate')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.QUESTION_VIEW)
+  @ApiPermissions(AppPermission.QUESTION_VIEW)
+  async generateQuestion(
+    @Query() dto: QueryGenerateQuestionDto,
+    @User() user: UserEntity,
+  ) {
+    return this.questionService.generateQuestion(dto, user);
+  }
+  yt;
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)

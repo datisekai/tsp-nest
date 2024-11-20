@@ -53,17 +53,19 @@ export class QueryQuestionDto extends PaginationDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  difficultyId: string
+  difficultyId: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  majorId: string
+  majorId: string;
 
-  @ApiPropertyOptional({description:'questionType is multiple_choice or code'})
+  @ApiPropertyOptional({
+    description: 'questionType is multiple_choice or code',
+  })
   @IsOptional()
   @IsString()
-  questionType?: string
+  questionType?: string;
 }
 
 export class QueryChapterDto extends PaginationDto {
@@ -190,4 +192,21 @@ export class CreateDifficultyDto {
   @IsNotEmpty()
   @IsString()
   level: string;
+}
+
+export class QueryGenerateQuestionDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  chapterId: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  difficultyId: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  count: string;
 }

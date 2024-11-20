@@ -1,7 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Question } from './question.entity';
-import { CreateUpdateQuestionDto, QueryQuestionDto } from './question.dto';
+import {
+  CreateUpdateQuestionDto,
+  QueryGenerateQuestionDto,
+  QueryQuestionDto,
+} from './question.dto';
 import { Brackets, Repository } from 'typeorm';
 import { User } from '../user/user.entity';
 import { UserType } from '../user/user.dto';
@@ -35,6 +39,8 @@ export class QuestionService {
       majorId,
       isPublic,
     } = dto;
+
+    console.log('dto', dto);
     const query = this.questionRepository
       .createQueryBuilder('question')
       .leftJoinAndSelect('question.difficulty', 'difficulty')
@@ -44,7 +50,9 @@ export class QuestionService {
       .addSelect(['user.id']);
 
     if (difficultyId) {
-      query.andWhere('difficulty.id = :id', { id: difficultyId });
+      query.andWhere('difficulty.id = :id', {
+        id: difficultyId,
+      });
     }
 
     if (chapterId) {
@@ -185,5 +193,33 @@ export class QuestionService {
     const question = await this.getQuestionById(id, user);
     question.isDeleted = true;
     return await this.questionRepository.save(question);
+  }
+
+  async generateQuestion(dto: QueryGenerateQuestionDto, user: User) {
+    const { chapterId, count, difficultyId } = dto;
+    const queryBuilder = this.questionRepository.createQueryBuilder('question');
+    queryBuilder
+      .leftJoin('question.difficulty', 'difficulty')
+      .addSelect(['difficulty.id', 'difficulty.level'])
+      .leftJoin('question.chapter', 'chapter')
+      .addSelect(['chapter.id', 'chapter.name'])
+      .where('chapter.id = :chapterId', { chapterId })
+      .andWhere('difficulty.id = :difficultyId', { difficultyId })
+      .andWhere('question.isDeleted = false')
+      .limit(+count)
+      .orderBy('RAND()');
+
+    if (user.type !== UserType.MASTER) {
+      queryBuilder.andWhere(
+        new Brackets((qb) => {
+          qb.where('question.user.id = :userId', { userId: user.id }).orWhere(
+            'question.isPublic = true',
+          );
+        }),
+      );
+    }
+
+    const data = await queryBuilder.getMany();
+    return { data };
   }
 }
