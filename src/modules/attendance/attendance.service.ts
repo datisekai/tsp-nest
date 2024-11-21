@@ -184,7 +184,7 @@ export class AttendanceService {
         'user.phone',
         'user.id',
       ])
-      .where('attendee.attendanceId = :id', { id })
+      .where('attendee.attendanceId = :attendanceId', { attendanceId: id })
       .leftJoin('attendee.user', 'user');
     const data = await query.getMany();
     return { data };

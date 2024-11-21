@@ -50,19 +50,19 @@ export class QuestionService {
       .addSelect(['user.id']);
 
     if (difficultyId) {
-      query.andWhere('difficulty.id = :id', {
-        id: difficultyId,
+      query.andWhere('difficulty.id = :difficultyId', {
+        difficultyId,
       });
     }
 
     if (chapterId) {
-      query.andWhere('chapter.id = :id', { id: chapterId });
+      query.andWhere('chapter.id = :chapterId', { chapterId });
     }
 
     if (majorId) {
       query
         .leftJoin('question.major', 'major')
-        .andWhere('major.id = :id', { id: majorId });
+        .andWhere('major.id = :majorId', { majorId });
     }
 
     if (questionType) {
@@ -156,6 +156,7 @@ export class QuestionService {
       relations: ['difficulty', 'chapter', 'user', 'testCases', 'major'],
     });
     if (user) {
+      console.log('getQuestionById', question.user, user);
       checkUserPermission(question.user.id, user);
     }
     if (!question) {
@@ -169,6 +170,7 @@ export class QuestionService {
     updateQuestionDto: CreateUpdateQuestionDto,
     user: User,
   ): Promise<Question> {
+    console.log('called 1');
     const question = await this.getQuestionById(id, user);
 
     Object.assign(question, updateQuestionDto);

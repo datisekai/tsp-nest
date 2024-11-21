@@ -17,7 +17,7 @@ import { Submission } from './submission/submission.entity';
 import { Exam } from '../exam/exam.entity';
 import { BaseEntity } from 'src/common/entities/base.entity';
 import { Major } from '../major/major.entity';
-import {ExamQuestion} from "../exam/exam-question/exam-question.entity";
+import { ExamQuestion } from '../exam/exam-question/exam-question.entity';
 
 @Entity()
 export class Question extends BaseEntity {
@@ -43,13 +43,19 @@ export class Question extends BaseEntity {
   @ManyToOne(() => Major, (major) => major.id)
   major: Major;
 
-  @ManyToOne(() => Difficulty, (difficulty) => difficulty.id)
+  @ManyToOne(() => Difficulty, (difficulty) => difficulty.questions, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
   difficulty: Difficulty;
 
-  @ManyToOne(() => Chapter, (chapter) => chapter.questions)
+  @ManyToOne(() => Chapter, (chapter) => chapter.questions, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
   chapter: Chapter;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.questions)
   user: User;
 
   @Column({ type: 'json', nullable: true })
@@ -58,17 +64,15 @@ export class Question extends BaseEntity {
   @OneToMany(() => TestCase, (testCase) => testCase.question, { cascade: true })
   testCases: TestCase[]; // Các test case của bài tập
 
-
   @Column({ type: 'simple-array', nullable: true })
   acceptedLanguages: number[];
 
   @Column({ type: 'simple-json', nullable: true })
   initCode: { [key: string | number]: string };
 
-  @OneToMany(() => ExamQuestion
-      , (examQuestion) => examQuestion.question)
+  @OneToMany(() => ExamQuestion, (examQuestion) => examQuestion.question)
   examQuestions: ExamQuestion[]; // Thêm mối quan hệ với ExamQuestion
 
-  @Column({type:'boolean', default: false})
-  isDeleted: boolean
+  @Column({ type: 'boolean', default: false })
+  isDeleted: boolean;
 }

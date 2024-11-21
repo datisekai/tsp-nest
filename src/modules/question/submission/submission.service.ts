@@ -130,7 +130,6 @@ export class SubmissionService {
       }
     }
 
-
     if (submission) {
       // Nếu đã có submission, cập nhật thông tin
       submission.code = code;
@@ -170,41 +169,55 @@ export class SubmissionService {
       .addSelect(['exam.id', 'exam.title', 'exam.classId'])
       .getRawMany();
 
-      for(const sd of studentGrades){
-        const logs = await this.examService.getExamUserLogs(examId, sd.user_id);
-        sd.outTabCount = logs.filter(l => l.action === CheatAction.OUT_TAB).length
-        sd.controlCVX = logs.filter(l => l.action === CheatAction.CTROL_CVX).length
-        sd.mouseRight = logs.filter(l => l.action === CheatAction.MOUSE_RIGHT).length
-      }
+    for (const sd of studentGrades) {
+      const logs = await this.examService.getExamUserLogs(examId, sd.user_id);
+      sd.outTabCount = logs.filter(
+        (l) => l.action === CheatAction.OUT_TAB,
+      ).length;
+      sd.controlCVX = logs.filter(
+        (l) => l.action === CheatAction.CTROL_CVX,
+      ).length;
+      sd.mouseRight = logs.filter(
+        (l) => l.action === CheatAction.MOUSE_RIGHT,
+      ).length;
+    }
 
     return studentGrades;
   }
 
-  async getMySubmissionOfExam(examId: number, user: User){
+  async getMySubmissionOfExam(examId: number, user: User) {
     const exam = await this.examService.findOne(examId);
 
-    const qb = this.submissionRepository.createQueryBuilder('submission')
-    .where('submission.exam.id = :id',{id: examId})
-    .andWhere('submission.user.id = :userId', {userId: user.id}).leftJoin('submission.examQuestion','examQuestion')
-    .select(['submission.id','examQuestion.id','submission.languageId','submission.code','submission.answer','submission.questionTemp'])
+    const qb = this.submissionRepository
+      .createQueryBuilder('submission')
+      .where('submission.exam.id = :examId', { examId })
+      .andWhere('submission.user.id = :userId', { userId: user.id })
+      .leftJoin('submission.examQuestion', 'examQuestion')
+      .select([
+        'submission.id',
+        'examQuestion.id',
+        'submission.languageId',
+        'submission.code',
+        'submission.answer',
+        'submission.questionTemp',
+      ]);
 
-    if(exam.showResult){
-      qb.addSelect(['submission.resultJudge0','submission.grade'])
+    if (exam.showResult) {
+      qb.addSelect(['submission.resultJudge0', 'submission.grade']);
     }
 
     const submissions = await qb.getMany();
 
-    if(!exam.showResult){
-      submissions.forEach(sub => {
-        if(sub.questionTemp && sub.questionTemp.choices){
+    if (!exam.showResult) {
+      submissions.forEach((sub) => {
+        if (sub.questionTemp && sub.questionTemp.choices) {
           sub.questionTemp.choices = sub.questionTemp.choices?.map((c) => {
             return { text: c.text };
           }) as any;
         }
-      })
+      });
     }
 
-
-    return {data: {submissions, showResult: exam.showResult}}
+    return { data: { submissions, showResult: exam.showResult } };
   }
 }

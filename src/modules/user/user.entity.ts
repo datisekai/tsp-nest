@@ -8,8 +8,7 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
-  PrimaryGeneratedColumn,
-  Unique,
+  PrimaryGeneratedColumn
 } from 'typeorm';
 import { BaseEntity } from '../../common/entities/base.entity';
 import { Attendance } from '../attendance/attendance.entity';
@@ -17,9 +16,10 @@ import { Attendee } from '../attendance/attendee.entity';
 import { Class } from '../class/class.entity';
 import { Letter } from '../letter/letter.entity';
 import { Major } from '../major/major.entity';
+import { Question } from '../question/question.entity';
 import { Role } from '../role/role.entity';
-import { UserType } from './user.dto';
 import { StudentScore } from '../score-management/student-score/student-score.entity';
+import { UserType } from './user.dto';
 @Entity()
 // @Unique(['code'])
 export class User extends BaseEntity {
@@ -117,6 +117,9 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Attendance, (entity) => entity.user)
   attendances: Attendance[];
+
+  @OneToMany(() => Question, (entity) => entity.user)
+  questions: Question[];
 
   @OneToMany(() => Attendee, (entity) => entity.user)
   attendees: Attendee[];

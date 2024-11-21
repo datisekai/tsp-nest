@@ -43,6 +43,9 @@ export class Exam extends BaseEntity {
   @Column({ type: 'boolean', default: false })
   blockControlCVX: boolean;
 
+  @Column({ type: 'int', nullable: true })
+  duration: number
+
   @Column({ type: 'timestamp', nullable: true })
   startTime: Date;
 

@@ -17,6 +17,7 @@ import { ExamQuestion } from './exam-question/exam-question.entity';
 import { ExamLog } from './exam-log/exam-log.entity';
 import { SubmissionService } from '../question/submission/submission.service';
 import { ExamUserLog } from './exam-user-log/exam-user-log.entity';
+import { duration } from 'moment';
 
 @Injectable()
 export class ExamService {
@@ -45,6 +46,7 @@ export class ExamService {
       blockControlCVX,
       blockMouseRight,
       logOutTab,
+      duration,
     } = createExamDto;
 
     // Tạo exam mới
@@ -59,6 +61,7 @@ export class ExamService {
       blockControlCVX,
       blockMouseRight,
       logOutTab,
+      duration,
     });
 
     // Lưu exam vào database để lấy id
@@ -172,7 +175,7 @@ export class ExamService {
       .leftJoin('exam.examLogs', 'examLogs', 'examLogs.student.id = :userId', {
         userId: user.id,
       })
-      .andWhere('exam.id = :id', { id: examId });
+      .andWhere('exam.id = :examId', { examId });
     const exam = await queryBuilder.getOne();
 
     if (!exam) {
@@ -268,12 +271,17 @@ export class ExamService {
       where: { id },
       relations: {
         examQuestions: {
-          question: true,
+          question: {
+            chapter: true,
+            difficulty: true,
+          },
         },
         class: true,
         user: true,
       },
     });
+
+    console.log('findOne', examEntity.user, user);
     if (user) {
       checkUserPermission(examEntity.user.id, user);
     }
@@ -315,7 +323,7 @@ export class ExamService {
       )
       .leftJoin('submissions.examQuestion', 'submissionExamQuestion')
       .where('users.id = :userId', { userId: user.id })
-      .andWhere('exam.id = :id', { id })
+      .andWhere('exam.id = :examId', { examId: id })
       .andWhere('exam.startTime <= :now', { now: new Date() })
       .andWhere('exam.endTime >= :now', { now: new Date() });
 
@@ -334,6 +342,15 @@ export class ExamService {
         exam: { id },
       },
     });
+
+    if (examLog && examLog.startTime) {
+      const duration = exam.duration * 60 * 60;
+      const timeLeft =
+        new Date(examLog.startTime).getTime() + duration - Date.now();
+      if (timeLeft < 0) {
+        throw new NotFoundException(`Exam time out.`);
+      }
+    }
 
     if (examLog && examLog.endTime) {
       throw new NotFoundException(`You have submitted.`);
@@ -355,7 +372,7 @@ export class ExamService {
     console.log('getTakeOrderQuestionOfExam', id);
     const qb = this.examQuestionRepository
       .createQueryBuilder('examQuestion')
-      .where('examQuestion.exam.id = :id', { id })
+      .where('examQuestion.exam.id = :examId', { examId: id })
       .select(['examQuestion.id']);
     const data = await qb.getMany();
     return { data: data.map((item) => item.id) };
@@ -366,6 +383,7 @@ export class ExamService {
     updateExamDto: UpdateExamDto,
     user: User,
   ): Promise<Exam> {
+    console.log('123333');
     const exam = await this.findOne(id, user);
 
     // Cập nhật các thuộc tính của Exam (nếu có trong DTO)
@@ -373,6 +391,7 @@ export class ExamService {
       title: updateExamDto.title ?? exam.title,
       description: updateExamDto.description ?? exam.description,
       startTime: updateExamDto.startTime ?? exam.startTime,
+      duration: updateExamDto.duration ?? exam.duration,
       endTime: updateExamDto.endTime ?? exam.endTime,
       showResult:
         updateExamDto.showResult != null

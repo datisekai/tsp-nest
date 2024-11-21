@@ -28,6 +28,11 @@ class QuestionDto {
 }
 export class CreateExamDto {
   @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  duration: number;
+
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   title: string;
@@ -87,6 +92,11 @@ export class UpdateExamDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  duration?: string;
 
   @IsOptional()
   @IsDateString()
