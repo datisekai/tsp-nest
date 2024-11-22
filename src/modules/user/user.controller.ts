@@ -17,6 +17,7 @@ import {
   CreateUserDto,
   QueryTeacherDto,
   QueryUserDto,
+  SearchUserDto,
   UpdateUserDto,
 } from './user.dto';
 import { UserService } from './user.service';
@@ -38,6 +39,13 @@ export class UserController {
   @UsePipes(new ValidationPipe({ transform: true })) // Automatically applies validation
   async findAll(@Query() queryDto: QueryUserDto) {
     return this.userService.findAll(queryDto);
+  }
+
+  @Get('search')
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(new ValidationPipe({ transform: true })) // Automatically applies validation
+  async searchUser(@Query() queryDto: SearchUserDto) {
+    return this.userService.searchUser(queryDto);
   }
 
   @Get('/public/teachers')
@@ -107,4 +115,9 @@ export class UserController {
   async delete(@Param('id') id: number) {
     return this.userService.delete(id);
   }
+
+  // @Put('/abcushqsj/jdsjnj')
+  // updateAll() {
+  //   return this.userService.updateAll();
+  // }
 }

@@ -409,6 +409,7 @@ export class ExamService {
         updateExamDto.blockMouseRight != null
           ? updateExamDto.blockMouseRight
           : exam.blockMouseRight,
+      isLink: updateExamDto.isLink != null ? updateExamDto.isLink : exam.isLink,
     });
 
     // Lưu thay đổi của Exam

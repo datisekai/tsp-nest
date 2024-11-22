@@ -115,6 +115,21 @@ export class QueryUserDto extends PaginationDto {
   type?: UserType; // Thêm field để tìm kiếm theo type
 }
 
+export class SearchUserDto extends PaginationDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  q?: string;
+
+  @ApiPropertyOptional({
+    enum: UserType,
+    description: 'Filter by user type (teacher or student)',
+  })
+  @IsEnum(UserType)
+  @IsOptional()
+  type?: UserType; // Thêm field để tìm kiếm theo type
+}
+
 export class QueryTeacherDto {
   @ApiPropertyOptional()
   @IsOptional()

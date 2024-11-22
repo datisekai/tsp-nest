@@ -10,7 +10,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ExamService } from './exam.service';
-import { CreateExamDto, ExamQueryDto, ExamUserLogDto, ExamUserLogMultipleDto, UpdateExamDto } from './exam.dto';
+import {
+  CreateExamDto,
+  ExamQueryDto,
+  ExamUserLogDto,
+  ExamUserLogMultipleDto,
+  UpdateExamDto,
+} from './exam.dto';
 import { Exam } from './exam.entity';
 import { ApiTags } from '@nestjs/swagger';
 import { AppPermission, AppResource } from 'src/app.role';
@@ -59,7 +65,6 @@ export class ExamController {
   ) {
     return this.examService.getTakeOrderQuestionOfExam(id, user);
   }
-
 
   @Get('public/:id')
   @UseGuards(JwtAuthGuard)
@@ -127,7 +132,19 @@ export class ExamController {
   async saveAction(
     @Param('examId') examId: number,
     @Body() dto: ExamUserLogMultipleDto,
-    @User() user: UserEntity,){
-      return this.examService.createExamUserLog(examId, user.id, dto);
-    }
+    @User() user: UserEntity,
+  ) {
+    return this.examService.createExamUserLog(examId, user.id, dto);
+  }
+
+  @Post('link/:examId')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.EXAM_UPDATE)
+  async link(@Param('examId') examId: number, @User() user: UserEntity) {
+    return this.examService.update(
+      examId,
+      { isLink: true } as UpdateExamDto,
+      user,
+    );
+  }
 }

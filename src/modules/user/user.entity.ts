@@ -8,7 +8,7 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
-  PrimaryGeneratedColumn
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { BaseEntity } from '../../common/entities/base.entity';
 import { Attendance } from '../attendance/attendance.entity';
@@ -20,6 +20,7 @@ import { Question } from '../question/question.entity';
 import { Role } from '../role/role.entity';
 import { StudentScore } from '../score-management/student-score/student-score.entity';
 import { UserType } from './user.dto';
+import { removeVietnameseDiacritics } from 'src/common/helpers';
 @Entity()
 // @Unique(['code'])
 export class User extends BaseEntity {
@@ -28,6 +29,9 @@ export class User extends BaseEntity {
 
   @Column({ type: 'varchar', unique: true })
   code: string;
+
+  @Column({ type: 'text', nullable: true, select: false })
+  fullTextSearch: string;
 
   @Column({ type: 'varchar', nullable: true })
   email: string;
@@ -130,6 +134,7 @@ export class User extends BaseEntity {
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
+    this.fullTextSearch = `${removeVietnameseDiacritics(this.code)} ${removeVietnameseDiacritics(this.name)}`;
     if (!this.password) {
       return;
     }

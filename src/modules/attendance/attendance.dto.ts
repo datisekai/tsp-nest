@@ -50,6 +50,16 @@ export class CreateAttendanceDto {
   @IsBoolean()
   isOpen: boolean;
 
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  time: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  isLink: boolean;
+
   @ApiProperty()
   @IsNotEmpty()
   @IsInt()
@@ -126,9 +136,9 @@ export class CreateAttendeeDto {
   userId: number;
 }
 
-export class QueryStatisticDto{
+export class QueryStatisticDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  date:string
+  date: string;
 }

@@ -20,7 +20,8 @@ import { User as UserEntity } from '../user/user.entity';
 import {
   CreateAttendanceDto,
   QueryAttendanceDto,
-  QueryAttendeeDto, QueryStatisticDto,
+  QueryAttendeeDto,
+  QueryStatisticDto,
   UpdateAttendanceDto,
 } from './attendance.dto';
 import { Attendance } from './attendance.entity';
@@ -124,7 +125,21 @@ export class AttendanceController {
   async statistic(
     @Param('classId') classId: number,
     @Query() dto: QueryStatisticDto,
-  ){
-    return this.attendanceService.statisticClass(classId,dto?.date);
+  ) {
+    return this.attendanceService.statisticClass(classId, dto?.date);
+  }
+
+  @Post('link/:attendanceId')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.ATTENDANCE_UPDATE)
+  async link(
+    @Param('attendanceId') attendanceId: number,
+    @User() user: UserEntity,
+  ) {
+    return this.attendanceService.update(
+      attendanceId,
+      { isLink: true } as UpdateAttendanceDto,
+      user,
+    );
   }
 }

@@ -85,6 +85,11 @@ export class CreateExamDto {
 export class UpdateExamDto {
   @ApiPropertyOptional()
   @IsOptional()
+  @IsBoolean()
+  isLink: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
   title?: string;
 

@@ -107,6 +107,7 @@ export class AttendanceService {
         'attendance.title',
         'attendance.secretKey',
         'attendance.expirationTime',
+        'attendance.time',
         'class.id',
         'class.name',
         'major.code',
@@ -229,6 +230,7 @@ export class AttendanceService {
         'attendance.id',
         'attendance.createdAt',
         'attendance.updatedAt',
+        'attendance.time',
         'attendees',
         'user.code',
         'user.name',
@@ -239,7 +241,7 @@ export class AttendanceService {
 
     if (date) {
       queryBuilder.andWhere(
-        "DATE_FORMAT(attendance.updatedAt, '%d/%m/%Y') = :date",
+        "DATE_FORMAT(attendance.time, '%d/%m/%Y') = :date",
         { date },
       );
     }

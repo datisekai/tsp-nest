@@ -4,7 +4,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Question } from '../question.entity';
 import { QuestionType } from '../question.dto';
-import { RunTestCodeDto, SubmitCodeDto } from './submission.dto';
+import {
+  RunTestCodeDto,
+  SubmitCodeDto,
+  UpdateSubmissionDto,
+} from './submission.dto';
 import { User } from 'src/modules/user/user.entity';
 import { Judge0Service } from 'src/modules/judge0/judge0.service';
 import { ExamService } from '../../exam/exam.service';
@@ -185,13 +189,21 @@ export class SubmissionService {
     return studentGrades;
   }
 
-  async getMySubmissionOfExam(examId: number, user: User) {
+  async updateResult(submissionId: number, dto: UpdateSubmissionDto) {
+    const submission = await this.submissionRepository.findOne({
+      where: { id: submissionId },
+    });
+    submission.grade = dto.grade;
+    return await this.submissionRepository.save(submission);
+  }
+
+  async getMySubmissionOfExam(examId: number, userId: number) {
     const exam = await this.examService.findOne(examId);
 
     const qb = this.submissionRepository
       .createQueryBuilder('submission')
       .where('submission.exam.id = :examId', { examId })
-      .andWhere('submission.user.id = :userId', { userId: user.id })
+      .andWhere('submission.user.id = :userId', { userId: userId })
       .leftJoin('submission.examQuestion', 'examQuestion')
       .select([
         'submission.id',

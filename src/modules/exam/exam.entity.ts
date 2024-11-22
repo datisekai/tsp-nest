@@ -31,20 +31,17 @@ export class Exam extends BaseEntity {
   @Column({ type: 'boolean', default: false })
   showResult: boolean;
 
-
   @Column({ type: 'boolean', default: false })
   logOutTab: boolean;
 
-
   @Column({ type: 'boolean', default: false })
   blockMouseRight: boolean;
-
 
   @Column({ type: 'boolean', default: false })
   blockControlCVX: boolean;
 
   @Column({ type: 'int', nullable: true })
-  duration: number
+  duration: number;
 
   @Column({ type: 'timestamp', nullable: true })
   startTime: Date;
@@ -69,6 +66,12 @@ export class Exam extends BaseEntity {
   @OneToMany(() => ExamLog, (examLog) => examLog.exam)
   examLogs: ExamLog[];
 
-  @OneToMany(() => ExamUserLog, exam => exam.exam)
-  examUserLogs: ExamUserLog[]
+  @OneToMany(() => ExamUserLog, (exam) => exam.exam)
+  examUserLogs: ExamUserLog[];
+
+  @Column({
+    type: 'boolean',
+    default: false,
+  })
+  isLink: boolean;
 }

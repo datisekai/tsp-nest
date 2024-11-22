@@ -1,16 +1,27 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { SubmissionService } from './submission.service';
 import {
   RunTestCodeDto,
   SubmitCodeDto,
   SubmitMultipleChoiceDto,
+  UpdateSubmissionDto,
 } from './submission.dto';
-import { User } from 'src/common/decorators';
+import { Permissions, User } from 'src/common/decorators';
 
 import { User as UserEntity } from '../../user/user.entity';
 import { ApiTags } from '@nestjs/swagger';
-import { AppResource } from 'src/app.role';
+import { AppPermission, AppResource } from 'src/app.role';
 import { JwtAuthGuard } from 'src/modules/auth/guards';
+import { ApiPermissions } from 'src/common/decorators/api.decorator';
+import { PermissionGuard } from 'src/modules/auth/guards/permission.guard';
 
 @ApiTags(AppResource.SUBMISSION)
 @Controller('api.submission')
@@ -53,10 +64,28 @@ export class SubmissionController {
     return this.submissionService.runTestCode(dto);
   }
 
-
   @Get('/history/:examId')
   @UseGuards(JwtAuthGuard)
   async getHistory(@Param('examId') examId: number, @User() user: UserEntity) {
-    return await this.submissionService.getMySubmissionOfExam(examId, user);
+    return await this.submissionService.getMySubmissionOfExam(examId, user.id);
+  }
+
+  @Get('/history/:examId/user/:userId')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.EXAM_VIEW)
+  @ApiPermissions(AppPermission.EXAM_VIEW)
+  async getHistoryByUserId(
+    @Param('examId') examId: number,
+    @User() user: UserEntity,
+  ) {
+    return await this.submissionService.getMySubmissionOfExam(examId, user.id);
+  }
+
+  @Put('/:id')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.EXAM_UPDATE)
+  @ApiPermissions(AppPermission.EXAM_UPDATE)
+  async update(@Param('id') id: number, @Body() dto: UpdateSubmissionDto) {
+    return await this.submissionService.updateResult(id, dto);
   }
 }

@@ -9,10 +9,12 @@ import {
   CreateUserDto,
   QueryTeacherDto,
   QueryUserDto,
+  SearchUserDto,
   UpdateUserDto,
   UserType,
 } from './user.dto';
 import { User } from './user.entity';
+import { removeVietnameseDiacritics } from 'src/common/helpers';
 
 @Injectable()
 export class UserService {
@@ -229,4 +231,52 @@ export class UserService {
     const user = await this.findOne(id, ['classes', 'classes.major']);
     return { data: user.classes };
   }
+
+  async searchUser(
+    queryDto: SearchUserDto,
+  ): Promise<{ data: User[]; total: number }> {
+    const {
+      page = 1,
+      limit = 10,
+      q = '',
+      type, // Thêm điều kiện lọc theo type (teacher/student)
+      pagination,
+    } = queryDto;
+
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
+      .select(['user.code', 'user.name', 'user.avatar']);
+
+    if (q) {
+      queryBuilder.andWhere('fullTextSearch LIKE :keyword', {
+        keyword: `%${q}%`,
+      });
+    }
+
+    // Lọc theo type (teacher/student)
+    if (type) {
+      queryBuilder.andWhere('user.type = :type', { type });
+    }
+
+    // Paginate results
+    if (JSON.parse(pagination || 'true')) {
+      queryBuilder.skip((page - 1) * limit).take(limit);
+    }
+    queryBuilder.orderBy('user.createdAt', 'DESC');
+
+    // Execute the query and get the data and total count
+    const [data, total] = await queryBuilder.getManyAndCount();
+
+    return { data, total };
+  }
+
+  // async updateAll() {
+  //   const users = await this.userRepository.find();
+
+  //   for (const user of users) {
+  //     user.fullTextSearch = `${removeVietnameseDiacritics(user.code)} ${removeVietnameseDiacritics(user.name)}`;
+  //     // Cập nhật lại để trigger @BeforeUpdate
+  //     await this.userRepository.save(user);
+  //   }
+  // }
 }
