@@ -76,9 +76,13 @@ export class SubmissionController {
   @ApiPermissions(AppPermission.EXAM_VIEW)
   async getHistoryByUserId(
     @Param('examId') examId: number,
-    @User() user: UserEntity,
+    @Param('userId') userId: number,
   ) {
-    return await this.submissionService.getMySubmissionOfExam(examId, user.id);
+    return await this.submissionService.getMySubmissionOfExam(
+      examId,
+      userId,
+      true,
+    );
   }
 
   @Put('/:id')

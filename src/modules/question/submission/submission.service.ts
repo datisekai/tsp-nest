@@ -194,10 +194,15 @@ export class SubmissionService {
       where: { id: submissionId },
     });
     submission.grade = dto.grade;
+    submission.answer = dto.answer || submission.answer;
     return await this.submissionRepository.save(submission);
   }
 
-  async getMySubmissionOfExam(examId: number, userId: number) {
+  async getMySubmissionOfExam(
+    examId: number,
+    userId: number,
+    isAdmin: boolean = false,
+  ) {
     const exam = await this.examService.findOne(examId);
 
     const qb = this.submissionRepository
@@ -214,13 +219,21 @@ export class SubmissionService {
         'submission.questionTemp',
       ]);
 
-    if (exam.showResult) {
+    if (exam.showResult && !isAdmin) {
       qb.addSelect(['submission.resultJudge0', 'submission.grade']);
+    }
+
+    if (isAdmin) {
+      qb.addSelect([
+        'examQuestion.score',
+        'submission.resultJudge0',
+        'submission.grade',
+      ]);
     }
 
     const submissions = await qb.getMany();
 
-    if (!exam.showResult) {
+    if (!exam.showResult && !isAdmin) {
       submissions.forEach((sub) => {
         if (sub.questionTemp && sub.questionTemp.choices) {
           sub.questionTemp.choices = sub.questionTemp.choices?.map((c) => {
@@ -230,6 +243,6 @@ export class SubmissionService {
       });
     }
 
-    return { data: { submissions, showResult: exam.showResult } };
+    return { data: { submissions, showResult: isAdmin || exam.showResult } };
   }
 }

@@ -135,7 +135,7 @@ export class ExamService {
     queryBuilder.leftJoin('exam.class', 'class');
     queryBuilder
       .leftJoin('class.major', 'major')
-      .addSelect(['class.name', 'major.name', 'major.code']);
+      .addSelect(['class.name', 'major.name', 'major.code', 'class.id']);
     // Tính toán phân trang
     const [data, total] = await queryBuilder.getManyAndCount();
 

@@ -1,10 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsString,
   IsNumber,
   isNumber,
   IsBoolean,
+  IsOptional,
 } from 'class-validator';
 
 export class SubmitMultipleChoiceDto {
@@ -27,6 +28,11 @@ export class UpdateSubmissionDto {
   @ApiProperty()
   @IsNumber()
   grade: number;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  answer: string;
 }
 
 export class SubmitCodeDto {
