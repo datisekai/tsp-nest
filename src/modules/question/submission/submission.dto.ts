@@ -57,6 +57,22 @@ export class SubmitCodeDto {
   code: string;
 }
 
+export class SubmitCodeHtmlDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  examQuestionId: number;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  examId: number;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  code: any;
+}
+
 export class RunTestCodeDto {
   @ApiProperty()
   @IsNumber()

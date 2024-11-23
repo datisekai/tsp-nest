@@ -40,7 +40,6 @@ export class QuestionService {
       isPublic,
     } = dto;
 
-    console.log('dto', dto);
     const query = this.questionRepository
       .createQueryBuilder('question')
       .leftJoinAndSelect('question.difficulty', 'difficulty')

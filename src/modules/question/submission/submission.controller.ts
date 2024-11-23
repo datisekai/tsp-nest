@@ -11,6 +11,7 @@ import { SubmissionService } from './submission.service';
 import {
   RunTestCodeDto,
   SubmitCodeDto,
+  SubmitCodeHtmlDto,
   SubmitMultipleChoiceDto,
   UpdateSubmissionDto,
 } from './submission.dto';
@@ -56,6 +57,15 @@ export class SubmissionController {
     @User() user: UserEntity,
   ) {
     return this.submissionService.submitCode(submitCodeDto, user);
+  }
+
+  @Post('submit-code-html')
+  @UseGuards(JwtAuthGuard)
+  async submitCodeHtml(
+    @Body() submitCodeDto: SubmitCodeHtmlDto,
+    @User() user: UserEntity,
+  ) {
+    return this.submissionService.submitCodeHtml(submitCodeDto, user);
   }
 
   @Post('run-test-code')

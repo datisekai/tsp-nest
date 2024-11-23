@@ -3,7 +3,7 @@ import { Question } from '../question.entity';
 import { User } from '../../user/user.entity';
 import { BaseEntity } from 'src/common/entities/base.entity';
 import { Exam } from 'src/modules/exam/exam.entity';
-import {ExamQuestion} from "../../exam/exam-question/exam-question.entity";
+import { ExamQuestion } from '../../exam/exam-question/exam-question.entity';
 
 @Entity()
 export class Submission extends BaseEntity {
@@ -29,9 +29,12 @@ export class Submission extends BaseEntity {
   answer?: string; // Đáp án của sinh viên (nếu là câu hỏi trắc nghiệm)
 
   @Column({ type: 'simple-json', nullable: true })
+  codeHtml: any;
+
+  @Column({ type: 'simple-json', nullable: true })
   resultJudge0: any;
 
-  @Column({ type: 'simple-json', nullable: true})
+  @Column({ type: 'simple-json', nullable: true })
   questionTemp: any;
 
   @Column({ type: 'float', default: 0 })

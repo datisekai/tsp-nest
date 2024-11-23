@@ -7,6 +7,7 @@ import { QuestionType } from '../question.dto';
 import {
   RunTestCodeDto,
   SubmitCodeDto,
+  SubmitCodeHtmlDto,
   UpdateSubmissionDto,
 } from './submission.dto';
 import { User } from 'src/modules/user/user.entity';
@@ -217,6 +218,7 @@ export class SubmissionService {
         'submission.code',
         'submission.answer',
         'submission.questionTemp',
+        'submission.codeHtml',
       ]);
 
     if (exam.showResult && !isAdmin) {
@@ -244,5 +246,54 @@ export class SubmissionService {
     }
 
     return { data: { submissions, showResult: isAdmin || exam.showResult } };
+  }
+
+  async submitCodeHtml(
+    dto: SubmitCodeHtmlDto,
+    user: User,
+  ): Promise<{ data: true }> {
+    const hasSubmission = await this.examService.hasSubmission(
+      dto.examId,
+      user.id,
+    );
+    if (hasSubmission)
+      throw new NotFoundException(
+        `Exam with ID ${dto.examId} has been submitted`,
+      );
+    const { code, examId, examQuestionId } = dto;
+    const examQuestion = await this.examService.getExamQuestion(examQuestionId);
+
+    if (
+      !examQuestion ||
+      examQuestion.question.type !== QuestionType.CODE_HTML
+    ) {
+      throw new NotFoundException('Coding question not found');
+    }
+
+    // Tìm submission có cùng userId, examQuestionId và examId
+    let submission = await this.submissionRepository.findOne({
+      where: {
+        user: { id: user.id },
+        examQuestion: { id: examQuestionId },
+        exam: { id: examId },
+      },
+    });
+
+    if (submission) {
+      submission.codeHtml = code;
+    } else {
+      submission = this.submissionRepository.create({
+        user: { id: user.id },
+        examQuestion,
+        codeHtml: code,
+        exam: { id: examId },
+      });
+    }
+
+    submission.questionTemp = examQuestion.question;
+
+    await this.submissionRepository.save(submission);
+
+    return { data: true };
   }
 }

@@ -17,6 +17,7 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 export enum QuestionType {
   MULTIPLE_CHOICE = 'multiple_choice',
   CODE = 'code',
+  CODE_HTML = 'code_html',
 }
 
 export class CreateChoiceDto {
