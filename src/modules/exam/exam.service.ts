@@ -208,6 +208,7 @@ export class ExamService {
         'exam.endTime',
         'exam.showResult',
         'exam.createdAt',
+        'exam.duration',
         'class.id',
         'class.name',
         'major.id',
