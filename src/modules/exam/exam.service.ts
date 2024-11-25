@@ -345,10 +345,9 @@ export class ExamService {
     });
 
     if (examLog && examLog.startTime) {
-      const duration = exam.duration * 60 * 60;
-      const timeLeft =
-        new Date(examLog.startTime).getTime() + duration - Date.now();
-      if (timeLeft < 0) {
+      const duration =
+        new Date(examLog.startTime).getTime() + exam.duration * 60 * 60 * 60;
+      if (Date.now() > duration) {
         throw new NotFoundException(`Exam time out.`);
       }
     }
