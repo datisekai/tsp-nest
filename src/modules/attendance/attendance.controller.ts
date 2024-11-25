@@ -93,6 +93,18 @@ export class AttendanceController {
     return await this.attendanceService.findAttendees(id);
   }
 
+  @Post(':id/attendees/:userId')
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(AppPermission.ATTENDANCE_UPDATE)
+  @ApiPermissions(AppPermission.ATTENDANCE_UPDATE)
+  async addAttendee(@Param('id') id: number, @Param('userId') userId: number) {
+    return this.attendanceService.toggleAttendee({
+      attendanceId: id,
+      isSuccess: true,
+      userId: userId,
+    });
+  }
+
   // Cập nhật thông tin Attendance theo ID
   @Put(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)

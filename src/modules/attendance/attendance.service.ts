@@ -203,6 +203,33 @@ export class AttendanceService {
     return await this.attendeeRepository.save(newAttendee);
   }
 
+  async toggleAttendee(
+    createAttendeeDto: CreateAttendeeDto,
+  ): Promise<Attendee> {
+    const { attendanceId, userId } = createAttendeeDto;
+    const attendee = await this.attendeeRepository.findOne({
+      where: {
+        user: { id: userId },
+        attendance: { id: attendanceId },
+      },
+    });
+
+    if (attendee) {
+      return await this.attendeeRepository.save({
+        ...attendee,
+        isSuccess: !attendee.isSuccess,
+      });
+    }
+
+    const newAttendee = this.attendeeRepository.create({
+      isSuccess: true,
+      attendance: { id: attendanceId },
+      user: { id: userId },
+    });
+
+    return await this.attendeeRepository.save(newAttendee);
+  }
+
   // Cập nhật Attendance theo ID
   async update(
     id: number,
