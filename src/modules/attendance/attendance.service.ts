@@ -44,7 +44,15 @@ export class AttendanceService {
     dto: QueryAttendeeDto,
     userId: number,
   ): Promise<{ data: Attendee[]; total: number }> {
-    const { limit = 10, page = 1, from, to, majorCode, majorName } = dto;
+    const {
+      limit = 10,
+      page = 1,
+      from,
+      to,
+      majorCode,
+      majorName,
+      classId,
+    } = dto;
     const query = this.attendeeRepository
       .createQueryBuilder('attendee')
       .leftJoinAndSelect('attendee.attendance', 'attendance')
@@ -66,6 +74,10 @@ export class AttendanceService {
       ])
       .limit(limit)
       .offset((page - 1) * limit);
+
+    if (classId) {
+      query.andWhere('class.id = :classId', { classId });
+    }
 
     if (majorCode) {
       query.andWhere('major.code = :majorCode', { majorCode });
@@ -120,6 +132,7 @@ export class AttendanceService {
         'attendees.createdAt',
         'attendee_user.name',
         'attendee_user.code',
+        'attendees.isSuccess',
       ])
       .leftJoin('attendance.class', 'class')
       .leftJoin('class.major', 'major')

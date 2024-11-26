@@ -117,6 +117,12 @@ export class QueryAttendeeDto extends PaginationDto {
   @IsOptional()
   @IsString()
   majorName?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsInt()
+  @Type(() => Number)
+  classId?: number;
 }
 
 export class CreateAttendeeDto {
