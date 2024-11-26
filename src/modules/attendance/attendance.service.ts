@@ -118,6 +118,7 @@ export class AttendanceService {
         'attendance.isOpen',
         'attendance.title',
         'attendance.secretKey',
+        'attendance.isLink',
         'attendance.expirationTime',
         'attendance.time',
         'class.id',

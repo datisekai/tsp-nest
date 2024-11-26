@@ -69,6 +69,11 @@ export class CreateUserDto {
   @IsString()
   deviceUid?: string;
 
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  classCode?: string;
+
   @ApiPropertyOptional({
     enum: UserType,
     description: 'Type of user (teacher or student or master)',

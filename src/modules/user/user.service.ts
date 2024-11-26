@@ -147,7 +147,7 @@ export class UserService {
   }
 
   async findOrCreateUsersByCodes(
-    userData: { code: string; name?: string }[],
+    userData: any,
     userType?: UserType,
   ): Promise<User[]> {
     const codes = userData.map((user) => user.code); // Lấy tất cả codes từ mảng userData
@@ -163,6 +163,7 @@ export class UserService {
     const newUsers = await Promise.all(
       newUsersData.map(async (user) => {
         return this.create({
+          ...user,
           code: user.code,
           name: user.name || 'Unknown', // Nếu không có name, dùng tên mặc định
           password: null, // Mật khẩu null

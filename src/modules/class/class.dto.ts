@@ -20,6 +20,26 @@ export class UserData {
   @IsOptional()
   @IsString()
   name: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  phone: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  email: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  avatar: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  classCode: string;
 }
 export class CreateClassDto {
   @ApiProperty()

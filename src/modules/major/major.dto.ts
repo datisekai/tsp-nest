@@ -10,7 +10,7 @@ import {
 } from 'class-validator';
 import { PaginationDto } from '../../common/dto/pagination.dto';
 
-class UserData {
+export class UserData {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
@@ -20,6 +20,26 @@ class UserData {
   @IsOptional()
   @IsString()
   name: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  phone: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  email: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  avatar: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  classCode: string;
 }
 export class CreateMajorDto {
   @ApiProperty()
