@@ -46,8 +46,7 @@ export class SubmissionController {
   @Get('/score/:examId')
   @UseGuards(JwtAuthGuard)
   async getStudentGradesByExam(@Param('examId') examId: number) {
-    const data = await this.submissionService.getStudentGradesByExam(examId);
-    return { data };
+    return await this.submissionService.getStudentGradesByExam(examId);
   }
 
   @Post('submit-code')

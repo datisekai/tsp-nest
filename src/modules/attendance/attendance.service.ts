@@ -186,7 +186,8 @@ export class AttendanceService {
     return attendance;
   }
 
-  async findAttendees(id: number): Promise<{ data: Attendee[] }> {
+  async findAttendees(id: number) {
+    const attendance = await this.findOne(id);
     const query = this.attendeeRepository
       .createQueryBuilder('attendee')
       .select([
@@ -202,7 +203,7 @@ export class AttendanceService {
       .where('attendee.attendanceId = :attendanceId', { attendanceId: id })
       .leftJoin('attendee.user', 'user');
     const data = await query.getMany();
-    return { data };
+    return { data, attendance };
   }
 
   async addAttendee(createAttendeeDto: CreateAttendeeDto): Promise<Attendee> {

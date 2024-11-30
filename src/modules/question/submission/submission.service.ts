@@ -162,6 +162,7 @@ export class SubmissionService {
   }
 
   async getStudentGradesByExam(examId: number) {
+    const exam = await this.examService.findOne(examId);
     const studentGrades = await this.submissionRepository
       .createQueryBuilder('submission')
       .select('submission.userId', 'userId')
@@ -187,7 +188,7 @@ export class SubmissionService {
       ).length;
     }
 
-    return studentGrades;
+    return { data: studentGrades, exam };
   }
 
   async updateResult(submissionId: number, dto: UpdateSubmissionDto) {
