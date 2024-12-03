@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MajorService } from '../major/major.service';
@@ -16,6 +20,7 @@ import {
   UpdateClassDto,
 } from './class.dto';
 import { Class } from './class.entity';
+import { randomString } from 'src/common/helpers/randomString';
 
 @Injectable()
 export class ClassService {
@@ -64,6 +69,7 @@ export class ClassService {
       major,
       teachers,
       duration,
+      secretKey: randomString(6),
     });
 
     return this.classRepository.save(classEntity);
@@ -383,5 +389,25 @@ export class ClassService {
     queryBuilder.where('users.id = :userId', { userId: user.id });
     const data = await queryBuilder.getMany();
     return { data };
+  }
+
+  async joinClass(secretKey: string, user: User) {
+    const classEntity = await this.classRepository.findOne({
+      where: { secretKey },
+      relations: ['users'],
+    });
+    if (!classEntity) {
+      throw new NotFoundException(
+        `Class with secret key ${secretKey} not found`,
+      );
+    }
+
+    if (classEntity.users.some((item) => item.id === user.id)) {
+      throw new BadRequestException('User already in class');
+    }
+
+    classEntity.users.push(user);
+    await this.classRepository.save(classEntity);
+    return { data: true };
   }
 }
