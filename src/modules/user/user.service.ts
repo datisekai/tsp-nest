@@ -1,4 +1,6 @@
 import {
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -15,12 +17,17 @@ import {
 } from './user.dto';
 import { User } from './user.entity';
 import { removeVietnameseDiacritics } from 'src/common/helpers';
+import { LetterService } from '../letter/letter.service';
+import { ClassService } from '../class/class.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly letterService: LetterService,
+    @Inject(forwardRef(() => ClassService)) // Dùng forwardRef ở đây
+    private readonly classService: ClassService,
   ) {}
 
   async findAll(
@@ -280,4 +287,30 @@ export class UserService {
   //     await this.userRepository.save(user);
   //   }
   // }
+  async statistic(user: User) {
+    const teachingClassesCount = await this.classService.getCountMyClass(user);
+
+    // 2. Số bài kiểm tra đang mở
+    const openExamsCount = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoin('user.exams', 'exam')
+      .where('user.id = :userId', { userId: user.id })
+      .andWhere('exam.endTime > NOW()')
+      .getCount();
+
+    const pendingLettersCount = await this.letterService.getPendingLettersCount(
+      user.id,
+    );
+
+    const pendingLetters = await this.letterService.getPendingLetters(user.id);
+
+    return {
+      data: {
+        teachingClassesCount,
+        openExamsCount,
+        pendingLettersCount,
+        pendingLetters,
+      },
+    };
+  }
 }

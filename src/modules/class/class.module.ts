@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PermissionModule } from '../permission/permission.module';
 import { FacultyModule } from '../faculty/faculty.module';
@@ -12,7 +12,7 @@ import { MajorModule } from '../major/major.module';
   imports: [
     TypeOrmModule.forFeature([Class]),
     FacultyModule,
-    UserModule,
+    forwardRef(() => UserModule),
     PermissionModule,
     MajorModule,
   ],

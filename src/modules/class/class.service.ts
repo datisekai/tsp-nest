@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -28,6 +30,7 @@ export class ClassService {
     @InjectRepository(Class)
     private readonly classRepository: Repository<Class>,
     private readonly majorService: MajorService,
+    @Inject(forwardRef(() => UserService)) // Dùng forwardRef ở đây
     private readonly userService: UserService,
   ) {}
 
@@ -73,6 +76,14 @@ export class ClassService {
     });
 
     return this.classRepository.save(classEntity);
+  }
+
+  async getCountMyClass(user: User) {
+    return this.classRepository
+      .createQueryBuilder('class')
+      .leftJoinAndSelect('class.teachers', 'teacher')
+      .andWhere('teacher.id = :userId', { userId: user.id })
+      .getCount();
   }
 
   async findAll(
