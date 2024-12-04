@@ -396,7 +396,9 @@ export class ClassService {
     queryBuilder.leftJoin('class.users', 'users');
     queryBuilder
       .leftJoin('class.major', 'major')
-      .addSelect(['major.name', 'major.code']);
+      .addSelect(['major.name', 'major.code'])
+      .leftJoin('class.teachers', 'teacher')
+      .addSelect(['teacher.code', 'teacher.name', 'teacher.phone']);
     queryBuilder.where('users.id = :userId', { userId: user.id });
     const data = await queryBuilder.getMany();
     return { data };
