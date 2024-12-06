@@ -88,6 +88,7 @@ export class AuthService {
       newUser = await this.userService.create({
         ...userInfo,
         type: loginType,
+        roleId: 2,
       });
     }
 

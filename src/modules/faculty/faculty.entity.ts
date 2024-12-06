@@ -20,7 +20,7 @@ export class Faculty extends BaseEntity {
   @Column({ type: 'varchar', length: 255, unique: true, nullable: true })
   code: string;
 
-  @Column('varchar')
+  @Column({ type: 'text' })
   description: string;
 
   @OneToMany(() => Major, (major) => major.faculty)

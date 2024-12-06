@@ -268,27 +268,32 @@ export class ExamService {
     return { data, total }; // Trả về dữ liệu và tổng số lượng
   }
   async findOne(id: number, user?: User): Promise<Exam> {
-    const examEntity = await this.examRepository.findOne({
-      where: { id },
-      relations: {
-        examQuestions: {
-          question: {
-            chapter: true,
-            difficulty: true,
-          },
-        },
-        class: true,
-        user: true,
-      },
-    });
+    const queryBuilder = this.examRepository.createQueryBuilder('exam');
 
-    console.log('findOne', examEntity.user, user);
-    if (user) {
-      checkUserPermission(examEntity.user.id, user);
-    }
+    const examEntity = await queryBuilder
+      .leftJoinAndSelect('exam.examQuestions', 'examQuestions')
+      .leftJoinAndSelect('examQuestions.question', 'question')
+      .leftJoinAndSelect('question.chapter', 'chapter')
+      .leftJoinAndSelect('question.difficulty', 'difficulty')
+      .leftJoinAndSelect('exam.class', 'class')
+      .leftJoin('class.major', 'major')
+      .leftJoin('class.teachers', 'teacher')
+      .addSelect(['major.code', 'major.name', 'teacher.name'])
+      .addSelect(['teacher.name'])
+      .leftJoinAndSelect('exam.user', 'examUser')
+      .where('exam.id = :id', { id })
+      .getOne();
+
+    console.log('findOne', examEntity?.user, user);
+
     if (!examEntity) {
       throw new NotFoundException(`Exam with ID ${id} not found`);
     }
+
+    if (user) {
+      checkUserPermission(examEntity.user.id, user);
+    }
+
     return examEntity;
   }
 

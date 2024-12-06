@@ -213,7 +213,11 @@ export class UserService {
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const user = this.userRepository.create(createUserDto);
+    const user = this.userRepository.create({
+      ...createUserDto,
+      fullTextSearch: `${removeVietnameseDiacritics(createUserDto.code)} ${removeVietnameseDiacritics(createUserDto.name)}`,
+      role: createUserDto?.roleId ? { id: createUserDto.roleId } : null,
+    });
 
     return this.userRepository.save(user);
   }
