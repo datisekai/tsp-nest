@@ -46,6 +46,8 @@ export class QuestionService {
       .leftJoinAndSelect('question.chapter', 'chapter')
       .where('question.isDeleted = false')
       .leftJoin('question.user', 'user')
+      .leftJoin('question.major', 'major')
+      .leftJoin('major.teachers', 'teacher')
       .addSelect(['user.id']);
 
     if (difficultyId) {
@@ -59,9 +61,7 @@ export class QuestionService {
     }
 
     if (majorId) {
-      query
-        .leftJoin('question.major', 'major')
-        .andWhere('major.id = :majorId', { majorId });
+      query.andWhere('major.id = :majorId', { majorId });
     }
 
     if (questionType) {
@@ -86,6 +86,7 @@ export class QuestionService {
     }
 
     if (user.type !== UserType.MASTER && type === 'all') {
+      query.andWhere('teacher.id = :teacherId', { teacherId: user.id });
       query.andWhere(
         new Brackets((qb) => {
           qb.where('question.user.id = :userId', { userId: user.id }).orWhere(

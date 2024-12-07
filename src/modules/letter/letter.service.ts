@@ -71,10 +71,13 @@ export class LetterService {
 
     const queryBuilder = this.letterRepository
       .createQueryBuilder('letter')
-      .leftJoinAndSelect('letter.class', 'class')
+      .leftJoin('letter.class', 'class')
+      .addSelect(['class.name'])
+      .leftJoin('class.teachers', 'teacher')
       .leftJoin('class.major', 'major')
       .addSelect(['major.code', 'major.name'])
-      .leftJoinAndSelect('letter.user', 'user');
+      .leftJoin('letter.user', 'user')
+      .addSelect(['user.code', 'user.name']);
 
     if (status) {
       queryBuilder.andWhere('letter.status = :status', { status });
@@ -84,8 +87,12 @@ export class LetterService {
       queryBuilder.andWhere('letter.class.id = :classId', { classId });
     }
 
-    if (user.type !== UserType.MASTER) {
-      queryBuilder.andWhere('letter.user.id = :userId', { userId: user.id });
+    if (user.type == UserType.TEACHER) {
+      queryBuilder.andWhere('teacher.id = :userId', { userId: user.id });
+    }
+
+    if (user.type === UserType.STUDENT) {
+      queryBuilder.andWhere('user.id = :userId', { userId: user.id });
     }
 
     if (createdAt) {

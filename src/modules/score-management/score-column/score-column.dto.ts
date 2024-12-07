@@ -10,7 +10,6 @@ import {
 
 export class CreateScoreColumnDto {
   @ApiPropertyOptional()
-  @IsNumber()
   @IsOptional()
   id?: number;
 
@@ -20,7 +19,6 @@ export class CreateScoreColumnDto {
   name: string;
 
   @ApiProperty()
-  @IsNumber()
   @IsNotEmpty()
   weight: number;
 }
@@ -40,7 +38,6 @@ export class UpdateScoreColumnDto {
 export class CreateMultipleScoreColumnsDto {
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
   classId: number;
 
   @ApiProperty({

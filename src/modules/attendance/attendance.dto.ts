@@ -133,12 +133,10 @@ export class CreateAttendeeDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
   attendanceId: number;
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
   userId: number;
 }
 

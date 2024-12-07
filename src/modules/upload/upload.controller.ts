@@ -12,19 +12,17 @@ import { uploadFromBuffer } from '../../common/helpers/upload';
 import { JwtAuthGuard } from '../auth/guards';
 import { PermissionGuard } from '../auth/guards/permission.guard';
 import { Permissions } from '../../common/decorators';
-import {UploadService} from "./upload.service";
+import { UploadService } from './upload.service';
 
 @ApiTags(AppResource.UPLOAD)
 @Controller('api.upload')
 export class UploadController {
-  constructor(   private readonly uploadService: UploadService) {
-
-  }
+  constructor(private readonly uploadService: UploadService) {}
 
   @Post('image')
   @UseInterceptors(FileInterceptor('file'))
   uploadFile(@UploadedFile() file: Express.Multer.File) {
-    return this.uploadService.handleFileUpload(file);
+    return this.uploadService.handleImageUpload(file);
   }
 
   // @Post('/image')

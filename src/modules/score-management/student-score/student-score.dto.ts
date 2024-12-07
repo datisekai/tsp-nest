@@ -4,12 +4,10 @@ import { IsArray, IsNotEmpty, IsNumber, ValidateNested } from 'class-validator';
 
 export class CreateStudentScoreDto {
   @ApiProperty()
-  @IsNumber()
   @IsNotEmpty()
   studentId: number;
 
   @ApiProperty()
-  @IsNumber()
   @IsNotEmpty()
   scoreColumnId: number;
 

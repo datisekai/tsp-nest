@@ -53,7 +53,6 @@ export class CreateMajorDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
   facultyId: number; // ID của Faculty mà Major thuộc về
 
   @ApiPropertyOptional({ type: [UserData] })

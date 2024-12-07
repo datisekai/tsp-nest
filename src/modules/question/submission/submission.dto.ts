@@ -11,11 +11,9 @@ import {
 export class SubmitMultipleChoiceDto {
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
   examQuestionId: number;
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
   examId: number;
 
   @ApiProperty()
@@ -38,17 +36,14 @@ export class UpdateSubmissionDto {
 export class SubmitCodeDto {
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
   examQuestionId: number;
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
   examId: number;
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
   languageId: number;
 
   @ApiProperty()
@@ -60,12 +55,10 @@ export class SubmitCodeDto {
 export class SubmitCodeHtmlDto {
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
   examQuestionId: number;
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsNumber()
   examId: number;
 
   @ApiProperty()
@@ -75,7 +68,6 @@ export class SubmitCodeHtmlDto {
 
 export class RunTestCodeDto {
   @ApiProperty()
-  @IsNumber()
   @IsNotEmpty()
   language_id: number;
 

@@ -99,7 +99,9 @@ export class NotificationService {
 
     const queryBuilder = this.notificationRepository
       .createQueryBuilder('notification')
-      .innerJoin('notification.classes', 'class'); // Tham gia bảng trung gian với bảng Class
+      .innerJoin('notification.classes', 'class')
+      .leftJoin('class.major', 'major')
+      .addSelect(['major.code', 'major.name', 'class.name']); // Tham gia bảng trung gian với bảng Class
 
     // Tìm kiếm theo name nếu có
     if (name) {
