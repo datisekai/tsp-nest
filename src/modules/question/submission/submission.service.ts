@@ -212,6 +212,10 @@ export class SubmissionService {
       .where('submission.exam.id = :examId', { examId })
       .andWhere('submission.user.id = :userId', { userId: userId })
       .leftJoin('submission.examQuestion', 'examQuestion')
+      .leftJoin('submission.user', 'user')
+      .leftJoin('submission.exam', 'exam')
+      .leftJoin('exam.class', 'class')
+      .leftJoin('class.major', 'major')
       .select([
         'submission.id',
         'examQuestion.id',
@@ -220,6 +224,15 @@ export class SubmissionService {
         'submission.answer',
         'submission.questionTemp',
         'submission.codeHtml',
+        'user.code',
+        'user.name',
+        'exam.title',
+        'exam.duration',
+        'exam.startTime',
+        'exam.endTime',
+        'class.name',
+        'major.code',
+        'major.name',
       ]);
 
     if (exam.showResult && !isAdmin) {

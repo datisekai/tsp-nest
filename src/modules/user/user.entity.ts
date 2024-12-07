@@ -21,6 +21,7 @@ import { Role } from '../role/role.entity';
 import { StudentScore } from '../score-management/student-score/student-score.entity';
 import { UserType } from './user.dto';
 import { removeVietnameseDiacritics } from 'src/common/helpers';
+import { Exam } from '../exam/exam.entity';
 @Entity()
 // @Unique(['code'])
 export class User extends BaseEntity {
@@ -124,6 +125,9 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Attendance, (entity) => entity.user)
   attendances: Attendance[];
+
+  @OneToMany(() => Exam, (entity) => entity.user)
+  exams: Exam[];
 
   @OneToMany(() => Question, (entity) => entity.user)
   questions: Question[];

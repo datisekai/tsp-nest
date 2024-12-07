@@ -25,8 +25,8 @@ export class ChapterController {
 
   @Post()
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(AppPermission.QUESTION_CREATE)
-  @ApiPermissions(AppPermission.QUESTION_CREATE)
+  @Permissions(AppPermission.CHAPTER_CREATE)
+  @ApiPermissions(AppPermission.CHAPTER_CREATE)
   async createChapter(
     @Body() createChapterDto: CreateChapterDto,
     @User() user: UserEntity,
@@ -36,8 +36,8 @@ export class ChapterController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(AppPermission.QUESTION_DELETE)
-  @ApiPermissions(AppPermission.QUESTION_DELETE)
+  @Permissions(AppPermission.CHAPTER_DELETE)
+  @ApiPermissions(AppPermission.CHAPTER_DELETE)
   async deleteChapter(@Param('id') id: number, @User() user: UserEntity) {
     return this.chapterService.deleteChapter(id, user);
   }

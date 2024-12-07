@@ -41,6 +41,12 @@ export class UserController {
     return this.userService.findAll(queryDto);
   }
 
+  @Get('statistic')
+  @UseGuards(JwtAuthGuard)
+  async getStatistic(@User() user: UserEntity) {
+    return this.userService.statistic(user);
+  }
+
   @Get('search')
   @UseGuards(JwtAuthGuard)
   @UsePipes(new ValidationPipe({ transform: true })) // Automatically applies validation

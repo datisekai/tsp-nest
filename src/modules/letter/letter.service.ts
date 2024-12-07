@@ -22,8 +22,6 @@ export class LetterService {
   constructor(
     @InjectRepository(Letter)
     private readonly letterRepository: Repository<Letter>,
-    private readonly classService: ClassService,
-    private readonly userService: UserService,
   ) {}
 
   // Tạo một đơn
@@ -32,18 +30,13 @@ export class LetterService {
     userId: number,
   ): Promise<Letter> {
     const { type, reason, classId, image, time } = createLetterDto;
-    const classEntity = await this.classService.findOne(classId);
-    if (!classEntity) {
-      throw new NotFoundException(`Class with ID ${classId} not found`);
-    }
-    const user = await this.userService.findOne(userId);
 
     const letter = this.letterRepository.create({
       type,
       reason,
       status: LetterStatus.PENDING,
-      user,
-      class: classEntity,
+      user: { id: userId },
+      class: { id: classId },
       image,
       time,
     });
@@ -79,6 +72,8 @@ export class LetterService {
     const queryBuilder = this.letterRepository
       .createQueryBuilder('letter')
       .leftJoinAndSelect('letter.class', 'class')
+      .leftJoin('class.major', 'major')
+      .addSelect(['major.code', 'major.name'])
       .leftJoinAndSelect('letter.user', 'user');
 
     if (status) {
@@ -249,5 +244,31 @@ export class LetterService {
       .getManyAndCount();
 
     return { data, total };
+  }
+
+  getPendingLettersCount(userId: number) {
+    return this.letterRepository
+      .createQueryBuilder('letter')
+      .leftJoin('letter.class', 'class')
+      .leftJoin('class.teachers', 'teacher')
+      .where('teacher.id = :userId', { userId })
+      .andWhere('letter.status = :status', { status: 'pending' })
+      .getCount();
+  }
+
+  getPendingLetters(userId: number) {
+    return this.letterRepository
+      .createQueryBuilder('letter')
+      .leftJoin('letter.class', 'class')
+      .leftJoin('class.major', 'major')
+      .leftJoin('letter.user', 'user')
+      .addSelect(['user.code', 'user.name'])
+      .addSelect(['class.name', 'major.name', 'major.code'])
+      .leftJoin('class.teachers', 'teacher')
+      .addSelect(['teacher.code', 'teacher.name'])
+      .where('teacher.id = :userId', { userId })
+      .orderBy('letter.createdAt', 'DESC')
+      .limit(10)
+      .getMany();
   }
 }

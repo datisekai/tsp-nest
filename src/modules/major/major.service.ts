@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Major } from './major.entity';
@@ -20,6 +25,7 @@ export class MajorService {
     @InjectRepository(Major)
     private readonly majorRepository: Repository<Major>,
     private readonly facultyService: FacultyService,
+    @Inject(forwardRef(() => UserService)) // Dùng forwardRef ở đây
     private readonly userService: UserService,
   ) {}
 

@@ -26,6 +26,9 @@ export class Class extends BaseEntity {
   @Column({ type: 'varchar', length: 255, nullable: true })
   duration: string;
 
+  @Column({ type: 'varchar', length: 255, nullable: true, unique: true })
+  secretKey: string;
+
   @ManyToMany(() => User, (teacher) => teacher.teacherClasses)
   teachers: User[];
 

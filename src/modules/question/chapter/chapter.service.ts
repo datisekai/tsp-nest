@@ -39,7 +39,10 @@ export class ChapterService {
     dto: QueryChapterDto,
   ): Promise<{ data: Chapter[]; total: number }> {
     const { majorId, page = 1, limit = 10, pagination } = dto;
-    const query = this.chapterRepository.createQueryBuilder('chapter');
+    const query = this.chapterRepository
+      .createQueryBuilder('chapter')
+      .leftJoin('chapter.major', 'major')
+      .addSelect(['major.name', 'major.code']);
 
     if (majorId) {
       query.andWhere('chapter.major.id LIKE :majorId', { majorId });

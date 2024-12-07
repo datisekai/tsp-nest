@@ -42,6 +42,15 @@ export class ClassController {
     return this.classService.create(createClassDto);
   }
 
+  @Post('join-class/:secretKey')
+  @UseGuards(JwtAuthGuard)
+  async joinClass(
+    @Param('secretKey') secretKey: string,
+    @User() user: UserEntity,
+  ) {
+    return this.classService.joinClass(secretKey, user);
+  }
+
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.CLASS_CREATE)
   @ApiPermissions(AppPermission.CLASS_CREATE)

@@ -59,7 +59,7 @@ export class Exam extends BaseEntity {
   @OneToMany(() => Submission, (s) => s.exam)
   submissions: Submission[];
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.exams)
   @JoinColumn({ name: 'userId' })
   user: User;
 

@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MajorService } from '../major/major.service';
@@ -16,6 +22,7 @@ import {
   UpdateClassDto,
 } from './class.dto';
 import { Class } from './class.entity';
+import { randomString } from 'src/common/helpers/randomString';
 
 @Injectable()
 export class ClassService {
@@ -23,6 +30,7 @@ export class ClassService {
     @InjectRepository(Class)
     private readonly classRepository: Repository<Class>,
     private readonly majorService: MajorService,
+    @Inject(forwardRef(() => UserService)) // Dùng forwardRef ở đây
     private readonly userService: UserService,
   ) {}
 
@@ -64,9 +72,18 @@ export class ClassService {
       major,
       teachers,
       duration,
+      secretKey: randomString(6),
     });
 
     return this.classRepository.save(classEntity);
+  }
+
+  async getCountMyClass(user: User) {
+    return this.classRepository
+      .createQueryBuilder('class')
+      .leftJoinAndSelect('class.teachers', 'teacher')
+      .andWhere('teacher.id = :userId', { userId: user.id })
+      .getCount();
   }
 
   async findAll(
@@ -379,9 +396,31 @@ export class ClassService {
     queryBuilder.leftJoin('class.users', 'users');
     queryBuilder
       .leftJoin('class.major', 'major')
-      .addSelect(['major.name', 'major.code']);
+      .addSelect(['major.name', 'major.code'])
+      .leftJoin('class.teachers', 'teacher')
+      .addSelect(['teacher.code', 'teacher.name', 'teacher.phone']);
     queryBuilder.where('users.id = :userId', { userId: user.id });
     const data = await queryBuilder.getMany();
     return { data };
+  }
+
+  async joinClass(secretKey: string, user: User) {
+    const classEntity = await this.classRepository.findOne({
+      where: { secretKey },
+      relations: ['users'],
+    });
+    if (!classEntity) {
+      throw new NotFoundException(
+        `Class with secret key ${secretKey} not found`,
+      );
+    }
+
+    if (classEntity.users.some((item) => item.id === user.id)) {
+      throw new BadRequestException('User already in class');
+    }
+
+    classEntity.users.push(user);
+    await this.classRepository.save(classEntity);
+    return { data: true };
   }
 }

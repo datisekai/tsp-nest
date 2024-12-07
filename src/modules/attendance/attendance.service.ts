@@ -173,16 +173,37 @@ export class AttendanceService {
   }
 
   async findOne(id: number, user?: User): Promise<Attendance> {
-    const attendance = await this.attendanceRepository.findOne({
-      where: { id },
-      relations: ['user', 'class'],
-    });
-    if (user) {
-      checkUserPermission(attendance.user.id, user);
-    }
+    const queryBuilder =
+      this.attendanceRepository.createQueryBuilder('attendance');
+
+    const attendance = await queryBuilder
+      .leftJoin('attendance.user', 'user')
+      .addSelect(['user.name', 'user.code', 'user.id'])
+      .leftJoin('attendance.class', 'class')
+      .leftJoin('class.major', 'major')
+      .leftJoin('class.teachers', 'teachers')
+      .addSelect([
+        'teachers.name',
+        'teachers.code',
+        'major.name',
+        'major.code',
+        'user.id',
+        'user.name',
+        'user.code',
+        'class.id',
+        'class.name`',
+      ])
+      .where('attendance.id = :id', { id })
+      .getOne();
+
     if (!attendance) {
       throw new NotFoundException(`Attendance với ID ${id} không tồn tại`);
     }
+
+    if (user) {
+      checkUserPermission(attendance.user.id, user);
+    }
+
     return attendance;
   }
 
