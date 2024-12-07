@@ -141,7 +141,7 @@ export class User extends BaseEntity {
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
-    this.fullTextSearch = `${removeVietnameseDiacritics(this.code)} ${removeVietnameseDiacritics(this.name)}`;
+    this.fullTextSearch = `${removeVietnameseDiacritics(`${this.code}`)} ${removeVietnameseDiacritics(`${this.name}`)}`;
     if (!this.password) {
       return;
     }
