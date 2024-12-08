@@ -10,7 +10,7 @@ export class LanguageController {
   constructor(private readonly judge0Service: Judge0Service) {}
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   async findAll() {
     const languages = await this.judge0Service.getLanguages();
     return { data: languages };

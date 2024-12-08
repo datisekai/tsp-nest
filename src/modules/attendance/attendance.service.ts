@@ -187,11 +187,8 @@ export class AttendanceService {
         'teachers.code',
         'major.name',
         'major.code',
-        'user.id',
-        'user.name',
-        'user.code',
         'class.id',
-        'class.name`',
+        'class.name',
       ])
       .where('attendance.id = :id', { id })
       .getOne();
@@ -215,14 +212,14 @@ export class AttendanceService {
         'attendee.id',
         'attendee.createdAt',
         'attendee.isSuccess',
-        'user.code',
-        'user.name',
-        'user.email',
-        'user.phone',
-        'user.id',
+        'attendee_user.code',
+        'attendee_user.name',
+        'attendee_user.email',
+        'attendee_user.phone',
+        'attendee_user.id',
       ])
-      .where('attendee.attendanceId = :attendanceId', { attendanceId: id })
-      .leftJoin('attendee.user', 'user');
+      .where('attendee.attendance.id = :attendanceId', { attendanceId: id })
+      .leftJoin('attendee.user', 'attendee_user');
     const data = await query.getMany();
     return { data, attendance };
   }

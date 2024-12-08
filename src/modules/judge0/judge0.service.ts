@@ -63,16 +63,21 @@ export class Judge0Service {
     const whileListLanguage = [50, 54, 51, 62, 63, 64, 68, 70, 74, 72];
     if (!this.judgeUrl || !this.xAuthToken)
       throw new NotFoundException('Judge0 URL or API key not found');
-    const response = await axios.get(`${this.judgeUrl}/languages`, {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Auth-Token': this.xAuthToken,
-      },
-    });
+    try {
+      const response = await axios.get(`${this.judgeUrl}/languages`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Token': this.xAuthToken,
+        },
+      });
 
-    const languages = response.data.filter((language) =>
-      whileListLanguage.includes(language.id),
-    );
-    return languages;
+      const languages = response.data.filter((language) =>
+        whileListLanguage.includes(language.id),
+      );
+      return languages;
+    } catch (error) {
+      console.log('error', error);
+      return [];
+    }
   }
 }
