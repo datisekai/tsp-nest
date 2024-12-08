@@ -23,7 +23,4 @@ export class TestCase extends BaseEntity {
 
   @ManyToOne(() => Question, (question) => question.testCases)
   question: Question; // Liên kết với bài tập
-
-  @Column({ type: 'int' })
-  grade: number;
 }

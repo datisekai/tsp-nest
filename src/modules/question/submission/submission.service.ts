@@ -121,6 +121,7 @@ export class SubmissionService {
 
     console.log('examQuestion', examQuestion);
 
+    let isError = false;
     // Chạy từng test case với Judge0
     for (const testCase of examQuestion.question.testCases) {
       const result = await this.judge0Service.submitCode({
@@ -130,9 +131,13 @@ export class SubmissionService {
         stdin: testCase.input,
       });
       testResults[testCase.id] = result;
-      if (result.status.id == JUDGE0_SUCCESS_STATUS) {
-        grade += testCase.grade;
+      if (result.status.id != JUDGE0_SUCCESS_STATUS) {
+        isError = true;
       }
+    }
+
+    if (!isError) {
+      grade += examQuestion.score;
     }
 
     if (submission) {
