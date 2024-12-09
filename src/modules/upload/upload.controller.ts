@@ -25,23 +25,6 @@ export class UploadController {
     return this.uploadService.handleImageUpload(file);
   }
 
-  // @Post('/image')
-  // @ApiOperation({
-  //   summary: 'Upload Image',
-  // })
-  // @UseGuards(JwtAuthGuard, PermissionGuard)
-  // // @Permissions(AppPermission.UPLOAD_IMAGE)
-  // @UseInterceptors(FileInterceptor('file'))
-  // async uploadFile(@UploadedFile() file) {
-  //   try {
-  //     const result: any = await uploadFromBuffer(file, 'image');
-  //     return { url: result.secure_url };
-  //   } catch (error) {
-  //     console.log(error);
-  //     throw new Error('Failed to upload and process file');
-  //   }
-  // }
-
   @Post('/video')
   @ApiOperation({
     summary: 'Upload Video',

@@ -101,7 +101,7 @@ export class UpdateExamDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
-  duration?: string;
+  duration?: number;
 
   @IsOptional()
   @IsDateString()

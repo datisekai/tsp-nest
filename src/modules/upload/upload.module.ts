@@ -1,21 +1,17 @@
 import { Module } from '@nestjs/common';
-import { UploadController } from './upload.controller';
+import { MulterModule } from '@nestjs/platform-express';
+import * as multer from 'multer';
 import { PermissionModule } from '../permission/permission.module';
-import {MulterModule} from "@nestjs/platform-express";
-import {diskStorage} from "multer";
-import {UploadService} from "./upload.service";
-import * as path from "node:path";
+import { UploadController } from './upload.controller';
+import { UploadService } from './upload.service';
 
 @Module({
-  imports: [PermissionModule, MulterModule.register({
-    storage: diskStorage({
-      destination: path.join(__dirname, '..', '..', '..', 'public', 'uploads'),
-      filename: (req, file, cb) => {
-        const filename = `${Date.now()}-${file.originalname}`;
-        cb(null, filename);
-      },
+  imports: [
+    PermissionModule,
+    MulterModule.register({
+      storage: multer.memoryStorage(), // Sử dụng bộ nhớ tạm
     }),
-  }),],
+  ],
   controllers: [UploadController],
   providers: [UploadService],
   exports: [UploadService],
