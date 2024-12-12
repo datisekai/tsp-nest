@@ -48,7 +48,7 @@ export class QuestionService {
       .leftJoin('question.user', 'user')
       .leftJoin('question.major', 'major')
       .leftJoin('major.teachers', 'teacher')
-      .addSelect(['user.id']);
+      .addSelect(['user.id', 'major.code', 'major.name']);
 
     if (difficultyId) {
       query.andWhere('difficulty.id = :difficultyId', {
