@@ -123,7 +123,9 @@ export class User extends BaseEntity {
   })
   teacherClasses: Class[];
 
-  @OneToMany(() => Attendance, (entity) => entity.user)
+  @OneToMany(() => Attendance, (entity) => entity.user, {
+    onDelete: 'CASCADE',
+  })
   attendances: Attendance[];
 
   @OneToMany(() => Exam, (entity) => entity.user)
@@ -132,7 +134,9 @@ export class User extends BaseEntity {
   @OneToMany(() => Question, (entity) => entity.user)
   questions: Question[];
 
-  @OneToMany(() => Attendee, (entity) => entity.user)
+  @OneToMany(() => Attendee, (entity) => entity.user, {
+    onDelete: 'CASCADE',
+  })
   attendees: Attendee[];
 
   @OneToMany(() => StudentScore, (entity) => entity.student)

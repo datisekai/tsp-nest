@@ -41,7 +41,9 @@ export class Class extends BaseEntity {
   @OneToMany(() => Letter, (letter) => letter.user)
   letters: Letter[];
 
-  @OneToMany(() => Attendance, (attendance) => attendance.class)
+  @OneToMany(() => Attendance, (attendance) => attendance.class, {
+    onDelete: 'CASCADE',
+  })
   attendances: Attendance[];
 
   @OneToMany(() => ScoreColumn, (scoreColumn) => scoreColumn.class)

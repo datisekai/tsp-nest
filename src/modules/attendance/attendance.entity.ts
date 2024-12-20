@@ -25,10 +25,14 @@ export class Attendance extends BaseEntity {
   @Column({ type: 'varchar' })
   secretKey: string;
 
-  @ManyToOne(() => Class, (entity) => entity.attendances)
+  @ManyToOne(() => Class, (entity) => entity.attendances, {
+    onDelete: 'CASCADE',
+  })
   class: Class;
 
-  @OneToMany(() => Attendee, (entity) => entity.attendance)
+  @OneToMany(() => Attendee, (entity) => entity.attendance, {
+    onDelete: 'CASCADE',
+  })
   attendees: Attendee[];
 
   @ManyToOne(() => User, (entity) => entity.attendances)

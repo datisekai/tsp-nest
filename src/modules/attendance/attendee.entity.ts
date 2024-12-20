@@ -11,9 +11,13 @@ export class Attendee extends BaseEntity {
   @Column({ type: 'boolean', default: false })
   isSuccess: boolean;
 
-  @ManyToOne(() => Attendance, (entity) => entity.attendees)
+  @ManyToOne(() => Attendance, (entity) => entity.attendees, {
+    onDelete: 'CASCADE',
+  })
   attendance: Attendance;
 
-  @ManyToOne(() => User, (entity) => entity.attendees)
+  @ManyToOne(() => User, (entity) => entity.attendees, {
+    onDelete: 'CASCADE',
+  })
   user: User;
 }
