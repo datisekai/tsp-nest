@@ -152,8 +152,7 @@ export class AttendanceService {
       .leftJoin('attendance.user', 'user')
       .leftJoin('attendance.attendees', 'attendees')
       .leftJoin('attendees.user', 'attendee_user')
-      .leftJoin('attendance.location', 'location')
-      .addSelect(['location.id', 'location.name'])
+      .leftJoinAndSelect('attendance.location', 'location')
       .orderBy('attendance.createdAt', 'DESC'); // Sắp xếp theo createdAt (mới nhất trước)
 
     // Kiểm tra các điều kiện lọc
