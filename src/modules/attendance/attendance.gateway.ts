@@ -66,11 +66,27 @@ export class AttendanceGateway implements OnGatewayInit {
         location,
       };
       client.join(id.toString());
+      setTimeout(() => {
+        this.autoCloseRoom(id.toString());
+      }, 3600000);
+
       return this.generateSuccessResponse(
         'Tạo phòng thành công',
         this.rooms[id],
       );
     }
+
+    this.rooms[id] = {
+      id,
+      classId,
+      secretKey,
+      qrCode: '',
+      expirationTime: expirationTime, // 3 giây
+      lastGeneratedTime: 0,
+      attendees,
+      isOpen: false,
+      location,
+    };
     client.join(id.toString());
 
     return this.generateSuccessResponse('Tham gia phòng thành công', room);
@@ -102,10 +118,18 @@ export class AttendanceGateway implements OnGatewayInit {
 
     return this.generateSuccessResponse('Cập nhật thành công', { isOpen });
   }
+
+  private autoCloseRoom(id: string) {
+    const room = this.rooms[id];
+    if (!room || !room?.isOpen) {
+      return;
+    }
+
+    this.rooms[id] = null;
+  }
   private async generateQRCode(id: string) {
     const room = this.rooms[id];
-    console.log('generate', room);
-    if (!room.isOpen) {
+    if (!room || !room?.isOpen) {
       return;
     }
     // Tạo payload với id và thời gian hiện tại
