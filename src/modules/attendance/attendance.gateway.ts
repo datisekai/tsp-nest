@@ -101,7 +101,6 @@ export class AttendanceGateway implements OnGatewayInit {
       secretKey,
     }: { id: string; isOpen: boolean; secretKey: string },
   ) {
-    console.log('handleUpdateStatusRoom', isOpen, id, secretKey);
     const room = this.rooms[id];
     if (!room || (room && room.secretKey !== secretKey)) {
       return this.generateErrorResponse('Phòng không tồn tại');
@@ -207,6 +206,14 @@ export class AttendanceGateway implements OnGatewayInit {
         return this.generateErrorResponse('Sinh viên không thuộc lớp này.');
       }
 
+      console.log(
+        'location',
+        +location.latitude,
+        +location.longitude,
+        +room.location.latitude,
+        +room.location.longitude,
+      );
+
       //Kiểm tra vị trí
       const distance = haversine(
         +location.latitude,
@@ -214,6 +221,8 @@ export class AttendanceGateway implements OnGatewayInit {
         +room.location.latitude,
         +room.location.longitude,
       );
+
+      console.log('distance', distance);
       if (distance >= +room.location.accuracy) {
         return this.generateErrorResponse(
           'Sinh viên không nằm trong phạm vi điểm danh',
