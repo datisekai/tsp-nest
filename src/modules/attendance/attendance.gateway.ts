@@ -146,6 +146,12 @@ export class AttendanceGateway implements OnGatewayInit {
     if (!code || !qrCode || !location) {
       return this.generateErrorResponse('Vui lòng truyền đầy đủ thông tin.');
     }
+
+    if (location && (!location.latitude || !location.longitude)) {
+      return this.generateErrorResponse(
+        'Sinh viên không nằm trong phạm vi điểm danh.',
+      );
+    }
     // Giải mã mã QR để lấy classId
     const decoded: any = this.verifyQRCode(qrCode);
     if (!decoded.success) {
