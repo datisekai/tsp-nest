@@ -26,6 +26,11 @@ export interface AttendanceRoom {
   attendees: Attendee[];
   isOpen: boolean;
   secretKey: string;
+  location: {
+    latitude: number;
+    longitude: number;
+    accuracy: number;
+  };
 }
 
 export enum AttendanceMessage {

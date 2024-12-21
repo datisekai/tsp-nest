@@ -20,6 +20,7 @@ export enum AppResource {
   LANGUAGE = 'LANGUAGE',
   SCORE_COLUMN = 'SCORE_COLUMN',
   STUDENT_CORE = 'STUDENT_CORE',
+  LOCATION = 'LOCATION',
 }
 
 export enum AppPermission {
@@ -78,4 +79,8 @@ export enum AppPermission {
   STUDENT_SCORE_VIEW = 'student_score:view',
   CHAPTER_CREATE = 'chapter:create',
   CHAPTER_DELETE = 'chapter:delete',
+  LOCATION_VIEW = 'location:view',
+  LOCATION_CREATE = 'location:create',
+  LOCATION_UPDATE = 'location:update',
+  LOCATION_DELETE = 'location:delete',
 }

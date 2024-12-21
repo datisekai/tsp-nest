@@ -10,6 +10,7 @@ import {
 import { Class } from '../class/class.entity';
 import { User } from '../user/user.entity';
 import { Attendee } from './attendee.entity';
+import { Location } from '../location/location.entity';
 
 @Entity()
 export class Attendance extends BaseEntity {
@@ -43,6 +44,9 @@ export class Attendance extends BaseEntity {
 
   @Column({ type: 'int', default: 3000 })
   expirationTime: number;
+
+  @ManyToOne(() => Location, (entity) => entity.attendances)
+  location: Location;
 
   @Column({
     type: 'boolean',

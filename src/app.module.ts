@@ -24,6 +24,7 @@ import { UserModule } from './modules/user/user.module';
 import { LanguageModule } from './modules/language/language.module';
 import { ScoreManagementModule } from './modules/score-management/score-management.module';
 import { ExamModule } from './modules/exam/exam.module';
+import { LocationModule } from './modules/location/location.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { ExamModule } from './modules/exam/exam.module';
     LanguageModule,
     ScoreManagementModule,
     ExamModule,
+    LocationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

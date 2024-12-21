@@ -11,6 +11,7 @@ import { UserService } from '../user/user.service';
 import { AttendanceService } from './attendance.service';
 import { User } from '../user/user.entity';
 import { Attendee } from './attendance.dto';
+import { haversine } from 'src/common/helpers';
 
 @WebSocketGateway({ cors: true })
 export class AttendanceGateway implements OnGatewayInit {
@@ -36,6 +37,11 @@ export class AttendanceGateway implements OnGatewayInit {
       id: number;
       attendees?: Attendee[];
       expirationTime?: number;
+      location?: {
+        latitude: number;
+        longitude: number;
+        accuracy: number;
+      };
     },
   ) {
     const {
@@ -44,8 +50,8 @@ export class AttendanceGateway implements OnGatewayInit {
       secretKey,
       attendees = [],
       expirationTime = 3000,
+      location,
     } = data;
-    console.log('called', data);
     const room = this.rooms[id];
     if (!room) {
       this.rooms[id] = {
@@ -57,6 +63,7 @@ export class AttendanceGateway implements OnGatewayInit {
         lastGeneratedTime: 0,
         attendees,
         isOpen: false,
+        location,
       };
       client.join(id.toString());
       return this.generateSuccessResponse(
@@ -81,7 +88,6 @@ export class AttendanceGateway implements OnGatewayInit {
     console.log('handleUpdateStatusRoom', isOpen, id, secretKey);
     const room = this.rooms[id];
     if (!room || (room && room.secretKey !== secretKey)) {
-      console.log('roomNotFound', this.rooms, id);
       return this.generateErrorResponse('Phòng không tồn tại');
     }
     room.isOpen = isOpen;
@@ -127,8 +133,19 @@ export class AttendanceGateway implements OnGatewayInit {
   @SubscribeMessage(AttendanceMessage.CHECK_QRCODE)
   public async handleCheckQRCode(
     client: any,
-    { code, qrCode }: { code: string; qrCode: string },
+    {
+      code,
+      qrCode,
+      location,
+    }: {
+      code: string;
+      qrCode: string;
+      location: { latitude: number; longitude: number };
+    },
   ) {
+    if (!code || !qrCode || !location) {
+      return this.generateErrorResponse('Vui lòng truyền đầy đủ thông tin.');
+    }
     // Giải mã mã QR để lấy classId
     const decoded: any = this.verifyQRCode(qrCode);
     if (!decoded.success) {
@@ -157,6 +174,19 @@ export class AttendanceGateway implements OnGatewayInit {
       );
       if (!student) {
         return this.generateErrorResponse('Sinh viên không thuộc lớp này.');
+      }
+
+      //Kiểm tra vị trí
+      const distance = haversine(
+        +location.latitude,
+        +location.longitude,
+        +room.location.latitude,
+        +room.location.longitude,
+      );
+      if (distance >= +room.location.accuracy) {
+        return this.generateErrorResponse(
+          'Sinh viên không nằm trong phạm vi điểm danh',
+        );
       }
 
       // Thêm sinh viên vào danh sách attendees
