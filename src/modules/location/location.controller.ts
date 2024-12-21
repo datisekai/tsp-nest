@@ -13,10 +13,11 @@ import { Location } from './location.entity';
 import { CreateLocationDto, UpdateLocationDto } from './location.dto';
 import { JwtAuthGuard } from '../auth/guards';
 import { PermissionGuard } from '../auth/guards/permission.guard';
-import { Permissions } from 'src/common/decorators';
+import { Permissions, User } from 'src/common/decorators';
 import { AppPermission } from 'src/app.role';
 import { ApiPermissions } from 'src/common/decorators/api.decorator';
 import { ApiTags } from '@nestjs/swagger';
+import { User as UserEntity } from '../user/user.entity';
 
 @ApiTags('Location')
 @Controller('api.location')
@@ -27,8 +28,11 @@ export class LocationController {
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.LOCATION_CREATE)
   @ApiPermissions(AppPermission.LOCATION_CREATE)
-  async create(@Body() createLocationDto: CreateLocationDto) {
-    const created = await this.locationService.create(createLocationDto);
+  async create(
+    @Body() createLocationDto: CreateLocationDto,
+    @User() user: UserEntity,
+  ) {
+    const created = await this.locationService.create(createLocationDto, user);
     return { data: created };
   }
 

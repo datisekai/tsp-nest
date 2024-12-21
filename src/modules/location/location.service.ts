@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Location } from './location.entity';
 import { CreateLocationDto, UpdateLocationDto } from './location.dto';
+import { User } from '../user/user.entity';
 
 @Injectable()
 export class LocationService {
@@ -12,14 +13,23 @@ export class LocationService {
   ) {}
 
   // Create a new location
-  async create(createLocationDto: CreateLocationDto) {
-    const location = this.locationRepository.create(createLocationDto);
+  async create(createLocationDto: CreateLocationDto, user: User) {
+    const location = this.locationRepository.create({
+      ...createLocationDto,
+      user: { id: user.id },
+    });
     return await this.locationRepository.save(location);
   }
 
   // Get all locations
   async findAll(): Promise<Location[]> {
-    return this.locationRepository.find({ where: { isDeleted: false } });
+    const queryBuilder = this.locationRepository
+      .createQueryBuilder('location')
+      .leftJoin('location.user', 'user')
+      .addSelect(['user.name', 'user.code', 'user.id']);
+
+    const locations = await queryBuilder.getMany();
+    return locations;
   }
 
   // Get a location by ID
