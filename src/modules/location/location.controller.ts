@@ -27,42 +27,47 @@ export class LocationController {
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.LOCATION_CREATE)
   @ApiPermissions(AppPermission.LOCATION_CREATE)
-  create(@Body() createLocationDto: CreateLocationDto): Promise<Location> {
-    return this.locationService.create(createLocationDto);
+  async create(@Body() createLocationDto: CreateLocationDto) {
+    const created = await this.locationService.create(createLocationDto);
+    return { data: created };
   }
 
   @Get()
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.LOCATION_VIEW)
   @ApiPermissions(AppPermission.LOCATION_VIEW)
-  findAll(): Promise<Location[]> {
-    return this.locationService.findAll();
+  async findAll() {
+    const locations = await this.locationService.findAll();
+    return { data: locations };
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.LOCATION_VIEW)
   @ApiPermissions(AppPermission.LOCATION_VIEW)
-  findOne(@Param('id') id: number): Promise<Location> {
-    return this.locationService.findOne(id);
+  async findOne(@Param('id') id: number) {
+    const location = await this.locationService.findOne(id);
+    return { data: location };
   }
 
   @Put(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.LOCATION_UPDATE)
   @ApiPermissions(AppPermission.LOCATION_UPDATE)
-  update(
+  async update(
     @Param('id') id: number,
     @Body() updateLocationDto: UpdateLocationDto,
-  ): Promise<Location> {
-    return this.locationService.update(id, updateLocationDto);
+  ) {
+    const location = await this.locationService.update(id, updateLocationDto);
+    return { data: location };
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Permissions(AppPermission.LOCATION_DELETE)
   @ApiPermissions(AppPermission.LOCATION_DELETE)
-  remove(@Param('id') id: number) {
-    return this.locationService.remove(id);
+  async remove(@Param('id') id: number) {
+    const location = await this.locationService.remove(id);
+    return { data: location };
   }
 }
