@@ -46,6 +46,10 @@ export class UpdateLetterStatusDto {
   @ApiProperty()
   @IsEnum(LetterStatus)
   status: LetterStatus; // Trạng thái đơn: chờ duyệt, đã duyệt, từ chối
+
+  @ApiPropertyOptional()
+  @IsString()
+  note: string;
 }
 
 export class QueryLetterDto extends PaginationDto {

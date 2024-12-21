@@ -31,6 +31,9 @@ export class Letter extends BaseEntity {
   @Column({ type: 'enum', enum: LetterStatus, default: LetterStatus.PENDING })
   status: LetterStatus; // Trạng thái đơn: chờ duyệt, đã duyệt, từ chối
 
+  @Column({ type: 'text', nullable: true })
+  note: string;
+
   @ManyToOne(() => User, (user) => user.letters)
   user: User; // Người tạo đơn
 

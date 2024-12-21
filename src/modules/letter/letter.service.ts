@@ -51,6 +51,7 @@ export class LetterService {
   ): Promise<Letter> {
     const letter = await this.findOne(id);
     letter.status = updateLetterStatusDto.status;
+    letter.note = updateLetterStatusDto.note;
     return this.letterRepository.save(letter);
   }
 
