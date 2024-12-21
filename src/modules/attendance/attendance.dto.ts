@@ -75,6 +75,10 @@ export class CreateAttendanceDto {
     return value;
   })
   classId?: number;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  locationId: number;
 }
 
 export class UpdateAttendanceDto extends PartialType(CreateAttendanceDto) {}
@@ -101,6 +105,11 @@ export class QueryAttendanceDto extends PaginationDto {
     return value;
   })
   classId?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  locationId?: string;
 }
 
 export class QueryAttendeeDto extends PaginationDto {

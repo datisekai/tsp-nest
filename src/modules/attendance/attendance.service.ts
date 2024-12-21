@@ -15,6 +15,7 @@ import { User } from '../user/user.entity';
 import { UserType } from '../user/user.dto';
 import { checkUserPermission } from 'src/common/helpers/checkPermission';
 import { ClassService } from '../class/class.service';
+import { LocationService } from '../location/location.service';
 
 @Injectable()
 export class AttendanceService {
@@ -24,6 +25,7 @@ export class AttendanceService {
     @InjectRepository(Attendee)
     private readonly attendeeRepository: Repository<Attendee>,
     private readonly classService: ClassService,
+    private readonly locationService: LocationService,
   ) {}
 
   async create(
@@ -36,6 +38,7 @@ export class AttendanceService {
       user: { id: userId },
       secretKey,
       class: { id: createAttendanceDto.classId },
+      location: { id: createAttendanceDto.locationId },
     });
     return await this.attendanceRepository.save(attendance);
   }
@@ -108,7 +111,15 @@ export class AttendanceService {
     dto: QueryAttendanceDto,
     user: User,
   ): Promise<{ data: Attendance[]; total: number }> {
-    const { title, isOpen, classId, limit = 10, page = 1, pagination } = dto;
+    const {
+      title,
+      isOpen,
+      classId,
+      limit = 10,
+      page = 1,
+      pagination,
+      locationId,
+    } = dto;
     const query = this.attendanceRepository
       .createQueryBuilder('attendance')
       .select([
@@ -141,6 +152,8 @@ export class AttendanceService {
       .leftJoin('attendance.user', 'user')
       .leftJoin('attendance.attendees', 'attendees')
       .leftJoin('attendees.user', 'attendee_user')
+      .leftJoin('attendance.location', 'location')
+      .addSelect(['location.id', 'location.name'])
       .orderBy('attendance.createdAt', 'DESC'); // Sắp xếp theo createdAt (mới nhất trước)
 
     // Kiểm tra các điều kiện lọc
@@ -158,6 +171,10 @@ export class AttendanceService {
 
     if (user.type !== UserType.MASTER) {
       query.andWhere('attendance.user.id = :userId', { userId: user.id });
+    }
+
+    if (locationId) {
+      query.andWhere('location.id = :locationId', { locationId });
     }
 
     if (pagination) {
@@ -270,6 +287,12 @@ export class AttendanceService {
     user?: User,
   ): Promise<Attendance> {
     const attendance = await this.findOne(id, user);
+    if (updateAttendanceDto.locationId) {
+      const location = await this.locationService.findOne(
+        updateAttendanceDto.locationId,
+      );
+      attendance.location = location;
+    }
     Object.assign(attendance, updateAttendanceDto);
     return await this.attendanceRepository.save(attendance);
   }
