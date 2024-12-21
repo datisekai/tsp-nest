@@ -45,7 +45,9 @@ export class UserService {
       pagination,
     } = queryDto;
 
-    const queryBuilder = this.userRepository.createQueryBuilder('user');
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
+      .where('user.isDeleted = :isDeleted', { isDeleted: false });
 
     // Add filters dynamically
     if (code) {
@@ -230,7 +232,8 @@ export class UserService {
 
   async delete(id: number): Promise<User> {
     const user = await this.findOne(id);
-    return this.userRepository.remove(user);
+    user.isDeleted = true;
+    return this.userRepository.save(user);
   }
 
   async resetDevice(id: number): Promise<User> {

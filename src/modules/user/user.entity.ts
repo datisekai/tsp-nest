@@ -22,6 +22,7 @@ import { StudentScore } from '../score-management/student-score/student-score.en
 import { UserType } from './user.dto';
 import { removeVietnameseDiacritics } from 'src/common/helpers';
 import { Exam } from '../exam/exam.entity';
+import { Location } from '../location/location.entity';
 @Entity()
 // @Unique(['code'])
 export class User extends BaseEntity {
@@ -142,6 +143,9 @@ export class User extends BaseEntity {
   @OneToMany(() => StudentScore, (entity) => entity.student)
   studentScores: StudentScore[];
 
+  @OneToMany(() => Location, (entity) => entity.user)
+  locations: Location[];
+
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
@@ -151,4 +155,7 @@ export class User extends BaseEntity {
     }
     this.password = await hash(this.password, 10);
   }
+
+  @Column({ type: 'boolean', default: false })
+  isDeleted: boolean;
 }

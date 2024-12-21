@@ -1,6 +1,13 @@
 import { BaseEntity } from 'src/common/entities/base.entity';
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToOne,
+} from 'typeorm';
 import { Attendance } from '../attendance/attendance.entity';
+import { User } from '../user/user.entity';
 
 @Entity()
 export class Location extends BaseEntity {
@@ -24,4 +31,7 @@ export class Location extends BaseEntity {
 
   @OneToMany(() => Attendance, (entity) => entity.location)
   attendances: Attendance[];
+
+  @ManyToOne(() => User, (entity) => entity.locations)
+  user: User;
 }
