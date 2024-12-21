@@ -77,15 +77,8 @@ export class AttendanceGateway implements OnGatewayInit {
     }
 
     this.rooms[id] = {
-      id,
-      classId,
-      secretKey,
-      qrCode: '',
-      expirationTime: expirationTime, // 3 giây
-      lastGeneratedTime: 0,
-      attendees,
-      isOpen: false,
-      location,
+      ...room,
+      ...data,
     };
     client.join(id.toString());
 
@@ -223,6 +216,7 @@ export class AttendanceGateway implements OnGatewayInit {
       );
 
       console.log('distance', distance);
+      console.log('accuracy', room.location);
       if (distance >= +room.location.accuracy) {
         return this.generateErrorResponse(
           'Sinh viên không nằm trong phạm vi điểm danh',
