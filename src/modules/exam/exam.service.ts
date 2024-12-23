@@ -297,7 +297,7 @@ export class ExamService {
     return examEntity;
   }
 
-  async joinExam(id: number, user: User): Promise<Exam> {
+  async joinExam(id: number, user: User) {
     const query = this.examRepository
       .createQueryBuilder('exam')
       .select([
@@ -340,7 +340,7 @@ export class ExamService {
         `You have submitted or exam with ID ${id} not found`,
       );
 
-    const examLog = await this.examLogRepository.findOne({
+    let examLog = await this.examLogRepository.findOne({
       where: {
         student: {
           id: user.id,
@@ -361,6 +361,10 @@ export class ExamService {
       throw new NotFoundException(`You have submitted.`);
     }
 
+    if (!examLog) {
+      examLog = await this.updateStartTimeLog(id, user.id);
+    }
+
     exam.examQuestions.forEach((eq) => {
       eq.question.choices = eq.question.choices?.map((c) => {
         return { text: c.text };
@@ -368,9 +372,8 @@ export class ExamService {
     });
 
     // exam.examQuestions = await this.examQuestionRepository.find({where:{exam: {id}}});
-    await this.updateStartTimeLog(id, user.id);
 
-    return exam;
+    return { ...exam, logStartTime: examLog.startTime || null };
   }
 
   async getTakeOrderQuestionOfExam(id: number, user: User) {
@@ -468,8 +471,9 @@ export class ExamService {
         student: { id: studentId },
         startTime: new Date(),
       });
-      await this.examLogRepository.save(newExamLog);
+      return await this.examLogRepository.save(newExamLog);
     }
+    return examLog;
   }
 
   async updateEndTimeLog(examId: number, studentId: number) {
